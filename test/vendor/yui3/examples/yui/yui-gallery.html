@@ -1,0 +1,216 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: The YUI Global Object: Natively use YUI Gallery Modules</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+
+<!--there is no custom header content for this example-->
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-debug.js"></script>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: The YUI Global Object: Natively use YUI Gallery Modules</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>The YUI Global Object: Natively use YUI Gallery Modules</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example shows how to natively use a YUI Gallery module.</p>
+<p>It will load images from Flickr using the Gallery YQL module.</p>
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="yui-gallery_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	
+<style>
+#results img {
+    margin: .5em;
+    border: 1px solid black;
+}
+
+#results {
+    border: 1px solid black;
+    margin: 1em;
+    padding: 1em;
+}
+</style>
+
+<div id="results">Loading photos from YQL, please wait...</div>
+
+
+<script>
+YUI({filter:"debug", logInclude: {example:true}}).use('node', 'gallery-yql', function(Y) {
+    new Y.yql('select * from flickr.photos.search where tags = "yuiconf2009"', function(r) {
+        if (r.query) {
+            if (r.query.results) {
+                var res = Y.one('#results');
+                res.set('innerHTML', '');
+                Y.each(r.query.results.photo, function(v) {
+                    var img = '<img src="http:/'+'/static.flickr.com/' + v.server + '/' + v.id + '_' + v.secret + '_s.jpg">';
+                    res.append('<a href="http://flickr.com/photos/' + v.owner + '/' + v.id + '" title="' + v.title + '">' + img + '</a>');
+                });
+            }
+        }
+    });
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Loading Gallery Modules</h3>
+<p>If a Gallery module has been pushed to the CDN, it will be available to use as a first class
+YUI 3 module.</p>
+<p>To load a Gallery module, simply add its module name to your <code>YUI().use</code> call. In the code
+sample below we are using the <code>gallery-yql</code> module.</p>
+
+<div id="syntax-15f44a47453f6787ef258ce0aa2899f0" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'gallery-yql'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//Y.yql is available here</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'gallery-yql'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">//Y.yql is available here</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;</pre></div><textarea id="syntax-15f44a47453f6787ef258ce0aa2899f0-plain">YUI().use('gallery-yql', function(Y) {
+    //Y.yql is available here
+});
+</textarea></div>
+<h3>Flickr/YQL example</h3>
+<p>This simple example demonstrates using YQL to fetch images from Flickr by tag.</p>
+<p><strong>Note: </strong> We are using the YQL Gallery module directly from the <code>use</code> statement, no configuration needed.</p>
+<div id="syntax-f66857bb06c69ae53a6f49b2d656656e" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="sy0">,</span> <span class="st0">'gallery-yql'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">new</span> Y.<span class="me1">yql</span><span class="br0">&#40;</span><span class="st0">'select * from flickr.photos.search where tags = &quot;yuiconf2009&quot;'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>r<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>r.<span class="me1">query</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">if</span> <span class="br0">&#40;</span>r.<span class="me1">query</span>.<span class="me1">results</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                <span class="kw2">var</span> res <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#results'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                res.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span> <span class="st0">''</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                Y.<span class="me1">each</span><span class="br0">&#40;</span>r.<span class="me1">query</span>.<span class="me1">results</span>.<span class="me1">photo</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>v<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    <span class="kw2">var</span> img <span class="sy0">=</span> <span class="st0">'&lt;img src=&quot;http:/'</span><span class="sy0">+</span><span class="st0">'/static.flickr.com/'</span> <span class="sy0">+</span> v.<span class="me1">server</span> <span class="sy0">+</span> <span class="st0">'/'</span> <span class="sy0">+</span> v.<span class="me1">id</span> <span class="sy0">+</span> <span class="st0">'_'</span> <span class="sy0">+</span> v.<span class="me1">secret</span> <span class="sy0">+</span> <span class="st0">'_s.jpg&quot;&gt;'</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                    res.<span class="me1">append</span><span class="br0">&#40;</span><span class="st0">'&lt;a href=&quot;http://flickr.com/photos/'</span> <span class="sy0">+</span> v.<span class="me1">owner</span> <span class="sy0">+</span> <span class="st0">'/'</span> <span class="sy0">+</span> v.<span class="me1">id</span> <span class="sy0">+</span> <span class="st0">'&quot; title=&quot;'</span> <span class="sy0">+</span> v.<span class="me1">title</span> <span class="sy0">+</span> <span class="st0">'&quot;&gt;'</span> <span class="sy0">+</span> img <span class="sy0">+</span> <span class="st0">'&lt;/a&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">                <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="sy0">,</span> <span class="st0">'gallery-yql'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">new</span> Y.<span class="me1">yql</span><span class="br0">&#40;</span><span class="st0">'select * from flickr.photos.search where tags = &quot;yuiconf2009&quot;'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>r<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span>r.<span class="me1">query</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">if</span> <span class="br0">&#40;</span>r.<span class="me1">query</span>.<span class="me1">results</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="kw2">var</span> res <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#results'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                res.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span> <span class="st0">''</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                Y.<span class="me1">each</span><span class="br0">&#40;</span>r.<span class="me1">query</span>.<span class="me1">results</span>.<span class="me1">photo</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>v<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    <span class="kw2">var</span> img <span class="sy0">=</span> <span class="st0">'&lt;img src=&quot;http:/'</span><span class="sy0">+</span><span class="st0">'/static.flickr.com/'</span> <span class="sy0">+</span> v.<span class="me1">server</span> <span class="sy0">+</span> <span class="st0">'/'</span> <span class="sy0">+</span> v.<span class="me1">id</span> <span class="sy0">+</span> <span class="st0">'_'</span> <span class="sy0">+</span> v.<span class="me1">secret</span> <span class="sy0">+</span> <span class="st0">'_s.jpg&quot;&gt;'</span><span class="sy0">;</span>
+                    res.<span class="me1">append</span><span class="br0">&#40;</span><span class="st0">'&lt;a href=&quot;http://flickr.com/photos/'</span> <span class="sy0">+</span> v.<span class="me1">owner</span> <span class="sy0">+</span> <span class="st0">'/'</span> <span class="sy0">+</span> v.<span class="me1">id</span> <span class="sy0">+</span> <span class="st0">'&quot; title=&quot;'</span> <span class="sy0">+</span> v.<span class="me1">title</span> <span class="sy0">+</span> <span class="st0">'&quot;&gt;'</span> <span class="sy0">+</span> img <span class="sy0">+</span> <span class="st0">'&lt;/a&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;</pre></div><textarea id="syntax-f66857bb06c69ae53a6f49b2d656656e-plain">YUI().use('node', 'gallery-yql', function(Y) {
+    new Y.yql('select * from flickr.photos.search where tags = "yuiconf2009"', function(r) {
+        if (r.query) {
+            if (r.query.results) {
+                var res = Y.one('#results');
+                res.set('innerHTML', '');
+                Y.each(r.query.results.photo, function(v) {
+                    var img = '<img src="http:/'+'/static.flickr.com/' + v.server + '/' + v.id + '_' + v.secret + '_s.jpg">';
+                    res.append('<a href="http://flickr.com/photos/' + v.owner + '/' + v.id + '" title="' + v.title + '">' + img + '</a>');
+                });
+            }
+        }
+    });
+});
+</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    The YUI Global Object Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../yui/yui-core.html'>YUI Core</a></li><li><a href='../yui/yui-more.html'>Load All Modules</a></li><li><a href='../yui/yui-multi.html'>Multiple Instances</a></li><li><a href='../yui/yui-loader-ext.html'>YUI Loader - Dynamically Adding YUI and External Modules</a></li><li><a href='../yui/yui-extend.html'>Create Class Hierarchies with <code>extend</code></a></li><li><a href='../yui/yui-augment.html'>Compose Classes of Objects with <code>augment</code></a></li><li><a href='../yui/yui-mix.html'>Add Behaviors to Objects with <code>mix</code></a></li><li><a href='../yui/yui-merge.html'>Combine Data Sets with <code>merge</code></a></li><li><a href='../yui/yui-isa.html'>Check Data Types with <code>Lang</code></a></li><li><a href='../yui/yui-ua.html'>Browser Detection with <code>UA</code></a></li><li><a href='../yui/yui-compat.html'>YUI 2 in 3</a></li><li class='selected'><a href='../yui/yui-gallery.html'>Natively use YUI Gallery Modules</a></li><li><a href='../yui/yui-gallery2.html'>YUI 2 in 3 &amp; Gallery Modules</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More The YUI Global Object Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/yui/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_yui.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="selected "><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {filter:"debug", logInclude: {example:true}};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

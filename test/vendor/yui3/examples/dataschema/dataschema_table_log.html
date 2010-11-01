@@ -1,0 +1,421 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: DataSchema Utility: DataSchema.XML for HTML Tables</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+/* custom styles for this example */
+#demo .output {margin-bottom:1em; padding:10px; border:1px solid #D9D9D9;}
+#complex tbody, #complex thead {
+    border:3px solid #CCC;
+}
+</style>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: DataSchema Utility: DataSchema.XML for HTML Tables</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>DataSchema Utility: DataSchema.XML for HTML Tables</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	DataSchema.XML can be used to retrieve data held in HTML TABLE elements.
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="dataschema_table_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<form id="demo">
+    <h4>Simple Table</h4>
+    <h6>Data</h6>
+
+    <table id="simple">
+    <tr>
+        <td>coffee</td>
+        <td>1.25</td>
+    </tr>
+    <tr>
+        <td>juice</td>
+        <td>2.00</td>
+    </tr>
+    <tr>
+        <td>tea</td>
+        <td>1.25</td>
+    </tr>
+    <tr>
+        <td>soda</td>
+        <td>1.00</td>
+    </tr>
+    </table>
+
+    
+    <h6>Schema</h6>
+    <pre>
+{
+    // Each record is held in a TR
+    resultListLocator: "tr",
+    // Note that the XPath indexes are 1-based!
+    resultFields: [{key:"beverage", locator:"td[1]"}, {key:"price", locator:"td[2]"}]
+}
+    </pre>
+
+    <h6>Normalized data</h6>
+    <input type="button" id="demo_apply_basic" value="Apply schema =>">
+    <div id="demo_output_basic" class="output"></div>
+
+    <h4>Complex table</h4>
+    <h6>Data</h6>
+
+    <table id="complex">
+    <thead>
+        <tr>
+            <th>item</th>
+            <th>price</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>hamburger</td>
+            <td>4.00</td>
+        </tr>
+        <tr>
+            <td>cheeseburger</td>
+            <td>4.50</td>
+        </tr>
+        <tr>
+            <td>veggie burger</td>
+            <td>4.00</td>
+        </tr>
+        <tr>
+            <td>salmon burger</td>
+            <td>5.00</td>
+        </tr>
+    </tbody>
+    <tbody>
+        <tr>
+            <td>french fries</td>
+            <td>1.50</td>
+        </tr>
+        <tr>
+            <td>onion rings</td>
+            <td>2.00</td>
+        </tr>
+        <tr>
+            <td>fruit salad</td>
+            <td>2.50</td>
+        </tr>
+        <tr>
+            <td>side salad</td>
+            <td>2.00</td>
+        </tr>
+    </tbody>
+    <tbody>
+        <tr>
+            <td>coffee</td>
+            <td>1.25</td>
+        </tr>
+        <tr>
+            <td>juice</td>
+            <td>2.00</td>
+        </tr>
+        <tr>
+            <td>tea</td>
+            <td>1.25</td>
+        </tr>
+        <tr>
+            <td>soda</td>
+            <td>1.00</td>
+        </tr>
+    </tbody>
+    </table>
+
+    <h6>Schema</h6>
+    <pre>
+// This schema is dynamically generated
+{
+    // Each record is held in a TR
+    resultListLocator: "tr",
+    // Note that the XPath indexes are 1-based!
+    resultFields: [{key:"beverage", locator:"td[1]"}, {key:"price", locator:"td[2]"}]
+}
+    </pre>
+
+    <h6>Normalized data</h6>
+    <input type="button" id="demo_apply_complex" value="Apply schema =>">
+    <div id="demo_output_complex" class="output"></div>
+</form>
+
+
+<script type="text/javascript">
+YUI().use("dump", "node", "datatype-xml", "dataschema-xml", function (Y) {
+    Y.on("click", function(e){
+        var tableEl = Y.Node.getDOMNode(Y.one("#simple")),
+            schema = {
+                // Each record is held in a TR
+                resultListLocator: "tr",
+                // Note that the XPath indexes are 1-based!
+                resultFields: [{key:"beverage", locator:"td[1]"}, {key:"price", locator:"td[2]"}]
+            };
+        Y.one("#demo_output_basic").setContent(Y.dump(Y.DataSchema.XML.apply(schema, tableEl)));
+    }, "#demo_apply_basic");
+
+
+    Y.on("click", function(e){
+        // This function generates a schema based on contents of a TABLE element
+        var getSchemaFromTableNode = function(tableNode) {
+            var fields = [],
+                // Each record is held in a TR
+                schema = {resultListLocator:"tr"},
+                // Each field name is held in a TH
+                thList = tableNode.queryAll("th");
+                
+            // Generate field definitions based on TH
+            thList.each(function(thNode, i){
+                // Note that the XPath indexes are 1-based!
+                fields.push({key:thNode.get("text"), locator:"td["+(i+1)+"]"});
+            });
+            schema.resultFields = fields;
+            return schema;
+        };
+        
+        var tableNode = Y.one("#complex"),
+            // Generate schema dynamically
+            schema = getSchemaFromTableNode(tableNode),
+            // Create a temporary TBODY container to hold all data TRs
+            tbody = document.createElement("tbody"),
+            tbodyContainer = document.createDocumentFragment().appendChild(tbody);
+
+        // Grab each TR in a TBODY but don't include TRs from the THEAD
+        Y.all("#complex tbody tr").each(function(trNode, i){
+            // Cloning the TR keeps it in the document (optional)
+            // Append each TR to the container
+            tbodyContainer.appendChild(Y.Node.getDOMNode(trNode).cloneNode(true));
+        })
+
+        Y.one("#demo_output_complex").setContent(Y.dump(Y.DataSchema.XML.apply(schema, tbodyContainer)));
+    }, "#demo_apply_complex");
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<p>DataSource.XML's <code>apply()</code> method supports passing in DOM nodes or document fragments. Use XPath strings to define data locations. In this example, we are retrieving data held in the rows of a TABLE element.</p>
+
+<div id="syntax-c5ec55070077b4fdc1c969d58d55178a" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;dataschema-xml&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> tableEl <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">getDOMNode</span><span class="br0">&#40;</span>Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#simple&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        schema <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="co1">// Each record is held in a TR</span></div></li><li class="li2"><div class="de2">            resultListLocator<span class="sy0">:</span> <span class="st0">&quot;tr&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            <span class="co1">// Note that the XPath indexes are 1-based!</span></div></li><li class="li1"><div class="de1">            resultFields<span class="sy0">:</span> <span class="br0">&#91;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#123;</span>key<span class="sy0">:</span><span class="st0">&quot;beverage&quot;</span><span class="sy0">,</span> locator<span class="sy0">:</span><span class="st0">&quot;td[1]&quot;</span><span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#123;</span>key<span class="sy0">:</span><span class="st0">&quot;price&quot;</span><span class="sy0">,</span> locator<span class="sy0">:</span><span class="st0">&quot;td[2]&quot;</span><span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">            <span class="br0">&#93;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        data_out <span class="sy0">=</span> Y.<span class="me1">DataSchema</span>.<span class="me1">XML</span>.<span class="me1">apply</span><span class="br0">&#40;</span>schema<span class="sy0">,</span> tableEl<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw3">alert</span><span class="br0">&#40;</span>data_out<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;dataschema-xml&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> tableEl <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">getDOMNode</span><span class="br0">&#40;</span>Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#simple&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        schema <span class="sy0">=</span> <span class="br0">&#123;</span>
+            <span class="co1">// Each record is held in a TR</span>
+            resultListLocator<span class="sy0">:</span> <span class="st0">&quot;tr&quot;</span><span class="sy0">,</span>
+            <span class="co1">// Note that the XPath indexes are 1-based!</span>
+            resultFields<span class="sy0">:</span> <span class="br0">&#91;</span>
+                <span class="br0">&#123;</span>key<span class="sy0">:</span><span class="st0">&quot;beverage&quot;</span><span class="sy0">,</span> locator<span class="sy0">:</span><span class="st0">&quot;td[1]&quot;</span><span class="br0">&#125;</span><span class="sy0">,</span>
+                <span class="br0">&#123;</span>key<span class="sy0">:</span><span class="st0">&quot;price&quot;</span><span class="sy0">,</span> locator<span class="sy0">:</span><span class="st0">&quot;td[2]&quot;</span><span class="br0">&#125;</span>
+            <span class="br0">&#93;</span>
+        <span class="br0">&#125;</span><span class="sy0">,</span>
+        data_out <span class="sy0">=</span> Y.<span class="me1">DataSchema</span>.<span class="me1">XML</span>.<span class="me1">apply</span><span class="br0">&#40;</span>schema<span class="sy0">,</span> tableEl<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw3">alert</span><span class="br0">&#40;</span>data_out<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-c5ec55070077b4fdc1c969d58d55178a-plain">YUI().use("dataschema-xml", function(Y) {
+    var tableEl = Y.Node.getDOMNode(Y.one("#simple")),
+        schema = {
+            // Each record is held in a TR
+            resultListLocator: "tr",
+            // Note that the XPath indexes are 1-based!
+            resultFields: [
+                {key:"beverage", locator:"td[1]"},
+                {key:"price", locator:"td[2]"}
+            ]
+        },
+        data_out = Y.DataSchema.XML.apply(schema, tableEl));
+
+    alert(data_out);
+});</textarea></div>
+<p>If the table has a THEAD element and/or multiple TBODY elements, special considerations must be taken to apply the schema to the appropriate collection of TR elements. In the following complex example we leverage the power of the Node API to</p>
+
+<ul>
+    <li>Access the contents of the THEAD to generate our schema dynamically;</li>
+    <li>and access only the TR elements contained in TBODY elements for data values, ignoring those TR elements in the THEAD.</li>
+</ul>
+
+<div id="syntax-2e785e324913d901658de5e88db4fcd6" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;dataschema-xml&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">// This function generates a schema based on contents of a TABLE element</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> getSchemaFromTableNode <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>tableNode<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> fields <span class="sy0">=</span> <span class="br0">&#91;</span><span class="br0">&#93;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            <span class="co1">// Each record is held in a TR</span></div></li><li class="li1"><div class="de1">            schema <span class="sy0">=</span> <span class="br0">&#123;</span>resultListLocator<span class="sy0">:</span><span class="st0">&quot;tr&quot;</span><span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            <span class="co1">// Each field name is held in a TH</span></div></li><li class="li1"><div class="de1">            thList <span class="sy0">=</span> tableNode.<span class="me1">queryAll</span><span class="br0">&#40;</span><span class="st0">&quot;th&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="co1">// Generate field definitions based on TH</span></div></li><li class="li1"><div class="de1">        thList.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>thNode<span class="sy0">,</span> i<span class="br0">&#41;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="co1">// Note that the XPath indexes are 1-based!</span></div></li><li class="li1"><div class="de1">            fields.<span class="me1">push</span><span class="br0">&#40;</span><span class="br0">&#123;</span>key<span class="sy0">:</span>thNode.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;text&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span> locator<span class="sy0">:</span><span class="st0">&quot;td[&quot;</span><span class="sy0">+</span><span class="br0">&#40;</span>i<span class="sy0">+</span><span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">+</span><span class="st0">&quot;]&quot;</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        schema.<span class="me1">resultFields</span> <span class="sy0">=</span> fields<span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">return</span> schema<span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> tableNode <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#complex&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        <span class="co1">// Generate schema dynamically</span></div></li><li class="li1"><div class="de1">        schema <span class="sy0">=</span> getSchemaFromTableNode<span class="br0">&#40;</span>tableNode<span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        <span class="co1">// Create a temporary TBODY container to hold all data TRs</span></div></li><li class="li1"><div class="de1">        tbody <span class="sy0">=</span> document.<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">&quot;tbody&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        tbodyContainer <span class="sy0">=</span> document.<span class="me1">createDocumentFragment</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="me1">appendChild</span><span class="br0">&#40;</span>tbody<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Grab each TR in a TBODY but don't include TRs from the THEAD</span></div></li><li class="li1"><div class="de1">    Y.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;#complex tbody tr&quot;</span><span class="br0">&#41;</span>.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>trNode<span class="sy0">,</span> i<span class="br0">&#41;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// Cloning the TR keeps it in the document (optional)</span></div></li><li class="li1"><div class="de1">        <span class="co1">// Append each TR to the container</span></div></li><li class="li2"><div class="de2">        tbodyContainer.<span class="me1">appendChild</span><span class="br0">&#40;</span>Y.<span class="me1">Node</span>.<span class="me1">getDOMNode</span><span class="br0">&#40;</span>trNode<span class="br0">&#41;</span>.<span class="me1">cloneNode</span><span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> data_out <span class="sy0">=</span> Y.<span class="me1">DataSchema</span>.<span class="me1">XML</span>.<span class="me1">apply</span><span class="br0">&#40;</span>schema<span class="sy0">,</span> tbodyContainer<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="kw3">alert</span><span class="br0">&#40;</span>data_out<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;dataschema-xml&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">// This function generates a schema based on contents of a TABLE element</span>
+    <span class="kw2">var</span> getSchemaFromTableNode <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>tableNode<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw2">var</span> fields <span class="sy0">=</span> <span class="br0">&#91;</span><span class="br0">&#93;</span><span class="sy0">,</span>
+            <span class="co1">// Each record is held in a TR</span>
+            schema <span class="sy0">=</span> <span class="br0">&#123;</span>resultListLocator<span class="sy0">:</span><span class="st0">&quot;tr&quot;</span><span class="br0">&#125;</span><span class="sy0">,</span>
+            <span class="co1">// Each field name is held in a TH</span>
+            thList <span class="sy0">=</span> tableNode.<span class="me1">queryAll</span><span class="br0">&#40;</span><span class="st0">&quot;th&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">// Generate field definitions based on TH</span>
+        thList.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>thNode<span class="sy0">,</span> i<span class="br0">&#41;</span><span class="br0">&#123;</span>
+            <span class="co1">// Note that the XPath indexes are 1-based!</span>
+            fields.<span class="me1">push</span><span class="br0">&#40;</span><span class="br0">&#123;</span>key<span class="sy0">:</span>thNode.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;text&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span> locator<span class="sy0">:</span><span class="st0">&quot;td[&quot;</span><span class="sy0">+</span><span class="br0">&#40;</span>i<span class="sy0">+</span><span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">+</span><span class="st0">&quot;]&quot;</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        schema.<span class="me1">resultFields</span> <span class="sy0">=</span> fields<span class="sy0">;</span>
+        <span class="kw1">return</span> schema<span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw2">var</span> tableNode <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#complex&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        <span class="co1">// Generate schema dynamically</span>
+        schema <span class="sy0">=</span> getSchemaFromTableNode<span class="br0">&#40;</span>tableNode<span class="br0">&#41;</span><span class="sy0">,</span>
+        <span class="co1">// Create a temporary TBODY container to hold all data TRs</span>
+        tbody <span class="sy0">=</span> document.<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">&quot;tbody&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        tbodyContainer <span class="sy0">=</span> document.<span class="me1">createDocumentFragment</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="me1">appendChild</span><span class="br0">&#40;</span>tbody<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Grab each TR in a TBODY but don't include TRs from the THEAD</span>
+    Y.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;#complex tbody tr&quot;</span><span class="br0">&#41;</span>.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>trNode<span class="sy0">,</span> i<span class="br0">&#41;</span><span class="br0">&#123;</span>
+        <span class="co1">// Cloning the TR keeps it in the document (optional)</span>
+        <span class="co1">// Append each TR to the container</span>
+        tbodyContainer.<span class="me1">appendChild</span><span class="br0">&#40;</span>Y.<span class="me1">Node</span>.<span class="me1">getDOMNode</span><span class="br0">&#40;</span>trNode<span class="br0">&#41;</span>.<span class="me1">cloneNode</span><span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span>
+&nbsp;
+    <span class="kw2">var</span> data_out <span class="sy0">=</span> Y.<span class="me1">DataSchema</span>.<span class="me1">XML</span>.<span class="me1">apply</span><span class="br0">&#40;</span>schema<span class="sy0">,</span> tbodyContainer<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw3">alert</span><span class="br0">&#40;</span>data_out<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-2e785e324913d901658de5e88db4fcd6-plain">YUI().use("dataschema-xml", function(Y) {
+    // This function generates a schema based on contents of a TABLE element
+    var getSchemaFromTableNode = function(tableNode) {
+        var fields = [],
+            // Each record is held in a TR
+            schema = {resultListLocator:"tr"},
+            // Each field name is held in a TH
+            thList = tableNode.queryAll("th");
+
+        // Generate field definitions based on TH
+        thList.each(function(thNode, i){
+            // Note that the XPath indexes are 1-based!
+            fields.push({key:thNode.get("text"), locator:"td["+(i+1)+"]"});
+        });
+        schema.resultFields = fields;
+        return schema;
+    };
+
+    var tableNode = Y.one("#complex"),
+        // Generate schema dynamically
+        schema = getSchemaFromTableNode(tableNode),
+        // Create a temporary TBODY container to hold all data TRs
+        tbody = document.createElement("tbody"),
+        tbodyContainer = document.createDocumentFragment().appendChild(tbody);
+
+    // Grab each TR in a TBODY but don't include TRs from the THEAD
+    Y.all("#complex tbody tr").each(function(trNode, i){
+        // Cloning the TR keeps it in the document (optional)
+        // Append each TR to the container
+        tbodyContainer.appendChild(Y.Node.getDOMNode(trNode).cloneNode(true));
+    })
+
+    var data_out = Y.DataSchema.XML.apply(schema, tbodyContainer));
+
+    alert(data_out);
+});</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    DataSchema Utility Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../dataschema/dataschema_array.html'>DataSchema.Array</a></li><li><a href='../dataschema/dataschema_json.html'>DataSchema.JSON</a></li><li class='selected'><a href='../dataschema/dataschema_table.html'>DataSchema.XML for HTML Tables</a></li><li><a href='../dataschema/dataschema_xml.html'>DataSchema.XML for XML Data</a></li><li><a href='../dataschema/dataschema_text.html'>DataSchema.Text</a></li><li><a href='../dataschema/dataschema_parsing.html'>Enforcing DataTypes</a></li><li><a href='../datasource/datasource_caching.html'>DataSource with Caching (included with examples for DataSource Utility)</a></li><li><a href='../datasource/datasource_offlinecache.html'>DataSource with Offline Cache (included with examples for DataSource Utility)</a></li><li><a href='../datasource/datasource_function.html'>DataSource.Function (included with examples for DataSource Utility)</a></li><li><a href='../datasource/datasource_get.html'>DataSource.Get (included with examples for DataSource Utility)</a></li><li><a href='../datasource/datasource_io.html'>DataSource.IO (included with examples for DataSource Utility)</a></li><li><a href='../datasource/datasource_local.html'>DataSource.Local (included with examples for DataSource Utility)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More DataSchema Utility Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/dataschema/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_dataschema.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="selected "><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

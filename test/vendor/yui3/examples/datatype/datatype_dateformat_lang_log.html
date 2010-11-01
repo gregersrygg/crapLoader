@@ -1,0 +1,429 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: DataType Utility: Formatting Dates Using Language Resource Bundles</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+/* custom styles for this example */
+
+#default_lang_output, #single_lang_output {
+    font-style:italic;
+}
+
+#event_output {
+    margin-left:1em; 
+    color:#00aa00; 
+    font-style:italic;
+}
+
+#demo .output {
+    margin-bottom:1em; 
+    padding:10px; 
+    border:1px solid #D9D9D9;
+}
+
+#demo_output.rtl {
+    text-align:right;
+}
+
+#switchlang   {
+    margin-top:3em;
+}
+</style>
+
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: DataType Utility: Formatting Dates Using Language Resource Bundles</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>DataType Utility: Formatting Dates Using Language Resource Bundles</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>The "date-format" module of the DataType Utility leverages the external language resource bundle support provided in 3.1.0, as the preferred way to define and deliver formatting patterns for various languages.</p>	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="datatype_dateformat_lang_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div id="demo">
+
+    <div class="output"><span>Default Date Formatting (no language specified):</span> <span id="default_lang_output"></span></div>
+    <div class="output"><span>Date Formatted for "fr-FR":</span> <span id="single_lang_output"></span></div>
+
+    <form id="switchlang">
+        <fieldset>
+            <label for="demo_lang">Language:
+                <select id="demo_lang"></select>
+            </label>
+            <input type="button" id="demo_btn" value="Format Current Date/Time">
+            <span id="event_output"></span>
+        </fieldset>
+    </form>
+
+    <div id="demo_output" class="output"></div>
+
+</div>
+
+<script type="text/javascript">
+
+var langNames = {
+    "ar": "العربية",
+    "ar-JO": "العربية (الأردن)",
+    "ca": "català",
+    "ca-ES": "català (Espanya)",
+    "da": "dansk",
+    "da-DK": "dansk (Danmark)",
+    "de": "Deutsch",
+    "de-AT": "Deutsch (Österreich)",
+    "de-DE": "Deutsch (Deutschland)",
+    "el": "ελληνικά",
+    "el-GR": "ελληνικά (Ελλάδα)",
+    "en": "English",
+    "en-AU": "English (Australia)",
+    "en-CA": "English (Canada)",
+    "en-GB": "English (U.K.)",
+    "en-IE": "English (Ireland)",
+    "en-IN": "English (India)",
+    "en-JO": "English (Jordan)",
+    "en-MY": "English (Malaysia)",
+    "en-NZ": "English (New Zealand)",
+    "en-PH": "English (Philippines)",
+    "en-SG": "English (Singapore)",
+    "en-US": "English (U.S.)",
+    "es": "español",
+    "es-AR": "español (Argentina)",
+    "es-BO": "español (Bolivia)",
+    "es-CL": "español (Chile)",
+    "es-CO": "español (Colombia)",
+    "es-EC": "español (Ecuador)",
+    "es-ES": "español (España)",
+    "es-MX": "español (México)",
+    "es-PE": "español (Perú)",
+    "es-PY": "español (Paraguay)",
+    "es-US": "español (Estados Unidos)",
+    "es-UY": "español (Uruguay)",
+    "es-VE": "español (Venezuela)",
+    "fi": "suomi",
+    "fi-FI": "suomi (Suomi)",
+    "fr": "français",
+    "fr-BE": "français (Belgique)",
+    "fr-CA": "français (Canada)",
+    "fr-FR": "français (France)",
+    "hi": "हिंदी",
+    "hi-IN": "हिंदी (भारत)",
+    "id": "Bahasa Indonesia",
+    "id-ID": "Bahasa Indonesia (Indonesia)",
+    "it": "italiano",
+    "it-IT": "italiano (Italia)",
+    "ja": "日本語",
+    "ja-JP": "日本語 (日本)",
+    "ko": "한국어",
+    "ko-KR": "한국어 (대한민국)",
+    "ms": "Bahasa Melayu",
+    "ms-MY": "Bahasa Melayu (Malaysia)",
+    "nb": "norsk",
+    "nb-NO": "norsk (Norge)",
+    "nl": "Nederlands",
+    "nl-BE": "Nederlands (België)",
+    "nl-NL": "Nederlands (Nederland)",
+    "pl": "polski",
+    "pl-PL": "polski (Polska)",
+    "pt": "português",
+    "pt-BR": "português (Brasil)",
+    "ro": "română",
+    "ro-RO": "română (România)",
+    "ru": "русский",
+    "ru-RU": "русский (Россия)",
+    "sv": "svenska",
+    "sv-SE": "svenska (Sverige)",
+    "th": "ไทย",
+    "th-TH": "ไทย (ประเทศไทย)",
+    "tr": "Türkçe",
+    "tr-TR": "Türkçe (Türkiye)",
+    "vi": "Tiếng Việt",
+    "vi-VN": "Tiếng Việt (Việt Nam)",
+    "zh-Hans": "中文（简体）",
+    "zh-Hans-CN": "中文 (中国)",
+    "zh-Hant": "繁體中文",
+    "zh-Hant-HK": "中文 (香港)",
+    "zh-Hant-TW": "中文 (臺灣)"
+};
+
+function isRTL(lang) {
+    var pos = lang.indexOf("-");
+    if (pos >= 0) {
+        lang = lang.substring(0, pos);
+    }
+    // currently Arabic is our only RTL language
+    return lang === "ar";
+}
+    
+
+// Default Date Format (no language specified)
+YUI().use("node", "datatype-date", function (Y) {
+    
+    Y.one("#default_lang_output").setContent(
+        Y.DataType.Date.format(new Date(), {format:"%x"})
+    );
+
+});
+
+// Configure the YUI instance to use fr-FR
+YUI({lang:"fr-FR"}).use("node", "datatype-date", function (Y) {
+
+    Y.one("#single_lang_output").setContent(
+        Y.DataType.Date.format(new Date(), {format:"%x"})
+    );
+    
+});
+
+YUI().use("node", "datatype-date", function (Y) {
+
+    // Insert the languages available for the datatype-date module
+    var availLangs = Y.Intl.getAvailableLangs("datatype-date"),
+        select = Y.one("#demo_lang"),
+        i, lang, langName, dir;
+
+    for (i = 0; i < availLangs.length; i++) {
+        lang = availLangs[i];
+        langName = langNames[lang] || lang;
+        dir = isRTL(lang) ? "rtl" : "ltr";
+        select.append('<option value="' + lang + '" dir="' + dir + '">' + langName + '</option>');
+        select.addClass("yui3-avail-languages");
+    }
+
+    // Listen for language change
+    Y.Intl.on("intl:langChange", function(e) {
+        Y.one("#event_output").setContent('Language for "' + e.module + '" changed to "' + e.newVal + '"');
+    });
+
+    Y.on("click", function(e) {
+
+        var lang = Y.one("#demo_lang").get("value"),
+            output = Y.one("#demo_output");
+
+        // Pull down a new language resource bundle for datatype-date
+        Y.use("lang/datatype-date_" + lang, function(Y) {
+
+            // You only need to set the language explicitly when switching languages,
+            // It is not required for the single language use case instances shown previously.
+            Y.Intl.setLang("datatype-date-format", lang);
+
+            var formattedDate = Y.DataType.Date.format(new Date(), {format:"%c"}),
+                rtl = isRTL(lang);
+
+            output.setContent(formattedDate)
+            output.setAttribute("dir", rtl ? "rtl" : "ltr")
+            output.toggleClass("rtl", rtl);
+        });
+
+    }, "#demo_btn");
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h4>Using Date Formatting Support</h4>
+
+<p>To use Date formatting language resource bundle support in your application, all you need to do is use the <code>datatype-date</code> module, and specify the (supported) language you need for the instance.</p>
+
+<div id="syntax-d27cc000880d8eac55474543000a5823" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">// Default (no language specified)</span></div></li><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;datatype-date&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#default_lang_output&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">DataType</span>.<span class="me1">Date</span>.<span class="me1">format</span><span class="br0">&#40;</span><span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span> <span class="br0">&#123;</span>format<span class="sy0">:</span><span class="st0">&quot;%x&quot;</span><span class="br0">&#125;</span><span class="br0">&#41;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// Format Date For fr-FR</span></div></li><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>lang<span class="sy0">:</span><span class="st0">&quot;fr-FR&quot;</span><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;datatype-date&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#single_lang_output&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">DataType</span>.<span class="me1">Date</span>.<span class="me1">format</span><span class="br0">&#40;</span><span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span> <span class="br0">&#123;</span>format<span class="sy0">:</span><span class="st0">&quot;%x&quot;</span><span class="br0">&#125;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">// Default (no language specified)</span>
+YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;datatype-date&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#default_lang_output&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span>
+        Y.<span class="me1">DataType</span>.<span class="me1">Date</span>.<span class="me1">format</span><span class="br0">&#40;</span><span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span> <span class="br0">&#123;</span>format<span class="sy0">:</span><span class="st0">&quot;%x&quot;</span><span class="br0">&#125;</span><span class="br0">&#41;</span>
+    <span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Format Date For fr-FR</span>
+YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>lang<span class="sy0">:</span><span class="st0">&quot;fr-FR&quot;</span><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;datatype-date&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#single_lang_output&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span>
+        Y.<span class="me1">DataType</span>.<span class="me1">Date</span>.<span class="me1">format</span><span class="br0">&#40;</span><span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span> <span class="br0">&#123;</span>format<span class="sy0">:</span><span class="st0">&quot;%x&quot;</span><span class="br0">&#125;</span><span class="br0">&#41;</span>
+    <span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-d27cc000880d8eac55474543000a5823-plain">// Default (no language specified)
+YUI().use("datatype-date", function (Y) {
+    Y.one("#default_lang_output").setContent(
+        Y.DataType.Date.format(new Date(), {format:"%x"})
+    );
+});
+
+// Format Date For fr-FR
+YUI({lang:"fr-FR"}).use("datatype-date", function (Y) {
+    Y.one("#single_lang_output").setContent(
+        Y.DataType.Date.format(new Date(), {format:"%x"})
+    );
+});</textarea></div>
+<h4>Switching Languages</h4>
+
+<p>You can also switch the language resource bundle currently in use for your YUI instance, by invoking <code>Y.use</code> to pull down another language resource bundle if required:</p> 
+
+<div id="syntax-39fdab92c4c5bc5ea66b5c84d15ad963" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    ...</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> lang <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo_lang&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Pull down a new language resource bundle for datatype-date. </span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Since it's a potentially async operation, we write our application logic </span></div></li><li class="li1"><div class="de1">    <span class="co1">// in a callback which is invoked once the new language resource bundle is pulled down</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;lang/datatype-date_&quot;</span> <span class="sy0">+</span> lang<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// You only need to set the language explicitly when switching languages,</span></div></li><li class="li1"><div class="de1">        <span class="co1">// It is not required for the single language use case shown previously.</span></div></li><li class="li2"><div class="de2">        Y.<span class="me1">Intl</span>.<span class="me1">setLang</span><span class="br0">&#40;</span><span class="st0">&quot;datatype-date-format&quot;</span><span class="sy0">,</span> lang<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        formattedDate <span class="sy0">=</span> Y.<span class="me1">DataType</span>.<span class="me1">Date</span>.<span class="me1">format</span><span class="br0">&#40;</span><span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span> <span class="br0">&#123;</span>format<span class="sy0">:</span><span class="st0">&quot;%c&quot;</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    ...        </div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">&nbsp;
+    ...
+&nbsp;
+    <span class="kw2">var</span> lang <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo_lang&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Pull down a new language resource bundle for datatype-date. </span>
+&nbsp;
+    <span class="co1">// Since it's a potentially async operation, we write our application logic </span>
+    <span class="co1">// in a callback which is invoked once the new language resource bundle is pulled down</span>
+&nbsp;
+    Y.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;lang/datatype-date_&quot;</span> <span class="sy0">+</span> lang<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="co1">// You only need to set the language explicitly when switching languages,</span>
+        <span class="co1">// It is not required for the single language use case shown previously.</span>
+        Y.<span class="me1">Intl</span>.<span class="me1">setLang</span><span class="br0">&#40;</span><span class="st0">&quot;datatype-date-format&quot;</span><span class="sy0">,</span> lang<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        formattedDate <span class="sy0">=</span> Y.<span class="me1">DataType</span>.<span class="me1">Date</span>.<span class="me1">format</span><span class="br0">&#40;</span><span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span> <span class="br0">&#123;</span>format<span class="sy0">:</span><span class="st0">&quot;%c&quot;</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    ...        </pre></div><textarea id="syntax-39fdab92c4c5bc5ea66b5c84d15ad963-plain">
+    ...
+
+    var lang = Y.one("#demo_lang").get("value");
+
+    // Pull down a new language resource bundle for datatype-date. 
+    
+    // Since it's a potentially async operation, we write our application logic 
+    // in a callback which is invoked once the new language resource bundle is pulled down
+
+    Y.use("lang/datatype-date_" + lang, function(Y) {
+
+        // You only need to set the language explicitly when switching languages,
+        // It is not required for the single language use case shown previously.
+        Y.Intl.setLang("datatype-date-format", lang);
+
+        formattedDate = Y.DataType.Date.format(new Date(), {format:"%c"});
+
+    });
+    ...        </textarea></div>
+<p>The <code>Y.Intl</code> utility, which is automatically pulled down with a language resource bundle acts as a manager for language resource bundle handling, and is used to register new language resource bundles, set the language currently being used, and retrieve strings for the currently language.</p>
+
+<h4>Available Languages</h4>
+
+<p>The set of available languages for a given module, can be obtained from the <code>Intl</code> utility, and we use this support to generate the dropdown for this example:</p>
+
+<div id="syntax-46d69279ff1749cf6ebc2de0b440b3b2" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">    <span class="co1">// Insert the languages available for the datatype-date module</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> availLangs <span class="sy0">=</span> Y.<span class="me1">Intl</span>.<span class="me1">getAvailableLangs</span><span class="br0">&#40;</span><span class="st0">&quot;datatype-date&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        select <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo_lang&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        i<span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">for</span> <span class="br0">&#40;</span>i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> availLangs.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        select.<span class="me1">append</span><span class="br0">&#40;</span><span class="st0">'&lt;option value=&quot;'</span> <span class="sy0">+</span> availLangs<span class="br0">&#91;</span>i<span class="br0">&#93;</span> <span class="sy0">+</span> <span class="st0">'&quot;&gt;'</span> <span class="sy0">+</span> availLangs<span class="br0">&#91;</span>i<span class="br0">&#93;</span> <span class="sy0">+</span> <span class="st0">'&lt;/option&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">    <span class="co1">// Insert the languages available for the datatype-date module</span>
+    <span class="kw2">var</span> availLangs <span class="sy0">=</span> Y.<span class="me1">Intl</span>.<span class="me1">getAvailableLangs</span><span class="br0">&#40;</span><span class="st0">&quot;datatype-date&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        select <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo_lang&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        i<span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">for</span> <span class="br0">&#40;</span>i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> availLangs.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        select.<span class="me1">append</span><span class="br0">&#40;</span><span class="st0">'&lt;option value=&quot;'</span> <span class="sy0">+</span> availLangs<span class="br0">&#91;</span>i<span class="br0">&#93;</span> <span class="sy0">+</span> <span class="st0">'&quot;&gt;'</span> <span class="sy0">+</span> availLangs<span class="br0">&#91;</span>i<span class="br0">&#93;</span> <span class="sy0">+</span> <span class="st0">'&lt;/option&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span></pre></div><textarea id="syntax-46d69279ff1749cf6ebc2de0b440b3b2-plain">    // Insert the languages available for the datatype-date module
+    var availLangs = Y.Intl.getAvailableLangs("datatype-date"),
+        select = Y.one("#demo_lang"),
+        i;
+
+    for (i = 0; i < availLangs.length; i++) {
+        select.append('<option value="' + availLangs[i] + '">' + availLangs[i] + '</option>');
+    }</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    DataType Utility Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li class='selected'><a href='../datatype/datatype_dateformat_lang.html'>Formatting Dates Using Language Resource Bundles</a></li><li><a href='../datatype/datatype_dateformat.html'>DataType.Date.format()</a></li><li><a href='../datatype/datatype_dateparse.html'>DataType.Date.parse()</a></li><li><a href='../datatype/datatype_numberformat.html'>DataType.Number.format()</a></li><li><a href='../datatype/datatype_numberparse.html'>DataType.Number.parse()</a></li><li><a href='../datatype/datatype_xmlformat.html'>DataType.XML.format()</a></li><li><a href='../datatype/datatype_xmlparse.html'>DataType.XML.parse()</a></li><li><a href='../dataschema/dataschema_parsing.html'>Enforcing DataTypes (included with examples for DataSchema Utility)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More DataType Utility Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/datatype/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_datatype.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="selected "><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

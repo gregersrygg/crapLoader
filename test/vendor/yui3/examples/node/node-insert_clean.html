@@ -1,0 +1,66 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Adding Node Content</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<link href="assets//node.css" rel="stylesheet" type="text/css">
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Adding Node Content</h1>
+
+<div class="exampleIntro">
+	<p>This example demonstrates how insert content when working with NodeList instances.</p>
+<p>Clicking a box will update its content.</p>
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<ul id="demo">
+    <li>foo</li>
+    <li>bar</li>
+</ul>
+
+<script type="text/javascript">
+YUI().use("node", function(Y) {
+    var onClick = function(e) {
+        var node = e.currentTarget;
+        node.prepend('<em>prepended</em> &nbsp;'); // added as firstChild 
+        node.append('&nbsp; <em>appended</em>');  // added as lastChild
+        node.insert('&nbsp; <strong>before last child</strong> &nbsp;', node.get('lastChild')); // added before lastChild 
+        node.insert('&nbsp; <strong>before childNodes[1]</strong> &nbsp;', 1); // added before childNodes[1]
+    };
+
+    Y.all('#demo li').on('click', onClick);
+});
+</script>
+
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

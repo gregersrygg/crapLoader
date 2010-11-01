@@ -1,0 +1,71 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Node Styling</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<link href="assets//node.css" rel="stylesheet" type="text/css">
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Node Styling</h1>
+
+<div class="exampleIntro">
+	<p>This example shows how to style an element using Node.</p>
+
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<div id="demo">
+    <p>Click me to change my color and show some style information.</p>
+</div>
+
+
+<script type="text/javascript">
+YUI().use("node", function(Y) {
+    var onClick = function(e) {
+        var node = e.currentTarget;
+        if (!node.one('dl')) { // only create the DL once
+            node.setStyle('color', 'green');
+            var styleColor = node.getStyle('color'),
+                computedColor = node.getComputedStyle('color');
+
+            node.append('<dl>' +
+                '<dt>style.color</dt><dd>' + styleColor + '</dd>' + 
+                '<dt>computedStyle.color</dt><dd>' + computedColor + '</dd>' +
+            '</dl>');
+        }
+    };
+
+    Y.one('#demo').on('click', onClick);
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

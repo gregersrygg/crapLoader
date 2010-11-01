@@ -1,0 +1,1091 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Console: YUI configuration to filter log messages</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+#console {
+    float: left;
+}
+#demo .yui3-console .yui3-console-title {
+    border: 0 none;
+    color: #000;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 0;
+    text-transform: none;
+}
+
+#demo .yui3-console .yui3-console-entry-meta {
+    margin: 0;
+}
+
+.filter-controls p label {
+    display: block;
+    margin: .25em 0;
+}
+#demo input {
+    vertical-align: middle;
+}
+
+.form {
+    clear: left;
+    padding: 1em 0;
+}
+
+.form span {
+    padding-left: 3em;
+}
+
+#msg {
+    width: 50%;
+}
+
+.filter-controls {
+    width: 180px;
+    margin-left: 1em;
+    float: left;
+}
+
+#preview {
+    background: #eee;
+    border: 1px solid #999;
+    margin: 1em 0;
+    overflow: auto;
+    padding: 1em;
+    width: 480px;
+}
+</style>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Console: YUI configuration to filter log messages</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Console: YUI configuration to filter log messages</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example illustrates how to configure your YUI instance to ignore certain log messages to aid in reducing the signal-to-noise ratio when debugging.</p>
+
+<p>Log messages filtered out from the YUI config are permanently ignored.  If you want to be able to temporarily hide and reshow messages, use the <a href="../../console-filters.html">ConsoleFilters plugin</a>.  It is not uncommon to set up <code>logInclude</code> or <code>logExclude</code> in the YUI configuration and use the ConsoleFilters plugin.</p>
+
+<p>Log messages can be ignored based on the source (e.g. <code>event</code> or <code>attribute</code>) or based on their log level (info, warn, error).</p>
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="console_yui_config_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div id="demo">
+    <div id="console"></div>
+
+    <div class="filter-controls">
+        <h4>Source filter</h4>
+        <p>
+            <select id="incexc">
+                <option value="logExclude" selected="selected">Exclude</option>
+                <option value="logInclude">Include</option>
+            </select>
+            <label for="filter_a"><input type="checkbox" name="src_filter" value="sourceA" id="filter_a"> <code>sourceA</code></label>
+            <label for="filter_b"><input type="checkbox" name="src_filter" value="sourceB" id="filter_b"> <code>sourceB</code></label>
+            <label for="filter_c"><input type="checkbox" name="src_filter" value="sourceC" id="filter_c" checked="checked"> <code>sourceC</code></label>
+        </p>
+    </div>
+
+    <div class="filter-controls">
+        <h4>Log level</h4>
+        <p>
+            <label for="lvl_info">
+                <input type="radio" name="log_level" id="lvl_info" value="info" checked="checked">
+                info
+            </label>
+            <label for="lvl_warn">
+                <input type="radio" name="log_level" id="lvl_warn" value="warn">
+                warn
+            </label>
+            <label for="lvl_error">
+                <input type="radio" name="log_level" id="lvl_error" value="error">
+                error
+            </label>
+        </p>
+    </div>
+
+    <div class="form">
+        <h4>Log a message</h4>
+        <div>
+            <input type="text" id="msg" value="This is a log message!">
+            <button type="button" id="log">log message</button>
+
+            <p>
+                Source:
+                <label for="msg_src_a">
+                    <input type="radio" name="msg_src" id="msg_src_a" value="sourceA" checked="checked">
+                    A
+                </label>
+                <label for="msg_src_b">
+                    <input type="radio" name="msg_src" id="msg_src_b" value="sourceB">
+                    B
+                </label>
+                <label for="msg_src_c">
+                    <input type="radio" name="msg_src" id="msg_src_c" value="sourceC">
+                    C
+                </label>
+
+                <span>Category:</span>
+                <label for="msg_info">
+                    <input type="radio" name="msg_cat" id="msg_info" value="info" checked="checked">
+                    info
+                </label>
+                <label for="msg_warn">
+                    <input type="radio" name="msg_cat" id="msg_warn" value="warn">
+                    warn
+                </label>
+                <label for="msg_error">
+                    <input type="radio" name="msg_cat" id="msg_error" value="error">
+                    error
+                </label>
+            </p>
+        </div>
+
+        <h4>Code preview</h4>
+        <pre id="preview">// YUI instance configuration
+var Y = YUI({
+    "logLevel": "info",
+    "logExclude": {
+        "sourceC": true
+    }
+});
+
+// Log statement
+Y.log(&quot;This is a log message!&quot;, &quot;info&quot;, &quot;sourceA&quot;);</pre>
+    </div>
+</div>
+<script type="text/javascript">
+YUI().use("console", "selector-css3", "json-stringify", function (Y) {
+
+// Add the default filtering of sourceC messages
+Y.config.logExclude = {
+    sourceC : true
+};
+
+// Create and render the Console
+var yconsole = new Y.Console({
+    boundingBox: "#console",
+    style: "block"
+}).render();
+
+
+// Set up event listeners
+// Source include or exclude select
+Y.on("change", function () {
+    if (this.get("value") === "logInclude") {
+        Y.config.logInclude = Y.config.logExclude;
+        delete Y.config.logExclude;
+    } else {
+        Y.config.logExclude = Y.config.logInclude;
+        delete Y.config.logInclude;
+    }
+    updatePreview();
+}, "#incexc");
+
+// delegate all checkbox and radio group clicks via a single event subscriber
+// routing to the appropriate function based on the input name
+var clickHandlers = {
+    src_filter : updateSourceFilters,
+    log_level  : updateLogLevel,
+    msg_src    : updatePreview,
+    msg_cat    : updatePreview
+};
+
+Y.delegate("click", function (e) {
+    var input   = e.currentTarget,
+        handler = clickHandlers[ input.get("name") ];
+
+    if (handler) {
+        handler(input.get("value"), input.get("checked"));
+    }
+
+}, "#demo", "input[name]");
+
+// Log message input and radio groups
+Y.on("keyup", updatePreview, "#msg");
+
+// Log message button
+Y.on("click", function (e) {
+    var msg = Y.one("#msg").get("value"),
+        cat = Y.one("#demo input[name=msg_cat]:checked").get("value"),
+        src = Y.one("#demo input[name=msg_src]:checked").get("value");
+
+    Y.log(msg,cat,src);
+}, "#log");
+
+// Support functions
+function updateSourceFilters(source, checked) {
+    var disposition = Y.one("#incexc").get("value"),
+        cfg = Y.config[disposition]; // Y.config.logInclude or logExclude
+
+    if (checked) {
+        if (!cfg) {
+            cfg = Y.config[disposition] = {};
+        }
+        cfg[source] = true;
+    } else {
+        delete cfg[source];
+        if (!Y.Object.size(cfg)) {
+            delete Y.config[disposition];
+        }
+    }
+
+    updatePreview();
+}
+
+function updateLogLevel(level, checked) {
+    if (checked) {
+        Y.config.logLevel = level;
+        yconsole.set("logLevel", level);
+        updatePreview();
+    }
+}
+
+function updatePreview() {
+    var filters   = Y.all("#demo input[name=src_filter]:checked"),
+        cfg = {
+            logLevel: Y.one("#demo input[name=log_level]:checked").get("value")
+        };
+
+    if (filters.size()) {
+        cfg[Y.one("#incexc").get("value")] = Y.Array.hash(filters.get("value"));
+    }
+
+    Y.one("#preview").set("text",Y.substitute(
+        "// YUI instance configuration\n" +
+        "var Y = YUI({cfg});\n\n" +
+        "// Log statement\n" +
+        'Y.log("{msg}", "{lvl}", "{src}");',
+        {
+            cfg: Y.JSON.stringify(cfg, null, 4),
+            msg: Y.one("#msg").get("value"),
+            lvl: Y.one("#demo input[name=msg_cat]:checked").get("value"),
+            src: Y.one("#demo input[name=msg_src]:checked").get("value")
+        }));
+}
+
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Setting up filters in the YUI configuration</h3>
+<p>The configuration object passed to the YUI constructor supports a few settings that can help manage Console output while debugging.  These configuration options are <code>logExclude</code>, <code>logInclude</code>, <code>logLevel</code>, <code>filter</code>, and <code>filters</code>.</p>
+
+<p>This example will show the use of the <code>logInclude</code>, <code>logExclude</code>, and <code>logLevel</code> configurations.</p>
+
+<p>An example configuration might look like this:</p>
+
+<div id="syntax-72ca051e15c7022896dc2c6467a060d7" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    filter <span class="sy0">:</span> <span class="st0">'debug'</span><span class="sy0">,</span> <span class="co1">// request -debug versions of modules for log statements</span></div></li><li class="li1"><div class="de1">    logExclude <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        event <span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span>     <span class="co1">// Don't broadcast log messages from the event module</span></div></li><li class="li2"><div class="de2">        attribute <span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span> <span class="co1">// or the attribute module</span></div></li><li class="li1"><div class="de1">        widget <span class="sy0">:</span> <span class="kw2">true</span>     <span class="co1">// or the widget module</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    logLevel <span class="sy0">:</span> <span class="st0">'error'</span><span class="sy0">,</span>       <span class="co1">// Show only errors in the Console</span></div></li><li class="li1"><div class="de1">    useBrowserConsole <span class="sy0">:</span> <span class="kw2">false</span> <span class="co1">// Don't use the browser's native console</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'overlay'</span><span class="sy0">,</span><span class="st0">'anim'</span><span class="sy0">,</span><span class="st0">'console'</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co2">/* Console instances will default to logLevel = &quot;info&quot; */</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>
+    filter <span class="sy0">:</span> <span class="st0">'debug'</span><span class="sy0">,</span> <span class="co1">// request -debug versions of modules for log statements</span>
+    logExclude <span class="sy0">:</span> <span class="br0">&#123;</span>
+        event <span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span>     <span class="co1">// Don't broadcast log messages from the event module</span>
+        attribute <span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span> <span class="co1">// or the attribute module</span>
+        widget <span class="sy0">:</span> <span class="kw2">true</span>     <span class="co1">// or the widget module</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+    logLevel <span class="sy0">:</span> <span class="st0">'error'</span><span class="sy0">,</span>       <span class="co1">// Show only errors in the Console</span>
+    useBrowserConsole <span class="sy0">:</span> <span class="kw2">false</span> <span class="co1">// Don't use the browser's native console</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'overlay'</span><span class="sy0">,</span><span class="st0">'anim'</span><span class="sy0">,</span><span class="st0">'console'</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+<span class="co2">/* Console instances will default to logLevel = &quot;info&quot; */</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-72ca051e15c7022896dc2c6467a060d7-plain">YUI({
+    filter : 'debug', // request -debug versions of modules for log statements
+    logExclude : {
+        event : true,     // Don't broadcast log messages from the event module
+        attribute : true, // or the attribute module
+        widget : true     // or the widget module
+    },
+    logLevel : 'error',       // Show only errors in the Console
+    useBrowserConsole : false // Don't use the browser's native console
+}).use('overlay','anim','console', function (Y) {
+
+/* Console instances will default to logLevel = "info" */
+
+});</textarea></div>
+<p><code>logExclude</code> and <code>logInclude</code> prevent the logging subsystem from broadcasting filtered log messages.  <code>logLevel</code>, on the other hand is used by Console instances to filter messages received from the subsystem.</p>
+
+<p>Updating <code>Y.config.logExclude</code> or <code>Y.config.logInclude</code> at runtime will immediately change the subsystem filtering, but will not recover messages previously sent from that source.</p>
+
+<div id="syntax-6b941d850282cde0d1a6cd389e270b26" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    logExclude <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        event <span class="sy0">:</span> <span class="kw2">true</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'console'</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co2">/* In here, Y.config refers to the config object passed to the constructor */</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// Stop broadcasting log messages from the attribute module</span></div></li><li class="li2"><div class="de2">Y.<span class="me1">config</span>.<span class="me1">logExclude</span>.<span class="me1">attribute</span> <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// Start broadcasting log messages from the event module again</span></div></li><li class="li1"><div class="de1"><span class="kw1">delete</span> Y.<span class="me1">config</span>.<span class="me1">logExclude</span>.<span class="me1">event</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>
+    logExclude <span class="sy0">:</span> <span class="br0">&#123;</span>
+        event <span class="sy0">:</span> <span class="kw2">true</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'console'</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+<span class="co2">/* In here, Y.config refers to the config object passed to the constructor */</span>
+&nbsp;
+<span class="co1">// Stop broadcasting log messages from the attribute module</span>
+Y.<span class="me1">config</span>.<span class="me1">logExclude</span>.<span class="me1">attribute</span> <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Start broadcasting log messages from the event module again</span>
+<span class="kw1">delete</span> Y.<span class="me1">config</span>.<span class="me1">logExclude</span>.<span class="me1">event</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-6b941d850282cde0d1a6cd389e270b26-plain">YUI({
+    logExclude : {
+        event : true
+    }
+}).use('console', function (Y) {
+
+/* In here, Y.config refers to the config object passed to the constructor */
+
+// Stop broadcasting log messages from the attribute module
+Y.config.logExclude.attribute = true;
+
+// Start broadcasting log messages from the event module again
+delete Y.config.logExclude.event;
+
+});</textarea></div>
+<p>When a Console is instantiated, barring explicit <code>logLevel</code> attribute configuration, the <code>logLevel</code> will be adopted from the YUI instance's configured <code>logLevel</code>, or <code>Y.Console.LOG_LEVEL_INFO</code> (&quot;info&quot;) as a fallback.  Unlike <code>logExclude</code>, changing the value in the YUI configuration will only affect instantiated Consoles from that point on.  Additionally, you can manually override the <code>logLevel</code> a Console instance will display by updating its <code>logLevel</code> attribute.</p>
+
+<div id="syntax-0637edc551cd51e2bfa3a77d1b7daa72" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span> logLevel <span class="sy0">:</span> <span class="st0">&quot;warn&quot;</span> <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'console'</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">var</span> yconsole_1 <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Console</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// logLevel == &quot;warn&quot;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="kw2">var</span> yconsole_2 <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Console</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    logLevel <span class="sy0">:</span> <span class="st0">&quot;info&quot;</span> <span class="co1">// override at construction</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// This will not affect yconsole_1 or yconsole_2</span></div></li><li class="li2"><div class="de2">Y.<span class="me1">config</span>.<span class="me1">logLevel</span> <span class="sy0">=</span> <span class="st0">&quot;error&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">var</span> yconsole_3 <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Console</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// logLevel == &quot;error&quot;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">yconsole_1.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;logLevel&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// update this instance</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span> logLevel <span class="sy0">:</span> <span class="st0">&quot;warn&quot;</span> <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'console'</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+<span class="kw2">var</span> yconsole_1 <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Console</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// logLevel == &quot;warn&quot;</span>
+&nbsp;
+<span class="kw2">var</span> yconsole_2 <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Console</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+    logLevel <span class="sy0">:</span> <span class="st0">&quot;info&quot;</span> <span class="co1">// override at construction</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// This will not affect yconsole_1 or yconsole_2</span>
+Y.<span class="me1">config</span>.<span class="me1">logLevel</span> <span class="sy0">=</span> <span class="st0">&quot;error&quot;</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw2">var</span> yconsole_3 <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Console</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// logLevel == &quot;error&quot;</span>
+&nbsp;
+yconsole_1.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;logLevel&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// update this instance</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-0637edc551cd51e2bfa3a77d1b7daa72-plain">YUI({ logLevel : "warn" }).use('console', function (Y) {
+
+var yconsole_1 = new Y.Console(); // logLevel == "warn"
+
+var yconsole_2 = new Y.Console({
+    logLevel : "info" // override at construction
+});
+
+// This will not affect yconsole_1 or yconsole_2
+Y.config.logLevel = "error";
+
+var yconsole_3 = new Y.Console(); // logLevel == "error"
+
+yconsole_1.set("logLevel", "info"); // update this instance
+
+});</textarea></div>
+<p>The interactive portion of this example illustrates the effect of various filter settings against logged messages.  In a real application, it is most likely that the logging configuration won't be changed at runtime but set once in the YUI configuration at construction.</p>
+
+<p>The most relevant portion of the <a href="#full_code_listing">code for the demo above</a> is the updating of the YUI config and Console attribute.</p>
+
+<div id="syntax-a4779394ece64174e0bac26a68d8d22e" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">// Create and render the Console</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> yconsole <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Console</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    boundingBox<span class="sy0">:</span> <span class="st0">'#console'</span><span class="sy0">,</span> <span class="co1">// anchored to the page for the demo</span></div></li><li class="li1"><div class="de1">    style<span class="sy0">:</span> <span class="st0">&quot;block&quot;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">...</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// Source include or exclude select</span></div></li><li class="li2"><div class="de2">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;change&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span> <span class="sy0">===</span> <span class="st0">&quot;logInclude&quot;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">config</span>.<span class="me1">logInclude</span> <span class="sy0">=</span> Y.<span class="me1">config</span>.<span class="me1">logExclude</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">delete</span> Y.<span class="me1">config</span>.<span class="me1">logExclude</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        Y.<span class="me1">config</span>.<span class="me1">logExclude</span> <span class="sy0">=</span> Y.<span class="me1">config</span>.<span class="me1">logInclude</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">delete</span> Y.<span class="me1">config</span>.<span class="me1">logInclude</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    updatePreview<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#incexc&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// These functions are called from a delegated event handler.</span></div></li><li class="li1"><div class="de1"><span class="co1">// See the Full Code Listing for how they are called.</span></div></li><li class="li1"><div class="de1"><span class="kw2">function</span> updateSourceFilters<span class="br0">&#40;</span>source<span class="sy0">,</span> checked<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> disposition <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#incexc&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        cfg <span class="sy0">=</span> Y.<span class="me1">config</span><span class="br0">&#91;</span>disposition<span class="br0">&#93;</span><span class="sy0">;</span> <span class="co1">// Y.config.logInclude or logExclude</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>checked<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>cfg<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            cfg <span class="sy0">=</span> Y.<span class="me1">config</span><span class="br0">&#91;</span>disposition<span class="br0">&#93;</span> <span class="sy0">=</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        cfg<span class="br0">&#91;</span>source<span class="br0">&#93;</span> <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span> <span class="co1">// e.g. Y.config.logInclude.sourceA = true;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">delete</span> cfg<span class="br0">&#91;</span>source<span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>Y.<span class="me1">Object</span>.<span class="me1">size</span><span class="br0">&#40;</span>cfg<span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">delete</span> Y.<span class="me1">config</span><span class="br0">&#91;</span>disposition<span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    updatePreview<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">function</span> updateLogLevel<span class="br0">&#40;</span>level<span class="sy0">,</span> checked<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>checked<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        Y.<span class="me1">config</span>.<span class="me1">logLevel</span> <span class="sy0">=</span> level<span class="sy0">;</span></div></li><li class="li1"><div class="de1">        yconsole.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;logLevel&quot;</span><span class="sy0">,</span> level<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        updatePreview<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">// Create and render the Console</span>
+<span class="kw2">var</span> yconsole <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Console</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+    boundingBox<span class="sy0">:</span> <span class="st0">'#console'</span><span class="sy0">,</span> <span class="co1">// anchored to the page for the demo</span>
+    style<span class="sy0">:</span> <span class="st0">&quot;block&quot;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+...
+&nbsp;
+<span class="co1">// Source include or exclude select</span>
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;change&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span> <span class="sy0">===</span> <span class="st0">&quot;logInclude&quot;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">config</span>.<span class="me1">logInclude</span> <span class="sy0">=</span> Y.<span class="me1">config</span>.<span class="me1">logExclude</span><span class="sy0">;</span>
+        <span class="kw1">delete</span> Y.<span class="me1">config</span>.<span class="me1">logExclude</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">config</span>.<span class="me1">logExclude</span> <span class="sy0">=</span> Y.<span class="me1">config</span>.<span class="me1">logInclude</span><span class="sy0">;</span>
+        <span class="kw1">delete</span> Y.<span class="me1">config</span>.<span class="me1">logInclude</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+    updatePreview<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#incexc&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// These functions are called from a delegated event handler.</span>
+<span class="co1">// See the Full Code Listing for how they are called.</span>
+<span class="kw2">function</span> updateSourceFilters<span class="br0">&#40;</span>source<span class="sy0">,</span> checked<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> disposition <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#incexc&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        cfg <span class="sy0">=</span> Y.<span class="me1">config</span><span class="br0">&#91;</span>disposition<span class="br0">&#93;</span><span class="sy0">;</span> <span class="co1">// Y.config.logInclude or logExclude</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">&#40;</span>checked<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>cfg<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            cfg <span class="sy0">=</span> Y.<span class="me1">config</span><span class="br0">&#91;</span>disposition<span class="br0">&#93;</span> <span class="sy0">=</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+        cfg<span class="br0">&#91;</span>source<span class="br0">&#93;</span> <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span> <span class="co1">// e.g. Y.config.logInclude.sourceA = true;</span>
+    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+        <span class="kw1">delete</span> cfg<span class="br0">&#91;</span>source<span class="br0">&#93;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>Y.<span class="me1">Object</span>.<span class="me1">size</span><span class="br0">&#40;</span>cfg<span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">delete</span> Y.<span class="me1">config</span><span class="br0">&#91;</span>disposition<span class="br0">&#93;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    updatePreview<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="kw2">function</span> updateLogLevel<span class="br0">&#40;</span>level<span class="sy0">,</span> checked<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span>checked<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">config</span>.<span class="me1">logLevel</span> <span class="sy0">=</span> level<span class="sy0">;</span>
+        yconsole.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;logLevel&quot;</span><span class="sy0">,</span> level<span class="br0">&#41;</span><span class="sy0">;</span>
+        updatePreview<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-a4779394ece64174e0bac26a68d8d22e-plain">// Create and render the Console
+var yconsole = new Y.Console({
+    boundingBox: '#console', // anchored to the page for the demo
+    style: "block"
+}).render();
+
+...
+
+// Source include or exclude select
+Y.on("change", function () {
+    if (this.get("value") === "logInclude") {
+        Y.config.logInclude = Y.config.logExclude;
+        delete Y.config.logExclude;
+    } else {
+        Y.config.logExclude = Y.config.logInclude;
+        delete Y.config.logInclude;
+    }
+    updatePreview();
+}, "#incexc");
+
+// These functions are called from a delegated event handler.
+// See the Full Code Listing for how they are called.
+function updateSourceFilters(source, checked) {
+    var disposition = Y.one("#incexc").get("value"),
+        cfg = Y.config[disposition]; // Y.config.logInclude or logExclude
+
+    if (checked) {
+        if (!cfg) {
+            cfg = Y.config[disposition] = {};
+        }
+        cfg[source] = true; // e.g. Y.config.logInclude.sourceA = true;
+    } else {
+        delete cfg[source];
+
+        if (!Y.Object.size(cfg)) {
+            delete Y.config[disposition];
+        }
+    }
+
+    updatePreview();
+}
+
+function updateLogLevel(level, checked) {
+    if (checked) {
+        Y.config.logLevel = level;
+        yconsole.set("logLevel", level);
+        updatePreview();
+    }
+}</textarea></div>
+<h3 id="full_code_listing">Full Code Listing</h3>
+
+<h4>Markup</h4>
+
+<div id="syntax-3f89f8889f2215e0245041a39741c570" class="yui-syntax-highlight yui-syntax-highlight-linenumbers"><div class="numbers"><pre class="html4strict" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;demo&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;console&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;filter-controls&quot;</span>&gt;</span></div></li><li class="li2"><div class="de2">        <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>Source filter<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">p</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">select</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;incexc&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="kw2">option</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;logExclude&quot;</span> <span class="kw3">selected</span><span class="sy0">=</span><span class="st0">&quot;selected&quot;</span>&gt;</span>Exclude<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">option</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="kw2">option</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;logInclude&quot;</span>&gt;</span>Include<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">option</span>&gt;</span></div></li><li class="li2"><div class="de2">            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">select</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;filter_a&quot;</span>&gt;&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;checkbox&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;src_filter&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;sourceA&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;filter_a&quot;</span>&gt;</span> <span class="sc2">&lt;<span class="kw2">code</span>&gt;</span>sourceA<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">code</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;filter_b&quot;</span>&gt;&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;checkbox&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;src_filter&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;sourceB&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;filter_b&quot;</span>&gt;</span> <span class="sc2">&lt;<span class="kw2">code</span>&gt;</span>sourceB<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">code</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;filter_c&quot;</span>&gt;&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;checkbox&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;src_filter&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;sourceC&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;filter_c&quot;</span> <span class="kw3">checked</span><span class="sy0">=</span><span class="st0">&quot;checked&quot;</span>&gt;</span> <span class="sc2">&lt;<span class="kw2">code</span>&gt;</span>sourceC<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">code</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span></div></li><li class="li2"><div class="de2">    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;filter-controls&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>Log level<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">p</span>&gt;</span></div></li><li class="li2"><div class="de2">            <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;lvl_info&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;log_level&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;lvl_info&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;info&quot;</span> <span class="kw3">checked</span><span class="sy0">=</span><span class="st0">&quot;checked&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                info</div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;lvl_warn&quot;</span>&gt;</span></div></li><li class="li2"><div class="de2">                <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;log_level&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;lvl_warn&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;warn&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                warn</div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;lvl_error&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;log_level&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;lvl_error&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;error&quot;</span>&gt;</span></div></li><li class="li2"><div class="de2">                error</div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;form&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>Log a message<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;text&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;msg&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;This is a log message!&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">button</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;log&quot;</span>&gt;</span>log message<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">button</span>&gt;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">p</span>&gt;</span></div></li><li class="li1"><div class="de1">                Source:</div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;msg_src_a&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;msg_src&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;msg_src_a&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;sourceA&quot;</span> <span class="kw3">checked</span><span class="sy0">=</span><span class="st0">&quot;checked&quot;</span>&gt;</span></div></li><li class="li2"><div class="de2">                    A</div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;msg_src_b&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;msg_src&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;msg_src_b&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;sourceB&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    B</div></li><li class="li2"><div class="de2">                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;msg_src_c&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;msg_src&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;msg_src_c&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;sourceC&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    C</div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="kw2">span</span>&gt;</span>Category:<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;msg_info&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;msg_cat&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;msg_info&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;info&quot;</span> <span class="kw3">checked</span><span class="sy0">=</span><span class="st0">&quot;checked&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    info</div></li><li class="li2"><div class="de2">                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;msg_warn&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;msg_cat&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;msg_warn&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;warn&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    warn</div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span></div></li><li class="li2"><div class="de2">                <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;msg_error&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;msg_cat&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;msg_error&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;error&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    error</div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span></div></li><li class="li2"><div class="de2">        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>Code preview<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">pre</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;preview&quot;</span>&gt;</span>// YUI instance configuration</div></li><li class="li1"><div class="de1">var Y = YUI({</div></li><li class="li2"><div class="de2">    &quot;logLevel&quot;: &quot;info&quot;,</div></li><li class="li1"><div class="de1">    &quot;logExclude&quot;: {</div></li><li class="li1"><div class="de1">        &quot;sourceC&quot;: true</div></li><li class="li1"><div class="de1">    }</div></li><li class="li1"><div class="de1">});</div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">// Log statement</div></li><li class="li1"><div class="de1">Y.log(<span class="sc1">&amp;quot;</span>This is a log message!<span class="sc1">&amp;quot;</span>, <span class="sc1">&amp;quot;</span>info<span class="sc1">&amp;quot;</span>, <span class="sc1">&amp;quot;</span>sourceA<span class="sc1">&amp;quot;</span>);<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">pre</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="html4strict" style="font-family:monospace;"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;demo&quot;</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;console&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+&nbsp;
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;filter-controls&quot;</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>Source filter<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">p</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">select</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;incexc&quot;</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">option</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;logExclude&quot;</span> <span class="kw3">selected</span><span class="sy0">=</span><span class="st0">&quot;selected&quot;</span>&gt;</span>Exclude<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">option</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">option</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;logInclude&quot;</span>&gt;</span>Include<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">option</span>&gt;</span>
+            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">select</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;filter_a&quot;</span>&gt;&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;checkbox&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;src_filter&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;sourceA&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;filter_a&quot;</span>&gt;</span> <span class="sc2">&lt;<span class="kw2">code</span>&gt;</span>sourceA<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">code</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;filter_b&quot;</span>&gt;&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;checkbox&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;src_filter&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;sourceB&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;filter_b&quot;</span>&gt;</span> <span class="sc2">&lt;<span class="kw2">code</span>&gt;</span>sourceB<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">code</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;filter_c&quot;</span>&gt;&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;checkbox&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;src_filter&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;sourceC&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;filter_c&quot;</span> <span class="kw3">checked</span><span class="sy0">=</span><span class="st0">&quot;checked&quot;</span>&gt;</span> <span class="sc2">&lt;<span class="kw2">code</span>&gt;</span>sourceC<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">code</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span>
+        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span>
+    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+&nbsp;
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;filter-controls&quot;</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>Log level<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">p</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;lvl_info&quot;</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;log_level&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;lvl_info&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;info&quot;</span> <span class="kw3">checked</span><span class="sy0">=</span><span class="st0">&quot;checked&quot;</span>&gt;</span>
+                info
+            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;lvl_warn&quot;</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;log_level&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;lvl_warn&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;warn&quot;</span>&gt;</span>
+                warn
+            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;lvl_error&quot;</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;log_level&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;lvl_error&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;error&quot;</span>&gt;</span>
+                error
+            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span>
+        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span>
+    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+&nbsp;
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;form&quot;</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>Log a message<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">div</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;text&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;msg&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;This is a log message!&quot;</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">button</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;log&quot;</span>&gt;</span>log message<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">button</span>&gt;</span>
+&nbsp;
+            <span class="sc2">&lt;<span class="kw2">p</span>&gt;</span>
+                Source:
+                <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;msg_src_a&quot;</span>&gt;</span>
+                    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;msg_src&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;msg_src_a&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;sourceA&quot;</span> <span class="kw3">checked</span><span class="sy0">=</span><span class="st0">&quot;checked&quot;</span>&gt;</span>
+                    A
+                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;msg_src_b&quot;</span>&gt;</span>
+                    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;msg_src&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;msg_src_b&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;sourceB&quot;</span>&gt;</span>
+                    B
+                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;msg_src_c&quot;</span>&gt;</span>
+                    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;msg_src&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;msg_src_c&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;sourceC&quot;</span>&gt;</span>
+                    C
+                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span>
+&nbsp;
+                <span class="sc2">&lt;<span class="kw2">span</span>&gt;</span>Category:<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;msg_info&quot;</span>&gt;</span>
+                    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;msg_cat&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;msg_info&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;info&quot;</span> <span class="kw3">checked</span><span class="sy0">=</span><span class="st0">&quot;checked&quot;</span>&gt;</span>
+                    info
+                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;msg_warn&quot;</span>&gt;</span>
+                    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;msg_cat&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;msg_warn&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;warn&quot;</span>&gt;</span>
+                    warn
+                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;msg_error&quot;</span>&gt;</span>
+                    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;radio&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;msg_cat&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;msg_error&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;error&quot;</span>&gt;</span>
+                    error
+                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span>
+            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span>
+        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+&nbsp;
+        <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>Code preview<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">pre</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;preview&quot;</span>&gt;</span>// YUI instance configuration
+var Y = YUI({
+    &quot;logLevel&quot;: &quot;info&quot;,
+    &quot;logExclude&quot;: {
+        &quot;sourceC&quot;: true
+    }
+});
+&nbsp;
+// Log statement
+Y.log(<span class="sc1">&amp;quot;</span>This is a log message!<span class="sc1">&amp;quot;</span>, <span class="sc1">&amp;quot;</span>info<span class="sc1">&amp;quot;</span>, <span class="sc1">&amp;quot;</span>sourceA<span class="sc1">&amp;quot;</span>);<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">pre</span>&gt;</span>
+    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></pre></div><textarea id="syntax-3f89f8889f2215e0245041a39741c570-plain"><div id="demo">
+    <div id="console"></div>
+
+    <div class="filter-controls">
+        <h4>Source filter</h4>
+        <p>
+            <select id="incexc">
+                <option value="logExclude" selected="selected">Exclude</option>
+                <option value="logInclude">Include</option>
+            </select>
+            <label for="filter_a"><input type="checkbox" name="src_filter" value="sourceA" id="filter_a"> <code>sourceA</code></label>
+            <label for="filter_b"><input type="checkbox" name="src_filter" value="sourceB" id="filter_b"> <code>sourceB</code></label>
+            <label for="filter_c"><input type="checkbox" name="src_filter" value="sourceC" id="filter_c" checked="checked"> <code>sourceC</code></label>
+        </p>
+    </div>
+
+    <div class="filter-controls">
+        <h4>Log level</h4>
+        <p>
+            <label for="lvl_info">
+                <input type="radio" name="log_level" id="lvl_info" value="info" checked="checked">
+                info
+            </label>
+            <label for="lvl_warn">
+                <input type="radio" name="log_level" id="lvl_warn" value="warn">
+                warn
+            </label>
+            <label for="lvl_error">
+                <input type="radio" name="log_level" id="lvl_error" value="error">
+                error
+            </label>
+        </p>
+    </div>
+
+    <div class="form">
+        <h4>Log a message</h4>
+        <div>
+            <input type="text" id="msg" value="This is a log message!">
+            <button type="button" id="log">log message</button>
+
+            <p>
+                Source:
+                <label for="msg_src_a">
+                    <input type="radio" name="msg_src" id="msg_src_a" value="sourceA" checked="checked">
+                    A
+                </label>
+                <label for="msg_src_b">
+                    <input type="radio" name="msg_src" id="msg_src_b" value="sourceB">
+                    B
+                </label>
+                <label for="msg_src_c">
+                    <input type="radio" name="msg_src" id="msg_src_c" value="sourceC">
+                    C
+                </label>
+
+                <span>Category:</span>
+                <label for="msg_info">
+                    <input type="radio" name="msg_cat" id="msg_info" value="info" checked="checked">
+                    info
+                </label>
+                <label for="msg_warn">
+                    <input type="radio" name="msg_cat" id="msg_warn" value="warn">
+                    warn
+                </label>
+                <label for="msg_error">
+                    <input type="radio" name="msg_cat" id="msg_error" value="error">
+                    error
+                </label>
+            </p>
+        </div>
+
+        <h4>Code preview</h4>
+        <pre id="preview">// YUI instance configuration
+var Y = YUI({
+    "logLevel": "info",
+    "logExclude": {
+        "sourceC": true
+    }
+});
+
+// Log statement
+Y.log(&quot;This is a log message!&quot;, &quot;info&quot;, &quot;sourceA&quot;);</pre>
+    </div>
+</div></textarea></div>
+<h4>JavaScript</h4>
+
+<div id="syntax-446cc9549d272c6c2f251732558fd1fa" class="yui-syntax-highlight yui-syntax-highlight-linenumbers"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;console&quot;</span><span class="sy0">,</span> <span class="st0">&quot;selector-css3&quot;</span><span class="sy0">,</span> <span class="st0">&quot;json-stringify&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// Add the default filtering of sourceC messages</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">config</span>.<span class="me1">logExclude</span> <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    sourceC <span class="sy0">:</span> <span class="kw2">true</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// Create and render the Console</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> yconsole <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Console</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    boundingBox<span class="sy0">:</span> <span class="st0">&quot;#console&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    style<span class="sy0">:</span> <span class="st0">&quot;block&quot;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="co1">// Set up event listeners</span></div></li><li class="li1"><div class="de1"><span class="co1">// Source include or exclude select</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;change&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span> <span class="sy0">===</span> <span class="st0">&quot;logInclude&quot;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">config</span>.<span class="me1">logInclude</span> <span class="sy0">=</span> Y.<span class="me1">config</span>.<span class="me1">logExclude</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="kw1">delete</span> Y.<span class="me1">config</span>.<span class="me1">logExclude</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">config</span>.<span class="me1">logExclude</span> <span class="sy0">=</span> Y.<span class="me1">config</span>.<span class="me1">logInclude</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">delete</span> Y.<span class="me1">config</span>.<span class="me1">logInclude</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">    updatePreview<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#incexc&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// delegate all checkbox and radio group clicks via a single event subscriber</span></div></li><li class="li1"><div class="de1"><span class="co1">// routing to the appropriate function based on the input name</span></div></li><li class="li2"><div class="de2"><span class="kw2">var</span> clickHandlers <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    src_filter <span class="sy0">:</span> updateSourceFilters<span class="sy0">,</span></div></li><li class="li1"><div class="de1">    log_level  <span class="sy0">:</span> updateLogLevel<span class="sy0">,</span></div></li><li class="li1"><div class="de1">    msg_src    <span class="sy0">:</span> updatePreview<span class="sy0">,</span></div></li><li class="li1"><div class="de1">    msg_cat    <span class="sy0">:</span> updatePreview</div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">Y.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> input   <span class="sy0">=</span> e.<span class="me1">currentTarget</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        handler <span class="sy0">=</span> clickHandlers<span class="br0">&#91;</span> input.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;name&quot;</span><span class="br0">&#41;</span> <span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>handler<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        handler<span class="br0">&#40;</span>input.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span> input.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;checked&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#demo&quot;</span><span class="sy0">,</span> <span class="st0">&quot;input[name]&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// Log message input and radio groups</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;keyup&quot;</span><span class="sy0">,</span> updatePreview<span class="sy0">,</span> <span class="st0">&quot;#msg&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="co1">// Log message button</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> msg <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#msg&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        cat <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo input[name=msg_cat]:checked&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        src <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo input[name=msg_src]:checked&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">log</span><span class="br0">&#40;</span>msg<span class="sy0">,</span>cat<span class="sy0">,</span>src<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#log&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// Support functions</span></div></li><li class="li2"><div class="de2"><span class="kw2">function</span> updateSourceFilters<span class="br0">&#40;</span>source<span class="sy0">,</span> checked<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> disposition <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#incexc&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        cfg <span class="sy0">=</span> Y.<span class="me1">config</span><span class="br0">&#91;</span>disposition<span class="br0">&#93;</span><span class="sy0">;</span> <span class="co1">// Y.config.logInclude or logExclude</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>checked<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>cfg<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            cfg <span class="sy0">=</span> Y.<span class="me1">config</span><span class="br0">&#91;</span>disposition<span class="br0">&#93;</span> <span class="sy0">=</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        cfg<span class="br0">&#91;</span>source<span class="br0">&#93;</span> <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="kw1">delete</span> cfg<span class="br0">&#91;</span>source<span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>Y.<span class="me1">Object</span>.<span class="me1">size</span><span class="br0">&#40;</span>cfg<span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">delete</span> Y.<span class="me1">config</span><span class="br0">&#91;</span>disposition<span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    updatePreview<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">function</span> updateLogLevel<span class="br0">&#40;</span>level<span class="sy0">,</span> checked<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">if</span> <span class="br0">&#40;</span>checked<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        yconsole.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;logLevel&quot;</span><span class="sy0">,</span> level<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        updatePreview<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">function</span> updatePreview<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> filters   <span class="sy0">=</span> Y.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;#demo input[name=src_filter]:checked&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        cfg <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            logLevel<span class="sy0">:</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo input[name=log_level]:checked&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>filters.<span class="me1">size</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        cfg<span class="br0">&#91;</span>Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#incexc&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="br0">&#93;</span> <span class="sy0">=</span> Y.<span class="me1">Array</span>.<span class="me1">hash</span><span class="br0">&#40;</span>filters.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#preview&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;text&quot;</span><span class="sy0">,</span>Y.<span class="me1">substitute</span><span class="br0">&#40;</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;// YUI instance configuration</span></div></li><li class="li1"><div class="de1"><span class="st0">&quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;var Y = YUI({cfg});</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="st0">&quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;// Log statement</span></div></li><li class="li1"><div class="de1"><span class="st0">&quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">'Y.log(&quot;{msg}&quot;, &quot;{lvl}&quot;, &quot;{src}&quot;);'</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            cfg<span class="sy0">:</span> Y.<span class="me1">JSON</span>.<span class="me1">stringify</span><span class="br0">&#40;</span>cfg<span class="sy0">,</span> <span class="kw2">null</span><span class="sy0">,</span> <span class="nu0">4</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            msg<span class="sy0">:</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#msg&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            lvl<span class="sy0">:</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo input[name=msg_cat]:checked&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            src<span class="sy0">:</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo input[name=msg_src]:checked&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;console&quot;</span><span class="sy0">,</span> <span class="st0">&quot;selector-css3&quot;</span><span class="sy0">,</span> <span class="st0">&quot;json-stringify&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+<span class="co1">// Add the default filtering of sourceC messages</span>
+Y.<span class="me1">config</span>.<span class="me1">logExclude</span> <span class="sy0">=</span> <span class="br0">&#123;</span>
+    sourceC <span class="sy0">:</span> <span class="kw2">true</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Create and render the Console</span>
+<span class="kw2">var</span> yconsole <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Console</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+    boundingBox<span class="sy0">:</span> <span class="st0">&quot;#console&quot;</span><span class="sy0">,</span>
+    style<span class="sy0">:</span> <span class="st0">&quot;block&quot;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+<span class="co1">// Set up event listeners</span>
+<span class="co1">// Source include or exclude select</span>
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;change&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span> <span class="sy0">===</span> <span class="st0">&quot;logInclude&quot;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">config</span>.<span class="me1">logInclude</span> <span class="sy0">=</span> Y.<span class="me1">config</span>.<span class="me1">logExclude</span><span class="sy0">;</span>
+        <span class="kw1">delete</span> Y.<span class="me1">config</span>.<span class="me1">logExclude</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">config</span>.<span class="me1">logExclude</span> <span class="sy0">=</span> Y.<span class="me1">config</span>.<span class="me1">logInclude</span><span class="sy0">;</span>
+        <span class="kw1">delete</span> Y.<span class="me1">config</span>.<span class="me1">logInclude</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+    updatePreview<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#incexc&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// delegate all checkbox and radio group clicks via a single event subscriber</span>
+<span class="co1">// routing to the appropriate function based on the input name</span>
+<span class="kw2">var</span> clickHandlers <span class="sy0">=</span> <span class="br0">&#123;</span>
+    src_filter <span class="sy0">:</span> updateSourceFilters<span class="sy0">,</span>
+    log_level  <span class="sy0">:</span> updateLogLevel<span class="sy0">,</span>
+    msg_src    <span class="sy0">:</span> updatePreview<span class="sy0">,</span>
+    msg_cat    <span class="sy0">:</span> updatePreview
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+Y.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> input   <span class="sy0">=</span> e.<span class="me1">currentTarget</span><span class="sy0">,</span>
+        handler <span class="sy0">=</span> clickHandlers<span class="br0">&#91;</span> input.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;name&quot;</span><span class="br0">&#41;</span> <span class="br0">&#93;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">&#40;</span>handler<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        handler<span class="br0">&#40;</span>input.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span> input.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;checked&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#demo&quot;</span><span class="sy0">,</span> <span class="st0">&quot;input[name]&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Log message input and radio groups</span>
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;keyup&quot;</span><span class="sy0">,</span> updatePreview<span class="sy0">,</span> <span class="st0">&quot;#msg&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Log message button</span>
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> msg <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#msg&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        cat <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo input[name=msg_cat]:checked&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        src <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo input[name=msg_src]:checked&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    Y.<span class="me1">log</span><span class="br0">&#40;</span>msg<span class="sy0">,</span>cat<span class="sy0">,</span>src<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#log&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Support functions</span>
+<span class="kw2">function</span> updateSourceFilters<span class="br0">&#40;</span>source<span class="sy0">,</span> checked<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> disposition <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#incexc&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        cfg <span class="sy0">=</span> Y.<span class="me1">config</span><span class="br0">&#91;</span>disposition<span class="br0">&#93;</span><span class="sy0">;</span> <span class="co1">// Y.config.logInclude or logExclude</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">&#40;</span>checked<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>cfg<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            cfg <span class="sy0">=</span> Y.<span class="me1">config</span><span class="br0">&#91;</span>disposition<span class="br0">&#93;</span> <span class="sy0">=</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+        cfg<span class="br0">&#91;</span>source<span class="br0">&#93;</span> <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+        <span class="kw1">delete</span> cfg<span class="br0">&#91;</span>source<span class="br0">&#93;</span><span class="sy0">;</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>Y.<span class="me1">Object</span>.<span class="me1">size</span><span class="br0">&#40;</span>cfg<span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">delete</span> Y.<span class="me1">config</span><span class="br0">&#91;</span>disposition<span class="br0">&#93;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    updatePreview<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="kw2">function</span> updateLogLevel<span class="br0">&#40;</span>level<span class="sy0">,</span> checked<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span>checked<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        yconsole.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;logLevel&quot;</span><span class="sy0">,</span> level<span class="br0">&#41;</span><span class="sy0">;</span>
+        updatePreview<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="kw2">function</span> updatePreview<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> filters   <span class="sy0">=</span> Y.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;#demo input[name=src_filter]:checked&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        cfg <span class="sy0">=</span> <span class="br0">&#123;</span>
+            logLevel<span class="sy0">:</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo input[name=log_level]:checked&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span>
+        <span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">&#40;</span>filters.<span class="me1">size</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        cfg<span class="br0">&#91;</span>Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#incexc&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="br0">&#93;</span> <span class="sy0">=</span> Y.<span class="me1">Array</span>.<span class="me1">hash</span><span class="br0">&#40;</span>filters.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#preview&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;text&quot;</span><span class="sy0">,</span>Y.<span class="me1">substitute</span><span class="br0">&#40;</span>
+        <span class="st0">&quot;// YUI instance configuration
+&quot;</span> <span class="sy0">+</span>
+        <span class="st0">&quot;var Y = YUI({cfg});
+&nbsp;
+&quot;</span> <span class="sy0">+</span>
+        <span class="st0">&quot;// Log statement
+&quot;</span> <span class="sy0">+</span>
+        <span class="st0">'Y.log(&quot;{msg}&quot;, &quot;{lvl}&quot;, &quot;{src}&quot;);'</span><span class="sy0">,</span>
+        <span class="br0">&#123;</span>
+            cfg<span class="sy0">:</span> Y.<span class="me1">JSON</span>.<span class="me1">stringify</span><span class="br0">&#40;</span>cfg<span class="sy0">,</span> <span class="kw2">null</span><span class="sy0">,</span> <span class="nu0">4</span><span class="br0">&#41;</span><span class="sy0">,</span>
+            msg<span class="sy0">:</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#msg&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+            lvl<span class="sy0">:</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo input[name=msg_cat]:checked&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+            src<span class="sy0">:</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo input[name=msg_src]:checked&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-446cc9549d272c6c2f251732558fd1fa-plain">YUI().use("console", "selector-css3", "json-stringify", function (Y) {
+
+// Add the default filtering of sourceC messages
+Y.config.logExclude = {
+    sourceC : true
+};
+
+// Create and render the Console
+var yconsole = new Y.Console({
+    boundingBox: "#console",
+    style: "block"
+}).render();
+
+
+// Set up event listeners
+// Source include or exclude select
+Y.on("change", function () {
+    if (this.get("value") === "logInclude") {
+        Y.config.logInclude = Y.config.logExclude;
+        delete Y.config.logExclude;
+    } else {
+        Y.config.logExclude = Y.config.logInclude;
+        delete Y.config.logInclude;
+    }
+    updatePreview();
+}, "#incexc");
+
+// delegate all checkbox and radio group clicks via a single event subscriber
+// routing to the appropriate function based on the input name
+var clickHandlers = {
+    src_filter : updateSourceFilters,
+    log_level  : updateLogLevel,
+    msg_src    : updatePreview,
+    msg_cat    : updatePreview
+};
+
+Y.delegate("click", function (e) {
+    var input   = e.currentTarget,
+        handler = clickHandlers[ input.get("name") ];
+
+    if (handler) {
+        handler(input.get("value"), input.get("checked"));
+    }
+
+}, "#demo", "input[name]");
+
+// Log message input and radio groups
+Y.on("keyup", updatePreview, "#msg");
+
+// Log message button
+Y.on("click", function (e) {
+    var msg = Y.one("#msg").get("value"),
+        cat = Y.one("#demo input[name=msg_cat]:checked").get("value"),
+        src = Y.one("#demo input[name=msg_src]:checked").get("value");
+
+    Y.log(msg,cat,src);
+}, "#log");
+
+// Support functions
+function updateSourceFilters(source, checked) {
+    var disposition = Y.one("#incexc").get("value"),
+        cfg = Y.config[disposition]; // Y.config.logInclude or logExclude
+
+    if (checked) {
+        if (!cfg) {
+            cfg = Y.config[disposition] = {};
+        }
+        cfg[source] = true;
+    } else {
+        delete cfg[source];
+        if (!Y.Object.size(cfg)) {
+            delete Y.config[disposition];
+        }
+    }
+
+    updatePreview();
+}
+
+function updateLogLevel(level, checked) {
+    if (checked) {
+        yconsole.set("logLevel", level);
+        updatePreview();
+    }
+}
+
+function updatePreview() {
+    var filters   = Y.all("#demo input[name=src_filter]:checked"),
+        cfg = {
+            logLevel: Y.one("#demo input[name=log_level]:checked").get("value")
+        };
+
+    if (filters.size()) {
+        cfg[Y.one("#incexc").get("value")] = Y.Array.hash(filters.get("value"));
+    }
+
+    Y.one("#preview").set("text",Y.substitute(
+        "// YUI instance configuration
+" +
+        "var Y = YUI({cfg});
+
+" +
+        "// Log statement
+" +
+        'Y.log("{msg}", "{lvl}", "{src}");',
+        {
+            cfg: Y.JSON.stringify(cfg, null, 4),
+            msg: Y.one("#msg").get("value"),
+            lvl: Y.one("#demo input[name=msg_cat]:checked").get("value"),
+            src: Y.one("#demo input[name=msg_src]:checked").get("value")
+        }));
+}
+
+});</textarea></div>
+<h4>CSS</h4>
+
+<div id="syntax-d87865f8e1d6b4481d6253555e69ee08" class="yui-syntax-highlight yui-syntax-highlight-linenumbers"><div class="numbers"><pre class="css" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="re0">#console</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">static</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">float</span><span class="sy0">:</span> <span class="kw1">left</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li2"><div class="de2"><span class="re0">#demo</span> <span class="re1">.yui3-console</span> <span class="re1">.yui3-console-title</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">border</span><span class="sy0">:</span> <span class="nu0">0</span> <span class="kw2">none</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">color</span><span class="sy0">:</span> <span class="re0">#000</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">font-size</span><span class="sy0">:</span> <span class="re3">13px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">font-weight</span><span class="sy0">:</span> <span class="kw2">bold</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">text-transform</span><span class="sy0">:</span> <span class="kw2">none</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="re0">#demo</span> <span class="re1">.yui3-console</span> <span class="re1">.yui3-console-entry-meta</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="re1">.filter-controls</span> p label <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">display</span><span class="sy0">:</span> <span class="kw2">block</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">margin</span><span class="sy0">:</span> <span class="re3">.25em</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#demo</span> input <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">vertical-align</span><span class="sy0">:</span> <span class="kw2">middle</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="re1">.form</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">clear</span><span class="sy0">:</span> <span class="kw1">left</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">padding</span><span class="sy0">:</span> <span class="re3">1em</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="re1">.form</span> span <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">padding-left</span><span class="sy0">:</span> <span class="re3">3em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="re0">#msg</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3"><span class="nu0">50</span>%</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="re1">.filter-controls</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">180px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">margin-left</span><span class="sy0">:</span> <span class="re3">1em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">float</span><span class="sy0">:</span> <span class="kw1">left</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="re0">#preview</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background</span><span class="sy0">:</span> <span class="re0">#eee</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="re0">#999</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">margin</span><span class="sy0">:</span> <span class="re3">1em</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">overflow</span><span class="sy0">:</span> <span class="kw2">auto</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">padding</span><span class="sy0">:</span> <span class="re3">1em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">480px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="css" style="font-family:monospace;"><span class="re0">#console</span> <span class="br0">&#123;</span>
+    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">static</span><span class="sy0">;</span>
+    <span class="kw1">float</span><span class="sy0">:</span> <span class="kw1">left</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#demo</span> <span class="re1">.yui3-console</span> <span class="re1">.yui3-console-title</span> <span class="br0">&#123;</span>
+    <span class="kw1">border</span><span class="sy0">:</span> <span class="nu0">0</span> <span class="kw2">none</span><span class="sy0">;</span>
+    <span class="kw1">color</span><span class="sy0">:</span> <span class="re0">#000</span><span class="sy0">;</span>
+    <span class="kw1">font-size</span><span class="sy0">:</span> <span class="re3">13px</span><span class="sy0">;</span>
+    <span class="kw1">font-weight</span><span class="sy0">:</span> <span class="kw2">bold</span><span class="sy0">;</span>
+    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span>
+    <span class="kw1">text-transform</span><span class="sy0">:</span> <span class="kw2">none</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="re0">#demo</span> <span class="re1">.yui3-console</span> <span class="re1">.yui3-console-entry-meta</span> <span class="br0">&#123;</span>
+    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="re1">.filter-controls</span> p label <span class="br0">&#123;</span>
+    <span class="kw1">display</span><span class="sy0">:</span> <span class="kw2">block</span><span class="sy0">;</span>
+    <span class="kw1">margin</span><span class="sy0">:</span> <span class="re3">.25em</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#demo</span> input <span class="br0">&#123;</span>
+    <span class="kw1">vertical-align</span><span class="sy0">:</span> <span class="kw2">middle</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="re1">.form</span> <span class="br0">&#123;</span>
+    <span class="kw1">clear</span><span class="sy0">:</span> <span class="kw1">left</span><span class="sy0">;</span>
+    <span class="kw1">padding</span><span class="sy0">:</span> <span class="re3">1em</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="re1">.form</span> span <span class="br0">&#123;</span>
+    <span class="kw1">padding-left</span><span class="sy0">:</span> <span class="re3">3em</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="re0">#msg</span> <span class="br0">&#123;</span>
+    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3"><span class="nu0">50</span>%</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="re1">.filter-controls</span> <span class="br0">&#123;</span>
+    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">180px</span><span class="sy0">;</span>
+    <span class="kw1">margin-left</span><span class="sy0">:</span> <span class="re3">1em</span><span class="sy0">;</span>
+    <span class="kw1">float</span><span class="sy0">:</span> <span class="kw1">left</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="re0">#preview</span> <span class="br0">&#123;</span>
+    <span class="kw1">background</span><span class="sy0">:</span> <span class="re0">#eee</span><span class="sy0">;</span>
+    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="re0">#999</span><span class="sy0">;</span>
+    <span class="kw1">margin</span><span class="sy0">:</span> <span class="re3">1em</span> <span class="nu0">0</span><span class="sy0">;</span>
+    <span class="kw1">overflow</span><span class="sy0">:</span> <span class="kw2">auto</span><span class="sy0">;</span>
+    <span class="kw1">padding</span><span class="sy0">:</span> <span class="re3">1em</span><span class="sy0">;</span>
+    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">480px</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-d87865f8e1d6b4481d6253555e69ee08-plain">#console {
+    position: static;
+    float: left;
+}
+#demo .yui3-console .yui3-console-title {
+    border: 0 none;
+    color: #000;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 0;
+    text-transform: none;
+}
+
+#demo .yui3-console .yui3-console-entry-meta {
+    margin: 0;
+}
+
+.filter-controls p label {
+    display: block;
+    margin: .25em 0;
+}
+#demo input {
+    vertical-align: middle;
+}
+
+.form {
+    clear: left;
+    padding: 1em 0;
+}
+
+.form span {
+    padding-left: 3em;
+}
+
+#msg {
+    width: 50%;
+}
+
+.filter-controls {
+    width: 180px;
+    margin-left: 1em;
+    float: left;
+}
+
+#preview {
+    background: #eee;
+    border: 1px solid #999;
+    margin: 1em 0;
+    overflow: auto;
+    padding: 1em;
+    width: 480px;
+}</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Console Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../console/console_basic.html'>Creating a Console for debugging</a></li><li class='selected'><a href='../console/console_yui_config.html'>YUI configuration to filter log messages</a></li><li><a href='../console/console_global.html'>Creating a universal Console</a></li><li><a href='../console-filters/console-filters_intro.html'>Using the ConsoleFilters plugin (included with examples for Plugin.ConsoleFilters)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Console Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/console/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_console.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="selected "><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

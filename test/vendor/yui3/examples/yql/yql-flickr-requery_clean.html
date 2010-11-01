@@ -1,0 +1,83 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>YQL Flickr Requery</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+<!--there is no custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>YQL Flickr Requery</h1>
+
+<div class="exampleIntro">
+	<p>In this example, the Flickr Recent Photos YQL table is used to pull in a small set of recent Flickr images every 8 seconds.</p>
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<style>
+    #res {
+        background-color: white;
+        border: 1px solid black;
+        padding: 2em;
+    }
+    #res h2 {
+        color: black;
+    }
+    #res h2 em {
+        font-size: 60%;
+    }
+    #res a {
+        margin: .25em;
+    }
+    #res a img {
+        border: 1px solid black;
+    }
+</style>
+
+
+<div id="res"></div>
+
+
+<script>
+
+YUI().use('node', 'yql', function(Y) {
+    
+    var res = Y.one('#res'), count = 0,
+        url = '<a href="http://flickr.com/photos/{owner}/{id}"><img src="http://static.flickr.com/{server}/{id}_{secret}_t.jpg"></a>';
+    
+    var q = Y.YQL('select * from flickr.photos.recent', function(r) {
+        count++;
+        res.setContent('<h2>Recent Flickr Photos <em>(query #' + count + ')</em></h2>');
+        Y.each(r.query.results.photo, function(v) {
+            res.append(Y.Lang.sub(url, v));
+        });
+    });
+    Y.later(8000, q, q.send, null, true);
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

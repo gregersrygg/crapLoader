@@ -1,0 +1,269 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: DataSource Utility: DataSource.Get</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+/* custom styles for this example */
+#demo .output {margin-bottom:1em; padding:10px; border:1px solid #D9D9D9;}
+</style>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: DataSource Utility: DataSource.Get</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>DataSource Utility: DataSource.Get</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	DataSource.Get uses the Get Utility to retrieve data, even cross-domain resources, via a dynamically created script node. A <a href="http://developer.yahoo.com/yui/3/dataschema/">DataSchema</a> plugin is used to normalize incoming data into a known format for consistency of usage by other components. Please note that your data resource must support a callback mechanism, which is a function wrapper around the returned data. The name of the callback function is passed to the resource via a query string parameter defined by the DataSource.Get attribute <code>scriptCallbackParam</code>.
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="datasource_get_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<form id="demo">
+    <h4>JSON</h4>
+    <h6>Data</h6>
+    <pre>
+{
+    "query":{
+        "count":"10",
+        "created":"2009-06-04T05:15:06Z",
+        "lang":"en-US",
+        "updated":"2009-06-04T05:15:06Z",
+        "uri":"http://query.yahooapis.com/v1/yql?q=...query%3D%22pizza%22",
+        ...
+        "results":{
+            "result":[
+                {
+                    ...
+                    "dispurl":"www.&lt;b&gt;pizzahut.com&lt;\/b&gt;",
+                    "size":"16217",
+                    "title":"&lt;b&gt;Pizza&lt;\/b&gt; Hut",
+                    "url":"http://www.pizzahut.com/"
+                },
+                {
+                    ...
+                    "dispurl":"www.&lt;b&gt;dominos.com&lt;\/b&gt;",
+                    "size":"29739",
+                    "title":"Domino's &lt;b&gt;Pizza&lt;\/b&gt;",
+                    "url":"http://www.dominos.com/"
+                },
+                {
+                    ...
+                    "dispurl":"&lt;b&gt;mobile.papajohns.com&lt;\/b&gt;",
+                    "size":"2315",
+                    "title":"Papa John's Mobile Web",
+                    "url":"https://mobile.papajohns.com/"
+                },
+                ...
+            ]
+        }
+    }
+}
+    </pre>
+
+    <h6>Schema</h6>
+    <pre>
+{
+    resultListLocator: "query.results.result",
+    resultFields: ["title"]
+}
+    </pre>
+
+    <h6>Normalized data</h6>
+    <input type="button" id="demo_json" value="Retrieve data =>">
+    <div id="demo_output_json" class="output"></div>
+</form>
+
+<script type="text/javascript">
+YUI().use("dump", "node", "datasource-get", "datasource-jsonschema", "datasource-xmlschema", function (Y) {
+    var myDataSource = new Y.DataSource.Get({source:"http://query.yahooapis.com/v1/public/yql?format=json&"}),
+        myCallback = {
+            success: function(e){
+                Y.one("#demo_output_json").setContent(Y.dump(e.response).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"));
+            },
+            failure: function(e){
+                Y.one("#demo_output_json").setContent("Could not retrieve data: " + e.error.message);
+            }
+        };
+
+    myDataSource.plug(Y.Plugin.DataSourceJSONSchema, {
+        schema: {
+            resultListLocator: "query.results.result",
+            resultFields: ["title"]
+        }
+    });
+
+    Y.on("click", function(e){
+        myDataSource.sendRequest({
+            request:"q=select%20*%20from%20search.web%20where%20query%3D%22pizza%22",
+            callback:myCallback
+        });
+    }, "#demo_json");
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<p>Use a DataSourceJSONSchema plugin to parse the data against a schema that you provide:</p>
+
+<div id="syntax-804ae86a53799bb16fa5ad852a17e3e3" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;datasource-get&quot;</span><span class="sy0">,</span> <span class="st0">&quot;datasource-jsonschema&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> myDataSource <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">DataSource</span>.<span class="me1">Get</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        source<span class="sy0">:</span><span class="st0">&quot;http://query.yahooapis.com/v1/public/yql?format=json&amp;&quot;</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        myCallback <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            success<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw3">alert</span><span class="br0">&#40;</span>e.<span class="me1">response</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            failure<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw3">alert</span><span class="br0">&#40;</span><span class="st0">&quot;Could not retrieve data: &quot;</span> <span class="sy0">+</span> e.<span class="me1">error</span>.<span class="me1">message</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    myDataSource.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">DataSourceJSONSchema</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        schema<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            resultListLocator<span class="sy0">:</span> <span class="st0">&quot;query.results.result&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            resultFields<span class="sy0">:</span> <span class="br0">&#91;</span><span class="st0">&quot;title&quot;</span><span class="br0">&#93;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    myDataSource.<span class="me1">sendRequest</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        request<span class="sy0">:</span><span class="st0">&quot;q=select%20*%20from%20search.web%20where%20query%3D%22pizza%22&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        callback<span class="sy0">:</span>myCallback</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;datasource-get&quot;</span><span class="sy0">,</span> <span class="st0">&quot;datasource-jsonschema&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> myDataSource <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">DataSource</span>.<span class="me1">Get</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+        source<span class="sy0">:</span><span class="st0">&quot;http://query.yahooapis.com/v1/public/yql?format=json&amp;&quot;</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        myCallback <span class="sy0">=</span> <span class="br0">&#123;</span>
+            success<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span><span class="br0">&#123;</span>
+                <span class="kw3">alert</span><span class="br0">&#40;</span>e.<span class="me1">response</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span><span class="sy0">,</span>
+            failure<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span><span class="br0">&#123;</span>
+                <span class="kw3">alert</span><span class="br0">&#40;</span><span class="st0">&quot;Could not retrieve data: &quot;</span> <span class="sy0">+</span> e.<span class="me1">error</span>.<span class="me1">message</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+    myDataSource.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">DataSourceJSONSchema</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+        schema<span class="sy0">:</span> <span class="br0">&#123;</span>
+            resultListLocator<span class="sy0">:</span> <span class="st0">&quot;query.results.result&quot;</span><span class="sy0">,</span>
+            resultFields<span class="sy0">:</span> <span class="br0">&#91;</span><span class="st0">&quot;title&quot;</span><span class="br0">&#93;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    myDataSource.<span class="me1">sendRequest</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+        request<span class="sy0">:</span><span class="st0">&quot;q=select%20*%20from%20search.web%20where%20query%3D%22pizza%22&quot;</span><span class="sy0">,</span>
+        callback<span class="sy0">:</span>myCallback
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-804ae86a53799bb16fa5ad852a17e3e3-plain">YUI().use("datasource-get", "datasource-jsonschema", function(Y) {
+    var myDataSource = new Y.DataSource.Get({
+        source:"http://query.yahooapis.com/v1/public/yql?format=json&"}),
+        myCallback = {
+            success: function(e){
+                alert(e.response);
+            },
+            failure: function(e){
+                alert("Could not retrieve data: " + e.error.message);
+            }
+        };
+
+    myDataSource.plug(Y.Plugin.DataSourceJSONSchema, {
+        schema: {
+            resultListLocator: "query.results.result",
+            resultFields: ["title"]
+        }
+    });
+
+    myDataSource.sendRequest({
+        request:"q=select%20*%20from%20search.web%20where%20query%3D%22pizza%22",
+        callback:myCallback
+    });
+});</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    DataSource Utility Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../datasource/datasource_local.html'>DataSource.Local</a></li><li class='selected'><a href='../datasource/datasource_get.html'>DataSource.Get</a></li><li><a href='../datasource/datasource_io.html'>DataSource.IO</a></li><li><a href='../datasource/datasource_function.html'>DataSource.Function</a></li><li><a href='../datasource/datasource_caching.html'>DataSource with Caching</a></li><li><a href='../datasource/datasource_offlinecache.html'>DataSource with Offline Cache</a></li><li><a href='../datasource/datasource_polling.html'>DataSource with Polling</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More DataSource Utility Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/datasource/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_datasource.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="selected "><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

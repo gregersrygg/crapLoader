@@ -1,0 +1,131 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Compose Classes of Objects with <code>augment</code></title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-debug.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+    #demo input {
+        margin: 0 0 1ex;
+        font-size: 113%;
+        padding: .2em 1em;
+    }
+    
+    #demo .tally {
+        text-align: center;
+        width: 7em;
+        display: inline;
+        float: left;
+    }
+    #demo .tally h3 {
+        background: #222;
+        color: #fff;
+        margin: 0;
+        padding: 1ex;
+    }
+    #demo .tally p {
+        font-size: 5em;
+        background: #fff;
+        color: #000;
+        margin: 0;
+    }
+    #demo .tally p.limit_reached {
+        color: #900;
+        font-style: italic;
+    }
+
+    #demo .demo_buttons {
+        margin-left: 8em;
+    }
+</style>
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Compose Classes of Objects with <code>augment</code></h1>
+
+<div class="exampleIntro">
+	<p>In this example, a class has been created then augmented with
+<code>EventTarget</code> to provide custom event functionality.</p>
+
+<p>Click the Send button to send the instance of the new class a request.</p>
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<input type="button" id="demo" name="demo" value="Send">
+
+<p id="demo_p1"></p>
+<p id="demo_p2"></p>
+
+<script type="text/javascript">
+YUI({filter:"debug", logInclude: {example:true}}).use("node", function(Y) {
+    // This method is in the 'oop' module.  Since we require 'node'
+    // for this example, and 'node' requires 'oop', the 'oop' module
+    // will be loaded automatically.
+
+    var Foo = function() {
+        /* code specific to Foo */
+        this.publish('interestingMoment');
+    };
+
+    Foo.prototype.doSomething = function() {
+
+        var eventData = {};
+
+        // -- do something interesting, add results to eventData --
+
+        eventData.statusText = 'bar';
+
+        // notify the subscribers, passing the event data
+        this.fire('interestingMoment', eventData);
+    }
+
+    Y.augment(Foo, Y.EventTarget);
+
+    var foo = new Foo();
+
+    // add some event listeners
+    foo.on('interestingMoment', function (data) {
+        var p = Y.one('#demo_p1');
+        p.set('innerHTML', 'I was notified of an interesting moment: ' + data.statusText);
+    });
+
+    foo.on('interestingMoment', function (data) {
+        var p = Y.one('#demo_p2');
+        p.set('innerHTML', 'I was also notified of an interesting moment: ' + data.statusText);
+    });
+
+    Y.on('click', function() { 
+        foo.doSomething();
+    }, '#demo');
+});
+
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

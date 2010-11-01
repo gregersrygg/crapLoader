@@ -1,0 +1,757 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Drag &amp; Drop: Interaction Groups</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+
+<!--there is no custom header content for this example-->
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Drag &amp; Drop: Interaction Groups</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Drag &amp; Drop: Interaction Groups</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>Using interaction groups, this example demonstrates how to tie into the Drag &amp; Drop Utility's interesting moments to provide visual affordances for the current drag operation.</p>
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="groups-drag_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<style>
+.slot {
+    border: 2px solid #808080;
+    background-color: #CDCDCD;
+    color: #666666;
+    text-align: center;
+    position: relative;
+    float: left;
+    margin: 4px;
+    width: 60px;
+    height: 60px;
+    z-index: 0;
+}
+.player {
+    border: 2px solid #808080;
+    color: #ffffff;
+    text-align: center;
+    position: relative;
+    float: left;
+    margin: 4px;
+    width: 60px;
+    height: 60px;
+    top: 150px;
+    z-index: 1;
+    cursor: move;
+}
+#pt1 {
+    clear: both;
+}
+.bottom {
+    top: 50px;
+}
+
+#pt1, #pt2 {
+    background-color: #71241A;
+}
+#pb1, #pb2 {
+    background-color: #004C6D;
+}
+
+#pboth1, #pboth2 {
+    background-color: #FFA928;
+}
+
+#workarea {
+    position: relative;
+    height: 300px;
+    width: 500px;
+}
+#workarea .yui3-dd-drop-active-valid {
+    border: 2px solid green;
+}
+#workarea .yui3-dd-drop-over {
+    background-color: green;
+}
+#workarea .yui3-dd-drop-active-invalid {
+    border: 2px solid red;
+}
+</style>
+
+<div id="workarea">
+
+    <div class="slot" id="t1">1</div>
+    <div class="slot bottom" id="b1">3</div>
+    <div class="slot bottom" id="b2">4</div>
+    <div class="slot bottom" id="b3">5</div>
+    <div class="slot bottom" id="b4">6</div>
+    <div class="slot" id="t2">2</div>
+
+
+    <div class="player" id="pt1">1</div>
+    <div class="player" id="pt2">2</div>
+    <div class="player" id="pb1">3</div>
+    <div class="player" id="pb2">4</div>
+    <div class="player" id="pboth1">5</div>
+    <div class="player" id="pboth2">6</div>
+
+</div>
+
+<script>
+var config = {};
+config.filter = 'raw';
+YUI(config).use('dd-drop', 'dd-proxy', 'dd-constrain', function(Y) {
+    
+    var slots = Y.one('#workarea').all('.slot');
+    Y.each(slots, function(v, k) {
+        var id = v.get('id'), groups = ['two'];
+        switch (id) {
+            case 't1':
+            case 't2':
+                groups = ['one'];
+                break;
+        }
+        var drop = new Y.DD.Drop({
+            node: v,
+            groups: groups
+        });
+    });
+
+    var players = Y.one('#workarea').all('.player');
+    Y.each(players, function(v, k) {
+        var id = v.get('id'), groups = ['one', 'two'];
+        switch (id) {
+            case 'pt1':
+            case 'pt2':
+                groups = ['one'];
+                break;
+            case 'pb1':
+            case 'pb2':
+                groups = ['two'];
+                break;
+        }
+        var drag = new Y.DD.Drag({
+            node: v,
+            groups: groups,
+            dragMode: 'intersect'
+        }).plug(Y.Plugin.DDProxy, {
+            moveOnEnd: false
+        }).plug(Y.Plugin.DDConstrained, {
+            constrain2node: '#workarea'
+        });
+        drag.on('drag:start', function() {
+            var p = this.get('dragNode'),
+                n = this.get('node');
+                n.setStyle('opacity', .25);
+                if (!this._playerStart) {
+                    this._playerStart = this.nodeXY;
+                }
+            p.set('innerHTML', n.get('innerHTML'));
+            p.setStyles({
+                backgroundColor: n.getStyle('backgroundColor'),
+                color: n.getStyle('color'),
+                opacity: .65
+            });
+        });
+        drag.on('drag:end', function() {
+            var n = this.get('node');
+            n.setStyle('opacity', '1');
+        });
+        drag.on('drag:drophit', function(e) {
+            var xy = e.drop.get('node').getXY();
+            this.get('node').setXY(xy, Y.UA.ie);
+        });
+        drag.on('drag:dropmiss', function(e) {
+            if (this._playerStart) {
+                this.get('node').setXY(this._playerStart, Y.UA.ie);
+                this._playerStart = null;
+            }
+        });
+    });
+});
+</script>
+
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Setting up the Work Area</h3>
+<p>First we need to create the work area, players (drags) and slots (drops).</p>
+<div id="syntax-e9eec63680b4b7211f1d931778d6121c" class="yui-syntax-highlight"><div class="numbers"><pre class="html4strict" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;workarea&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;slot&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;t1&quot;</span>&gt;</span>1<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;slot bottom&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;b1&quot;</span>&gt;</span>3<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li2"><div class="de2">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;slot bottom&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;b2&quot;</span>&gt;</span>4<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;slot bottom&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;b3&quot;</span>&gt;</span>5<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;slot bottom&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;b4&quot;</span>&gt;</span>6<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;slot&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;t2&quot;</span>&gt;</span>2<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;player&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;pt1&quot;</span>&gt;</span>1<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;player&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;pt2&quot;</span>&gt;</span>2<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;player&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;pb1&quot;</span>&gt;</span>3<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;player&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;pb2&quot;</span>&gt;</span>4<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li2"><div class="de2">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;player&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;pboth1&quot;</span>&gt;</span>5<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;player&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;pboth2&quot;</span>&gt;</span>6<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="html4strict" style="font-family:monospace;"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;workarea&quot;</span>&gt;</span>
+&nbsp;
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;slot&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;t1&quot;</span>&gt;</span>1<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;slot bottom&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;b1&quot;</span>&gt;</span>3<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;slot bottom&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;b2&quot;</span>&gt;</span>4<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;slot bottom&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;b3&quot;</span>&gt;</span>5<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;slot bottom&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;b4&quot;</span>&gt;</span>6<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;slot&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;t2&quot;</span>&gt;</span>2<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+&nbsp;
+&nbsp;
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;player&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;pt1&quot;</span>&gt;</span>1<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;player&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;pt2&quot;</span>&gt;</span>2<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;player&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;pb1&quot;</span>&gt;</span>3<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;player&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;pb2&quot;</span>&gt;</span>4<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;player&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;pboth1&quot;</span>&gt;</span>5<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;player&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;pboth2&quot;</span>&gt;</span>6<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+&nbsp;
+<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></pre></div><textarea id="syntax-e9eec63680b4b7211f1d931778d6121c-plain"><div id="workarea">
+
+    <div class="slot" id="t1">1</div>
+    <div class="slot bottom" id="b1">3</div>
+    <div class="slot bottom" id="b2">4</div>
+    <div class="slot bottom" id="b3">5</div>
+    <div class="slot bottom" id="b4">6</div>
+    <div class="slot" id="t2">2</div>
+
+
+    <div class="player" id="pt1">1</div>
+    <div class="player" id="pt2">2</div>
+    <div class="player" id="pb1">3</div>
+    <div class="player" id="pb2">4</div>
+    <div class="player" id="pboth1">5</div>
+    <div class="player" id="pboth2">6</div>
+
+</div></textarea></div>
+<p>Now we give them some CSS to make them visible.</p>
+<div id="syntax-5afb7c6ed3025f73352f196d681f9c08" class="yui-syntax-highlight"><div class="numbers"><pre class="css" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="re1">.slot</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">2px</span> <span class="kw2">solid</span> <span class="re0">#808080</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#CDCDCD</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">color</span><span class="sy0">:</span> <span class="re0">#666666</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">text-align</span><span class="sy0">:</span> <span class="kw2">center</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">relative</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">float</span><span class="sy0">:</span> <span class="kw1">left</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">margin</span><span class="sy0">:</span> <span class="re3">4px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">60px</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">60px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">z-index</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re1">.player</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">2px</span> <span class="kw2">solid</span> <span class="re0">#808080</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">color</span><span class="sy0">:</span> <span class="re0">#ffffff</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">text-align</span><span class="sy0">:</span> <span class="kw2">center</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">relative</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">float</span><span class="sy0">:</span> <span class="kw1">left</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">margin</span><span class="sy0">:</span> <span class="re3">4px</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">60px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">60px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">top</span><span class="sy0">:</span> <span class="re3">150px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">z-index</span><span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">cursor</span><span class="sy0">:</span> move<span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#pt1</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">clear</span><span class="sy0">:</span> <span class="kw2">both</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re1">.bottom</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">top</span><span class="sy0">:</span> <span class="re3">50px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="re0">#pt1</span><span class="sy0">,</span> <span class="re0">#pt2</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#71241A</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#pb1</span><span class="sy0">,</span> <span class="re0">#pb2</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#004C6D</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="re0">#pboth1</span><span class="sy0">,</span> <span class="re0">#pboth2</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#FFA928</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="re0">#workarea</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">relative</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">300px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">500px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#workarea</span> <span class="re1">.yui3-dd-drop-active-valid</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">2px</span> <span class="kw2">solid</span> <span class="kw2">green</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#workarea</span> <span class="re1">.yui3-dd-drop-over</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="kw2">green</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li2"><div class="de2"><span class="re0">#workarea</span> <span class="re1">.yui3-dd-drop-active-invalid</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">2px</span> <span class="kw2">solid</span> <span class="kw2">red</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="css" style="font-family:monospace;"><span class="re1">.slot</span> <span class="br0">&#123;</span>
+    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">2px</span> <span class="kw2">solid</span> <span class="re0">#808080</span><span class="sy0">;</span>
+    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#CDCDCD</span><span class="sy0">;</span>
+    <span class="kw1">color</span><span class="sy0">:</span> <span class="re0">#666666</span><span class="sy0">;</span>
+    <span class="kw1">text-align</span><span class="sy0">:</span> <span class="kw2">center</span><span class="sy0">;</span>
+    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">relative</span><span class="sy0">;</span>
+    <span class="kw1">float</span><span class="sy0">:</span> <span class="kw1">left</span><span class="sy0">;</span>
+    <span class="kw1">margin</span><span class="sy0">:</span> <span class="re3">4px</span><span class="sy0">;</span>
+    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">60px</span><span class="sy0">;</span>
+    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">60px</span><span class="sy0">;</span>
+    <span class="kw1">z-index</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re1">.player</span> <span class="br0">&#123;</span>
+    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">2px</span> <span class="kw2">solid</span> <span class="re0">#808080</span><span class="sy0">;</span>
+    <span class="kw1">color</span><span class="sy0">:</span> <span class="re0">#ffffff</span><span class="sy0">;</span>
+    <span class="kw1">text-align</span><span class="sy0">:</span> <span class="kw2">center</span><span class="sy0">;</span>
+    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">relative</span><span class="sy0">;</span>
+    <span class="kw1">float</span><span class="sy0">:</span> <span class="kw1">left</span><span class="sy0">;</span>
+    <span class="kw1">margin</span><span class="sy0">:</span> <span class="re3">4px</span><span class="sy0">;</span>
+    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">60px</span><span class="sy0">;</span>
+    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">60px</span><span class="sy0">;</span>
+    <span class="kw1">top</span><span class="sy0">:</span> <span class="re3">150px</span><span class="sy0">;</span>
+    <span class="kw1">z-index</span><span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">;</span>
+    <span class="kw1">cursor</span><span class="sy0">:</span> move<span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#pt1</span> <span class="br0">&#123;</span>
+    <span class="kw1">clear</span><span class="sy0">:</span> <span class="kw2">both</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re1">.bottom</span> <span class="br0">&#123;</span>
+    <span class="kw1">top</span><span class="sy0">:</span> <span class="re3">50px</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="re0">#pt1</span><span class="sy0">,</span> <span class="re0">#pt2</span> <span class="br0">&#123;</span>
+    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#71241A</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#pb1</span><span class="sy0">,</span> <span class="re0">#pb2</span> <span class="br0">&#123;</span>
+    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#004C6D</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="re0">#pboth1</span><span class="sy0">,</span> <span class="re0">#pboth2</span> <span class="br0">&#123;</span>
+    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#FFA928</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="re0">#workarea</span> <span class="br0">&#123;</span>
+    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">relative</span><span class="sy0">;</span>
+    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">300px</span><span class="sy0">;</span>
+    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">500px</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#workarea</span> <span class="re1">.yui3-dd-drop-active-valid</span> <span class="br0">&#123;</span>
+    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">2px</span> <span class="kw2">solid</span> <span class="kw2">green</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#workarea</span> <span class="re1">.yui3-dd-drop-over</span> <span class="br0">&#123;</span>
+    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="kw2">green</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#workarea</span> <span class="re1">.yui3-dd-drop-active-invalid</span> <span class="br0">&#123;</span>
+    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">2px</span> <span class="kw2">solid</span> <span class="kw2">red</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-5afb7c6ed3025f73352f196d681f9c08-plain">.slot {
+    border: 2px solid #808080;
+    background-color: #CDCDCD;
+    color: #666666;
+    text-align: center;
+    position: relative;
+    float: left;
+    margin: 4px;
+    width: 60px;
+    height: 60px;
+    z-index: 0;
+}
+.player {
+    border: 2px solid #808080;
+    color: #ffffff;
+    text-align: center;
+    position: relative;
+    float: left;
+    margin: 4px;
+    width: 60px;
+    height: 60px;
+    top: 150px;
+    z-index: 1;
+    cursor: move;
+}
+#pt1 {
+    clear: both;
+}
+.bottom {
+    top: 50px;
+}
+
+#pt1, #pt2 {
+    background-color: #71241A;
+}
+#pb1, #pb2 {
+    background-color: #004C6D;
+}
+
+#pboth1, #pboth2 {
+    background-color: #FFA928;
+}
+
+#workarea {
+    position: relative;
+    height: 300px;
+    width: 500px;
+}
+#workarea .yui3-dd-drop-active-valid {
+    border: 2px solid green;
+}
+#workarea .yui3-dd-drop-over {
+    background-color: green;
+}
+#workarea .yui3-dd-drop-active-invalid {
+    border: 2px solid red;
+}</textarea></div>
+<h4>Setting up the YUI Instance</h4>
+<p>Now we need to create our YUI instance and tell it to load the <code>dd-drop</code>, <code>dd-proxy</code> and <code>dd-constrain</code> modules.</p>
+<div id="syntax-a67f945f2017504ff68b7f384c310440" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drop'</span><span class="sy0">,</span> <span class="st0">'dd-proxy'</span><span class="sy0">,</span> <span class="st0">'dd-constrain'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drop'</span><span class="sy0">,</span> <span class="st0">'dd-proxy'</span><span class="sy0">,</span> <span class="st0">'dd-constrain'</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-a67f945f2017504ff68b7f384c310440-plain">YUI().use('dd-drop', 'dd-proxy', 'dd-constrain');</textarea></div>
+<h4>Setting up the Drop Targets</h4>
+<p>Now that we have a YUI instance with the requested modules, we are going to create our Drop Targets.</p>
+<div id="syntax-3d639e103bf4c803d8c67b39d62850d9" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drop'</span><span class="sy0">,</span> <span class="st0">'dd-proxy'</span><span class="sy0">,</span> <span class="st0">'dd-constrain'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//Get all the nodes with the class of .slot under #workarea</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> slots <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#workarea'</span><span class="br0">&#41;</span>.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">'.slot'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//Loop through them</span></div></li><li class="li2"><div class="de2">    Y.<span class="me1">each</span><span class="br0">&#40;</span>slots<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>v<span class="sy0">,</span> k<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> id <span class="sy0">=</span> v.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'id'</span><span class="br0">&#41;</span><span class="sy0">,</span> groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'two'</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="co1">//Assign them to different groups</span></div></li><li class="li1"><div class="de1">        <span class="kw1">switch</span> <span class="br0">&#40;</span>id<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">case</span> <span class="st0">'t1'</span><span class="sy0">:</span></div></li><li class="li2"><div class="de2">            <span class="kw1">case</span> <span class="st0">'t2'</span><span class="sy0">:</span></div></li><li class="li1"><div class="de1">                groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'one'</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="kw1">break</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="co1">//Create the Drop object</span></div></li><li class="li2"><div class="de2">        <span class="kw2">var</span> drop <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">DD</span>.<span class="me1">Drop</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            node<span class="sy0">:</span> v<span class="sy0">,</span></div></li><li class="li1"><div class="de1">            <span class="co1">//With the new groups array as a config option</span></div></li><li class="li1"><div class="de1">            groups<span class="sy0">:</span> groups</div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drop'</span><span class="sy0">,</span> <span class="st0">'dd-proxy'</span><span class="sy0">,</span> <span class="st0">'dd-constrain'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">//Get all the nodes with the class of .slot under #workarea</span>
+    <span class="kw2">var</span> slots <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#workarea'</span><span class="br0">&#41;</span>.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">'.slot'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="co1">//Loop through them</span>
+    Y.<span class="me1">each</span><span class="br0">&#40;</span>slots<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>v<span class="sy0">,</span> k<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw2">var</span> id <span class="sy0">=</span> v.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'id'</span><span class="br0">&#41;</span><span class="sy0">,</span> groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'two'</span><span class="br0">&#93;</span><span class="sy0">;</span>
+        <span class="co1">//Assign them to different groups</span>
+        <span class="kw1">switch</span> <span class="br0">&#40;</span>id<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">case</span> <span class="st0">'t1'</span><span class="sy0">:</span>
+            <span class="kw1">case</span> <span class="st0">'t2'</span><span class="sy0">:</span>
+                groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'one'</span><span class="br0">&#93;</span><span class="sy0">;</span>
+                <span class="kw1">break</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+        <span class="co1">//Create the Drop object</span>
+        <span class="kw2">var</span> drop <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">DD</span>.<span class="me1">Drop</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+            node<span class="sy0">:</span> v<span class="sy0">,</span>
+            <span class="co1">//With the new groups array as a config option</span>
+            groups<span class="sy0">:</span> groups
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-3d639e103bf4c803d8c67b39d62850d9-plain">YUI().use('dd-drop', 'dd-proxy', 'dd-constrain', function(Y) {
+    //Get all the nodes with the class of .slot under #workarea
+    var slots = Y.one('#workarea').all('.slot');
+    //Loop through them
+    Y.each(slots, function(v, k) {
+        var id = v.get('id'), groups = ['two'];
+        //Assign them to different groups
+        switch (id) {
+            case 't1':
+            case 't2':
+                groups = ['one'];
+                break;
+        }
+        //Create the Drop object
+        var drop = new Y.DD.Drop({
+            node: v,
+            //With the new groups array as a config option
+            groups: groups
+        });
+    });
+});</textarea></div>
+<h4>Setting up the Drag Nodes</h4>
+<p>Now we need to create the Drag Nodes and assign them to the proper group.</p>
+<div id="syntax-68365e6e9c780c5ea5aefa3da58f65b6" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drop'</span><span class="sy0">,</span> <span class="st0">'dd-proxy'</span><span class="sy0">,</span> <span class="st0">'dd-constrain'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//Snipped</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> players <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#workarea'</span><span class="br0">&#41;</span>.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">'.player'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    Y.<span class="me1">each</span><span class="br0">&#40;</span>players<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>v<span class="sy0">,</span> k<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="kw2">var</span> id <span class="sy0">=</span> v.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'id'</span><span class="br0">&#41;</span><span class="sy0">,</span> groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'one'</span><span class="sy0">,</span> <span class="st0">'two'</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">switch</span> <span class="br0">&#40;</span>id<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">case</span> <span class="st0">'pt1'</span><span class="sy0">:</span></div></li><li class="li1"><div class="de1">            <span class="kw1">case</span> <span class="st0">'pt2'</span><span class="sy0">:</span></div></li><li class="li1"><div class="de1">                groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'one'</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">                <span class="kw1">break</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">case</span> <span class="st0">'pb1'</span><span class="sy0">:</span></div></li><li class="li1"><div class="de1">            <span class="kw1">case</span> <span class="st0">'pb2'</span><span class="sy0">:</span></div></li><li class="li1"><div class="de1">                groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'two'</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="kw1">break</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> drag <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">DD</span>.<span class="me1">Drag</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            node<span class="sy0">:</span> v<span class="sy0">,</span></div></li><li class="li1"><div class="de1">            <span class="co1">//Assign the Groups</span></div></li><li class="li1"><div class="de1">            groups<span class="sy0">:</span> groups<span class="sy0">,</span></div></li><li class="li2"><div class="de2">            <span class="co1">//Use Intersect Mode for the Target Calculations</span></div></li><li class="li1"><div class="de1">            dragMode<span class="sy0">:</span> <span class="st0">'intersect'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">DDProxy</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="co1">//We don't want the node to move on end drag</span></div></li><li class="li1"><div class="de1">            moveOnEnd<span class="sy0">:</span> <span class="kw2">false</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">DDConstrained</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="co1">//Keep me inside the workarea</span></div></li><li class="li1"><div class="de1">            constrain2node<span class="sy0">:</span> <span class="st0">'#workarea'</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drop'</span><span class="sy0">,</span> <span class="st0">'dd-proxy'</span><span class="sy0">,</span> <span class="st0">'dd-constrain'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">//Snipped</span>
+    <span class="kw2">var</span> players <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#workarea'</span><span class="br0">&#41;</span>.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">'.player'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    Y.<span class="me1">each</span><span class="br0">&#40;</span>players<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>v<span class="sy0">,</span> k<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw2">var</span> id <span class="sy0">=</span> v.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'id'</span><span class="br0">&#41;</span><span class="sy0">,</span> groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'one'</span><span class="sy0">,</span> <span class="st0">'two'</span><span class="br0">&#93;</span><span class="sy0">;</span>
+        <span class="kw1">switch</span> <span class="br0">&#40;</span>id<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">case</span> <span class="st0">'pt1'</span><span class="sy0">:</span>
+            <span class="kw1">case</span> <span class="st0">'pt2'</span><span class="sy0">:</span>
+                groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'one'</span><span class="br0">&#93;</span><span class="sy0">;</span>
+                <span class="kw1">break</span><span class="sy0">;</span>
+            <span class="kw1">case</span> <span class="st0">'pb1'</span><span class="sy0">:</span>
+            <span class="kw1">case</span> <span class="st0">'pb2'</span><span class="sy0">:</span>
+                groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'two'</span><span class="br0">&#93;</span><span class="sy0">;</span>
+                <span class="kw1">break</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+        <span class="kw2">var</span> drag <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">DD</span>.<span class="me1">Drag</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+            node<span class="sy0">:</span> v<span class="sy0">,</span>
+            <span class="co1">//Assign the Groups</span>
+            groups<span class="sy0">:</span> groups<span class="sy0">,</span>
+            <span class="co1">//Use Intersect Mode for the Target Calculations</span>
+            dragMode<span class="sy0">:</span> <span class="st0">'intersect'</span><span class="sy0">,</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">DDProxy</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+            <span class="co1">//We don't want the node to move on end drag</span>
+            moveOnEnd<span class="sy0">:</span> <span class="kw2">false</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">DDConstrained</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+            <span class="co1">//Keep me inside the workarea</span>
+            constrain2node<span class="sy0">:</span> <span class="st0">'#workarea'</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-68365e6e9c780c5ea5aefa3da58f65b6-plain">YUI().use('dd-drop', 'dd-proxy', 'dd-constrain', function(Y) {
+    //Snipped
+    var players = Y.one('#workarea').all('.player');
+    Y.each(players, function(v, k) {
+        var id = v.get('id'), groups = ['one', 'two'];
+        switch (id) {
+            case 'pt1':
+            case 'pt2':
+                groups = ['one'];
+                break;
+            case 'pb1':
+            case 'pb2':
+                groups = ['two'];
+                break;
+        }
+        var drag = new Y.DD.Drag({
+            node: v,
+            //Assign the Groups
+            groups: groups,
+            //Use Intersect Mode for the Target Calculations
+            dragMode: 'intersect',
+        }).plug(Y.Plugin.DDProxy, {
+            //We don't want the node to move on end drag
+            moveOnEnd: false
+        }).plug(Y.Plugin.DDConstrained, {
+            //Keep me inside the workarea
+            constrain2node: '#workarea'
+        });
+});</textarea></div><h4>Handling the Drops and Moments</h4>
+<p>Now we are going to listen for Four Drag Events: <code>drag:start, drag:end, drag:drophit, drag:dropmiss</code></p>
+<div id="syntax-4eea7f94483a0c5cbec1ac8b246db80d" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:start'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//In this event we setup some styles to make the nodes look pretty</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> p <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'dragNode'</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        n <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        n.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">'opacity'</span><span class="sy0">,</span> .25<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span><span class="kw1">this</span>._playerStart<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">this</span>._playerStart <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">nodeXY</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//Put the Drag's HTML inside the proxy</span></div></li><li class="li2"><div class="de2">    p.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span> n.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//set some styles on the proxy</span></div></li><li class="li1"><div class="de1">    p.<span class="me1">setStyles</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        backgroundColor<span class="sy0">:</span> n.<span class="me1">getStyle</span><span class="br0">&#40;</span><span class="st0">'backgroundColor'</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        color<span class="sy0">:</span> n.<span class="me1">getStyle</span><span class="br0">&#40;</span><span class="st0">'color'</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        opacity<span class="sy0">:</span> .65</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:end'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//Undo some of the styles from the start</span></div></li><li class="li2"><div class="de2">    <span class="kw2">var</span> n <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    n.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">'opacity'</span><span class="sy0">,</span> <span class="st0">'1'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:drophit'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//If we drop on a target, move to its position</span></div></li><li class="li2"><div class="de2">    <span class="kw2">var</span> xy <span class="sy0">=</span> e.<span class="me1">drop</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span>.<span class="me1">getXY</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span>.<span class="me1">setXY</span><span class="br0">&#40;</span>xy<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:dropmiss'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//If we miss a target, move back to our start position</span></div></li><li class="li2"><div class="de2">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>._playerStart<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span>.<span class="me1">setXY</span><span class="br0">&#40;</span><span class="kw1">this</span>._playerStart<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>._playerStart <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:start'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">//In this event we setup some styles to make the nodes look pretty</span>
+    <span class="kw2">var</span> p <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'dragNode'</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        n <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        n.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">'opacity'</span><span class="sy0">,</span> .25<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span><span class="kw1">this</span>._playerStart<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">this</span>._playerStart <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">nodeXY</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+    <span class="co1">//Put the Drag's HTML inside the proxy</span>
+    p.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span> n.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="co1">//set some styles on the proxy</span>
+    p.<span class="me1">setStyles</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+        backgroundColor<span class="sy0">:</span> n.<span class="me1">getStyle</span><span class="br0">&#40;</span><span class="st0">'backgroundColor'</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        color<span class="sy0">:</span> n.<span class="me1">getStyle</span><span class="br0">&#40;</span><span class="st0">'color'</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        opacity<span class="sy0">:</span> .65
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:end'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">//Undo some of the styles from the start</span>
+    <span class="kw2">var</span> n <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    n.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">'opacity'</span><span class="sy0">,</span> <span class="st0">'1'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:drophit'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">//If we drop on a target, move to its position</span>
+    <span class="kw2">var</span> xy <span class="sy0">=</span> e.<span class="me1">drop</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span>.<span class="me1">getXY</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span>.<span class="me1">setXY</span><span class="br0">&#40;</span>xy<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:dropmiss'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">//If we miss a target, move back to our start position</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>._playerStart<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span>.<span class="me1">setXY</span><span class="br0">&#40;</span><span class="kw1">this</span>._playerStart<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="kw1">this</span>._playerStart <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-4eea7f94483a0c5cbec1ac8b246db80d-plain">drag.on('drag:start', function() {
+    //In this event we setup some styles to make the nodes look pretty
+    var p = this.get('dragNode'),
+        n = this.get('node');
+        n.setStyle('opacity', .25);
+        if (!this._playerStart) {
+            this._playerStart = this.nodeXY;
+        }
+    //Put the Drag's HTML inside the proxy
+    p.set('innerHTML', n.get('innerHTML'));
+    //set some styles on the proxy
+    p.setStyles({
+        backgroundColor: n.getStyle('backgroundColor'),
+        color: n.getStyle('color'),
+        opacity: .65
+    });
+});
+drag.on('drag:end', function() {
+    //Undo some of the styles from the start
+    var n = this.get('node');
+    n.setStyle('opacity', '1');
+});
+drag.on('drag:drophit', function(e) {
+    //If we drop on a target, move to its position
+    var xy = e.drop.get('node').getXY();
+    this.get('node').setXY(xy);
+});
+drag.on('drag:dropmiss', function(e) {
+    //If we miss a target, move back to our start position
+    if (this._playerStart) {
+        this.get('node').setXY(this._playerStart);
+        this._playerStart = null;
+    }
+});</textarea></div>
+<h4>Full Javascript Code</h4>
+<div id="syntax-e7e5019004875d57c926a2b4aa70fe1f" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drop'</span><span class="sy0">,</span> <span class="st0">'dd-proxy'</span><span class="sy0">,</span> <span class="st0">'dd-constrain'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> slots <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#workarea'</span><span class="br0">&#41;</span>.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">'.slot'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    Y.<span class="me1">each</span><span class="br0">&#40;</span>slots<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>v<span class="sy0">,</span> k<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="kw2">var</span> id <span class="sy0">=</span> v.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'id'</span><span class="br0">&#41;</span><span class="sy0">,</span> groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'two'</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">switch</span> <span class="br0">&#40;</span>id<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">case</span> <span class="st0">'t1'</span><span class="sy0">:</span></div></li><li class="li1"><div class="de1">            <span class="kw1">case</span> <span class="st0">'t2'</span><span class="sy0">:</span></div></li><li class="li1"><div class="de1">                groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'one'</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">                <span class="kw1">break</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> drop <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">DD</span>.<span class="me1">Drop</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            node<span class="sy0">:</span> v<span class="sy0">,</span></div></li><li class="li1"><div class="de1">            groups<span class="sy0">:</span> groups</div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> players <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#workarea'</span><span class="br0">&#41;</span>.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">'.player'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    Y.<span class="me1">each</span><span class="br0">&#40;</span>players<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>v<span class="sy0">,</span> k<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="kw2">var</span> id <span class="sy0">=</span> v.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'id'</span><span class="br0">&#41;</span><span class="sy0">,</span> groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'one'</span><span class="sy0">,</span> <span class="st0">'two'</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">switch</span> <span class="br0">&#40;</span>id<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">case</span> <span class="st0">'pt1'</span><span class="sy0">:</span></div></li><li class="li1"><div class="de1">            <span class="kw1">case</span> <span class="st0">'pt2'</span><span class="sy0">:</span></div></li><li class="li1"><div class="de1">                groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'one'</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">                <span class="kw1">break</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">case</span> <span class="st0">'pb1'</span><span class="sy0">:</span></div></li><li class="li1"><div class="de1">            <span class="kw1">case</span> <span class="st0">'pb2'</span><span class="sy0">:</span></div></li><li class="li1"><div class="de1">                groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'two'</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="kw1">break</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> drag <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">DD</span>.<span class="me1">Drag</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            node<span class="sy0">:</span> v<span class="sy0">,</span></div></li><li class="li1"><div class="de1">            groups<span class="sy0">:</span> groups<span class="sy0">,</span></div></li><li class="li1"><div class="de1">            dragMode<span class="sy0">:</span> <span class="st0">'intersect'</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">DDProxy</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            moveOnEnd<span class="sy0">:</span> <span class="kw2">false</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">DDConstrained</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            constrain2node<span class="sy0">:</span> <span class="st0">'#workarea'</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:start'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw2">var</span> p <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'dragNode'</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                n <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                n.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">'opacity'</span><span class="sy0">,</span> .25<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span><span class="kw1">this</span>._playerStart<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                    <span class="kw1">this</span>._playerStart <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">nodeXY</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">            p.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span> n.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            p.<span class="me1">setStyles</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                backgroundColor<span class="sy0">:</span> n.<span class="me1">getStyle</span><span class="br0">&#40;</span><span class="st0">'backgroundColor'</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                color<span class="sy0">:</span> n.<span class="me1">getStyle</span><span class="br0">&#40;</span><span class="st0">'color'</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                opacity<span class="sy0">:</span> .65</div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:end'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            <span class="kw2">var</span> n <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            n.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">'opacity'</span><span class="sy0">,</span> <span class="st0">'1'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:drophit'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw2">var</span> xy <span class="sy0">=</span> e.<span class="me1">drop</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span>.<span class="me1">getXY</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">            <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span>.<span class="me1">setXY</span><span class="br0">&#40;</span>xy<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:dropmiss'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>._playerStart<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span>.<span class="me1">setXY</span><span class="br0">&#40;</span><span class="kw1">this</span>._playerStart<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">                <span class="kw1">this</span>._playerStart <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drop'</span><span class="sy0">,</span> <span class="st0">'dd-proxy'</span><span class="sy0">,</span> <span class="st0">'dd-constrain'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="kw2">var</span> slots <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#workarea'</span><span class="br0">&#41;</span>.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">'.slot'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    Y.<span class="me1">each</span><span class="br0">&#40;</span>slots<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>v<span class="sy0">,</span> k<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw2">var</span> id <span class="sy0">=</span> v.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'id'</span><span class="br0">&#41;</span><span class="sy0">,</span> groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'two'</span><span class="br0">&#93;</span><span class="sy0">;</span>
+        <span class="kw1">switch</span> <span class="br0">&#40;</span>id<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">case</span> <span class="st0">'t1'</span><span class="sy0">:</span>
+            <span class="kw1">case</span> <span class="st0">'t2'</span><span class="sy0">:</span>
+                groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'one'</span><span class="br0">&#93;</span><span class="sy0">;</span>
+                <span class="kw1">break</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+        <span class="kw2">var</span> drop <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">DD</span>.<span class="me1">Drop</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+            node<span class="sy0">:</span> v<span class="sy0">,</span>
+            groups<span class="sy0">:</span> groups
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw2">var</span> players <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#workarea'</span><span class="br0">&#41;</span>.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">'.player'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    Y.<span class="me1">each</span><span class="br0">&#40;</span>players<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>v<span class="sy0">,</span> k<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw2">var</span> id <span class="sy0">=</span> v.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'id'</span><span class="br0">&#41;</span><span class="sy0">,</span> groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'one'</span><span class="sy0">,</span> <span class="st0">'two'</span><span class="br0">&#93;</span><span class="sy0">;</span>
+        <span class="kw1">switch</span> <span class="br0">&#40;</span>id<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">case</span> <span class="st0">'pt1'</span><span class="sy0">:</span>
+            <span class="kw1">case</span> <span class="st0">'pt2'</span><span class="sy0">:</span>
+                groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'one'</span><span class="br0">&#93;</span><span class="sy0">;</span>
+                <span class="kw1">break</span><span class="sy0">;</span>
+            <span class="kw1">case</span> <span class="st0">'pb1'</span><span class="sy0">:</span>
+            <span class="kw1">case</span> <span class="st0">'pb2'</span><span class="sy0">:</span>
+                groups <span class="sy0">=</span> <span class="br0">&#91;</span><span class="st0">'two'</span><span class="br0">&#93;</span><span class="sy0">;</span>
+                <span class="kw1">break</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+        <span class="kw2">var</span> drag <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">DD</span>.<span class="me1">Drag</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+            node<span class="sy0">:</span> v<span class="sy0">,</span>
+            groups<span class="sy0">:</span> groups<span class="sy0">,</span>
+            dragMode<span class="sy0">:</span> <span class="st0">'intersect'</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">DDProxy</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+            moveOnEnd<span class="sy0">:</span> <span class="kw2">false</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">DDConstrained</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+            constrain2node<span class="sy0">:</span> <span class="st0">'#workarea'</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:start'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw2">var</span> p <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'dragNode'</span><span class="br0">&#41;</span><span class="sy0">,</span>
+                n <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                n.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">'opacity'</span><span class="sy0">,</span> .25<span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span><span class="kw1">this</span>._playerStart<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    <span class="kw1">this</span>._playerStart <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">nodeXY</span><span class="sy0">;</span>
+                <span class="br0">&#125;</span>
+            p.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span> n.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            p.<span class="me1">setStyles</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+                backgroundColor<span class="sy0">:</span> n.<span class="me1">getStyle</span><span class="br0">&#40;</span><span class="st0">'backgroundColor'</span><span class="br0">&#41;</span><span class="sy0">,</span>
+                color<span class="sy0">:</span> n.<span class="me1">getStyle</span><span class="br0">&#40;</span><span class="st0">'color'</span><span class="br0">&#41;</span><span class="sy0">,</span>
+                opacity<span class="sy0">:</span> .65
+            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:end'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw2">var</span> n <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            n.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">'opacity'</span><span class="sy0">,</span> <span class="st0">'1'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:drophit'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw2">var</span> xy <span class="sy0">=</span> e.<span class="me1">drop</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span>.<span class="me1">getXY</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span>.<span class="me1">setXY</span><span class="br0">&#40;</span>xy<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        drag.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drag:dropmiss'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>._playerStart<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span>.<span class="me1">setXY</span><span class="br0">&#40;</span><span class="kw1">this</span>._playerStart<span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="kw1">this</span>._playerStart <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-e7e5019004875d57c926a2b4aa70fe1f-plain">YUI().use('dd-drop', 'dd-proxy', 'dd-constrain', function(Y) {
+    
+    var slots = Y.one('#workarea').all('.slot');
+    Y.each(slots, function(v, k) {
+        var id = v.get('id'), groups = ['two'];
+        switch (id) {
+            case 't1':
+            case 't2':
+                groups = ['one'];
+                break;
+        }
+        var drop = new Y.DD.Drop({
+            node: v,
+            groups: groups
+        });
+    });
+
+    var players = Y.one('#workarea').all('.player');
+    Y.each(players, function(v, k) {
+        var id = v.get('id'), groups = ['one', 'two'];
+        switch (id) {
+            case 'pt1':
+            case 'pt2':
+                groups = ['one'];
+                break;
+            case 'pb1':
+            case 'pb2':
+                groups = ['two'];
+                break;
+        }
+        var drag = new Y.DD.Drag({
+            node: v,
+            groups: groups,
+            dragMode: 'intersect'
+        }).plug(Y.Plugin.DDProxy, {
+            moveOnEnd: false
+        }).plug(Y.Plugin.DDConstrained, {
+            constrain2node: '#workarea'
+        });
+        drag.on('drag:start', function() {
+            var p = this.get('dragNode'),
+                n = this.get('node');
+                n.setStyle('opacity', .25);
+                if (!this._playerStart) {
+                    this._playerStart = this.nodeXY;
+                }
+            p.set('innerHTML', n.get('innerHTML'));
+            p.setStyles({
+                backgroundColor: n.getStyle('backgroundColor'),
+                color: n.getStyle('color'),
+                opacity: .65
+            });
+        });
+        drag.on('drag:end', function() {
+            var n = this.get('node');
+            n.setStyle('opacity', '1');
+        });
+        drag.on('drag:drophit', function(e) {
+            var xy = e.drop.get('node').getXY();
+            this.get('node').setXY(xy);
+        });
+        drag.on('drag:dropmiss', function(e) {
+            if (this._playerStart) {
+                this.get('node').setXY(this._playerStart);
+                this._playerStart = null;
+            }
+        });
+    });
+
+
+});</textarea></div>
+				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Drag &amp; Drop Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../dd/simple-drag.html'>Simple Drag</a></li><li><a href='../dd/drag-plugin.html'>Drag Node Plugin</a></li><li><a href='../dd/proxy-drag.html'>Proxy Drag</a></li><li><a href='../dd/constrained-drag.html'>Drag Constrained to a Region</a></li><li class='selected'><a href='../dd/groups-drag.html'>Interaction Groups</a></li><li><a href='../dd/shim-drag.html'>Using the Drag Shim</a></li><li><a href='../dd/anim-drop.html'>Animated Drop Targets</a></li><li><a href='../dd/drop-code.html'>Drop Based Coding</a></li><li><a href='../dd/winscroll.html'>Window Scrolling</a></li><li><a href='../dd/delegate.html'>Drag Delegation</a></li><li><a href='../dd/delegate-drop.html'>Drag Delegation with a Drop Target</a></li><li><a href='../dd/delegate-plugins.html'>Using Drag plugins with Delegate</a></li><li><a href='../dd/list-drag.html'>List reorder w/Bubbling</a></li><li><a href='../dd/scroll-list.html'>List reorder w/Scrolling</a></li><li><a href='../dd/portal-drag.html'>Portal Style Example</a></li><li><a href='../dd/photo-browser.html'>Photo Browser</a></li><li><a href='../stylesheet/stylesheet_theme.html'>Adjusting a page theme on the fly (included with examples for StyleSheet)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Drag &amp; Drop Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/dd/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_dd.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="selected "><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

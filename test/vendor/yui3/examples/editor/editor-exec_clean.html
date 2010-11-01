@@ -1,0 +1,124 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Creating ExecCommands</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+<!--there is no custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Creating ExecCommands</h1>
+
+<div class="exampleIntro">
+	<p>Creating custom execCommands</p>
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<style>
+    #editor_cont {
+        width: 600px;
+        border: 1px solid #999;
+        margin: 2em;
+        background-color: #f2f2f2;
+    }
+    #editor {
+        height: 265px;
+        background-color: #fff;
+    }
+    .yui3-skin-sam .yui3-console-bd {
+        width: 100%;
+    }
+    #buttons, #out {
+        padding: 10px;
+    }
+    #buttons {
+        border-bottom: 1px solid #999;
+    }
+    #out {
+        font-weight: bold;
+        border-top: 1px solid #999;
+    }
+</style>
+
+<p>Clicking on one of the buttons below will execute a custom <code>execCommand</code> on the Editor.</p>
+
+<div id="editor_cont">
+    <div id="buttons">
+        <button id="foo">Foo Command</button>
+        <button id="bar">Bar Command</button>
+        <button id="baz">Baz Command</button>
+    </div>
+    <div id="editor"></div>
+    <div id="out">&nbsp;</div>    
+</div>
+<div id="console"></div>
+
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<script>
+
+YUI().use('editor', function(Y) {
+
+    var logFn = function(str) {
+        Y.one('#out').set('innerHTML', str);
+    };
+
+    //Create the Base Editor
+    var editor = new Y.EditorBase({
+        content: '<p><b>This is <i class="foo">a test</i></b></p><p><b style="color: red; font-family: Comic Sans MS">This is <span class="foo">a test</span></b></p>',
+        extracss: '.foo { font-weight: normal; color: black; background-color: yellow; }'
+    });
+
+    //Mixin the new commands
+    Y.mix(Y.Plugin.ExecCommand.COMMANDS, {
+        foo: function(cmd, val) {
+            logFn('You clicked on Foo');
+            var inst = this.getInstance();
+            inst.one('body').setStyle('backgroundColor', 'yellow');
+        },
+        bar: function(cmd, val) {
+            logFn('You clicked on Bar');
+            var inst = this.getInstance();
+            inst.one('body').setStyle('backgroundColor', 'green');
+        },
+        baz: function(cmd, val) {
+            logFn('You clicked on Baz');
+            var inst = this.getInstance();
+            inst.one('body').setStyle('backgroundColor', 'blue');
+        }
+    });
+    
+    
+    //Rendering the Editor.
+    editor.render('#editor');
+
+    Y.delegate('click', function(e) {
+        editor.execCommand(e.target.get('id'));
+    }, '#buttons', 'button');
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

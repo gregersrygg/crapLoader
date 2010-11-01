@@ -1,0 +1,114 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Language Resource Bundles</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style>
+#out .word {
+    margin:0.3em 0.3em 0.3em 1em;
+}
+
+#out .speaking {
+    font-size:108%;
+    color:#00aa00;
+    margin-top:1em;
+    margin-bottom:1em;
+}
+
+
+</style>
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Language Resource Bundles</h1>
+
+<div class="exampleIntro">
+	<p>This example shows how you can define language resource bundles for your custom module implementations; it also illustrates how YUI Loader can load the correct bundle based on the language you've chosen for your YUI instance.</p>			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<div id="out"></div>
+
+<script>
+(function() {
+
+    var say = function(msg, node, cls) {
+        node.append('<p class="' + cls + '">' + msg + '</p>');
+    };
+
+    YUI_config = {
+        filter:"raw",
+        groups: {
+            myapp: {
+                base: 'assets/',
+                modules : {
+                    "translator" : {
+                        lang: ["en", "fr", "es"]
+                    }
+                }
+            }
+        }
+    };
+
+    YUI({
+        lang:"en"
+    }).use("node-base", "translator", function(Y) {
+        var translator = new Y.Translator(),
+            out = Y.one("#out");
+
+        say("Speaking in: " + Y.Intl.getLang("translator"), out, "speaking");
+        say(translator.hi(), out, "word");
+        say(translator.bye(), out, "word");
+    });
+
+    YUI({
+        lang:"fr"
+    }).use("node-base", "translator", function(Y) {
+        var translator = new Y.Translator(),
+            out = Y.one("#out");
+
+        say("Speaking in: " + Y.Intl.getLang("translator"), out, "speaking");
+        say(translator.hi(), out, "word");
+        say(translator.bye(), out, "word");
+    });
+
+    YUI({
+        lang:"es"
+    }).use("node-base", "translator", function(Y) {
+        var translator = new Y.Translator(),
+            out = Y.one("#out");
+
+        say("Speaking in: " + Y.Intl.getLang("translator"), out, "speaking");
+        say(translator.hi(), out, "word");
+        say(translator.bye(), out, "word");
+    });
+
+}());
+</script>
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

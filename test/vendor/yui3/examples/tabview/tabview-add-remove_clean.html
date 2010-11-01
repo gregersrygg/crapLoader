@@ -1,0 +1,227 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Adding and Removing Tabs</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style id="yui3-style-overrides">
+.yui3-tabview {
+    margin-bottom: 1em;
+}
+
+.yui3-skin-sam .yui3-tab {
+    position: relative;
+}
+
+.yui3-skin-sam .yui3-tabview-removeable .yui3-tab-label,
+.yui3-skin-sam .yui3-tabview-removeable .yui3-tab-selected .yui3-tab-label {
+    padding-right: 1.3em; /* make room for close link */
+}
+
+.yui3-skin-sam .yui3-tabview-removeable .yui3-tab-add {
+    padding-right: 0.75em; /* no close link for add tab link */
+}
+
+.yui3-skin-sam .yui3-tab-add {
+    color: #999;
+    font: bold 120%/1 verdana;
+    margin-left: 0.25em;
+}
+
+.yui3-tab-remove {
+    color: #999;
+    font:bold 80% verdana;
+    position: absolute;
+    right: 0.4em;
+    top: 0.4em;
+}
+
+.yui3-tab-remove:hover {
+    color: #666;
+}
+
+.yui3-skin-sam .yui3-tab-selected .yui3-tab-remove {
+    top: 0.52em;
+}
+
+.yui3-skin-sam .yui3-tab-selected .yui3-tab-remove:hover {
+    color: #fff;
+}
+</style>
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Adding and Removing Tabs</h1>
+
+<div class="exampleIntro">
+	This example shows how to give <code>TabView</code> buttons for adding and removing tabs.
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+
+<div id="demo">
+    <ul>
+        <li><a href="#foo">foo</a></li>
+        <li><a href="#bar">bar</a></li>
+        <li><a href="#baz">baz</a></li>
+    </ul>
+    <div>
+        <div id="foo">
+            <p>foo content</p>
+        </div>
+        <div id="bar">
+            <p>bar content</p>
+        </div>
+        <div id="baz">
+            <p>baz content</p>
+        </div>
+    </div>
+</div>
+
+<div id="demo2">
+</div>
+
+<div id="demo3">
+</div>
+<script type="text/javascript">
+YUI({insertBefore: 'yui3-style-overrides', filter: 'raw'}).use("yui", "tabview", "plugin", function(Y) {
+    var Addable = function(config) {
+        Addable.superclass.constructor.apply(this, arguments);
+    };
+
+    Addable.NAME = 'addableTabs';
+    Addable.NS = 'addable';
+
+    Y.extend(Addable, Y.Plugin.Base, {
+        ADD_TEMPLATE: '<li class="yui3-tab" title="add a tab">' +
+                    '<a class="yui3-tab-label yui3-tab-add">+</a></li>',
+
+        initializer: function(config) {
+            var tabview = this.get('host');
+            tabview.after('render', this.afterRender, this);
+            tabview.get('contentBox')
+                .delegate('click', this.onAddClick, '.yui3-tab-add', this);
+        },
+
+        getTabInput: function() {
+            var tabview = this.get('host');
+            return {
+                label: window.prompt('label:', 'new tab'),
+                content: window.prompt('content:', '<p>new content</p>'),
+                index: Number(window.prompt('index:', tabview.size()))
+            }
+        },
+
+        afterRender: function(e) {
+            var tabview = this.get('host');
+            tabview.get('contentBox').one('> ul').append(this.ADD_TEMPLATE);
+        },
+
+        onAddClick: function(e) {
+            e.stopPropagation();
+            var tabview = this.get('host'),
+                input = this.getTabInput();
+            tabview.add(input, input.index);
+        }
+    });
+
+    var Removeable = function(config) {
+        Removeable.superclass.constructor.apply(this, arguments);
+    };
+
+    Removeable.NAME = 'removeableTabs';
+    Removeable.NS = 'removeable';
+
+    Y.extend(Removeable, Y.Plugin.Base, {
+        REMOVE_TEMPLATE: '<a class="yui3-tab-remove" title="remove tab">x</a>',
+
+        initializer: function(config) {
+            var tabview = this.get('host'),
+                cb = tabview.get('contentBox');
+
+            cb.addClass('yui3-tabview-removeable');
+            cb.delegate('click', this.onRemoveClick, '.yui3-tab-remove', this);
+
+            // Tab events bubble to TabView
+            tabview.after('tab:render', this.afterTabRender, this);
+        },
+
+        afterTabRender: function(e) {
+            // boundingBox is the Tab's LI
+            e.target.get('boundingBox').append(this.REMOVE_TEMPLATE);
+        },
+
+        onRemoveClick: function(e) {
+            e.stopPropagation();
+            var tab = Y.Widget.getByNode(e.target);
+            tab.remove();
+        }
+    });
+
+    var tabview = new Y.TabView({
+        srcNode: '#demo',
+        plugins: [Addable]
+    });
+
+    var tabview2 = new Y.TabView({
+        children: [{
+            label: 'foo',
+            content: '<p>foo content</p>'
+        }, {
+            label: 'bar',
+            content: '<p>bar content</p>'
+        }, {
+            label: 'baz',
+            content: '<p>baz content</p>'
+        }],
+        plugins: [Removeable]
+    });
+
+    var tabview3 = new Y.TabView({
+        children: [{
+            label: 'foo',
+            content: '<p>foo content</p>'
+        }, {
+            label: 'bar',
+            content: '<p>bar content</p>'
+        }, {
+            label: 'baz',
+            content: '<p>bar content</p>'
+        }],
+        plugins: [Addable, Removeable]
+    });
+
+    tabview.render();
+    tabview2.render('#demo2');
+    tabview3.render('#demo3');
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

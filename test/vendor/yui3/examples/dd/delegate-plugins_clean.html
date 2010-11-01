@@ -1,0 +1,131 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Using Drag plugins with Delegate</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+<!--there is no custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Using Drag plugins with Delegate</h1>
+
+<div class="exampleIntro">
+	<p>This example is the same as the <code>Drag Delegation with Drop Target</code> example except we add some plugins.</p>
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<style>
+    #demo {
+    }
+    #demo ul li {
+        border: 1px solid black;
+        background-color: #8DD5E7;
+        cursor: move;
+        margin: 3px;
+        list-style-type: none;
+        z-index: 2;
+        width: 200px;
+    }
+    #play {
+        padding: 2em;
+        border: 1px solid black;
+    }
+    #drop {
+        border: 1px solid black;
+        background-color: #eee;
+        height: 50px;
+        width: 200px;
+        float: right;
+        bottom: 50px;
+        position: relative;
+    }
+    #drop strong {
+        font-weight: bold;
+    }
+    #drop.yui3-dd-drop-over {
+        background-color: #ccc;
+    }
+    #example-canvas {
+        position: static;
+    }
+
+</style>
+
+<div id="play">
+
+    <div id="demo">
+        <ul>
+            <li>Item #1</li>
+            <li>Item #2</li>
+            <li>Item #3</li>
+            <li>Item #4</li>
+            <li>Item #5</li>
+            <li>Item #6</li>
+            <li>Item #7</li>
+            <li>Item #8</li>
+            <li>Item #9</li>
+            <li>Item #10</li>
+        </ul>
+    </div>
+    
+    <div id="drop">Drop on me</div>
+</div>
+
+<script>
+
+YUI().use('dd-delegate', 'dd-drop-plugin', 'dd-constrain', 'dd-proxy', function(Y) {
+    var del = new Y.DD.Delegate({
+        container: '#demo',
+        nodes: 'li'
+    });
+
+    del.on('drag:start', function(e) {
+        e.target.get('node').setStyle('opacity', '.5');
+    });
+    del.on('drag:end', function(e) {
+        e.target.get('node').setStyle('opacity', '1');
+    });
+    
+    del.dd.plug(Y.Plugin.DDConstrained, {
+        constrain2node: '#play'
+    });
+
+    del.dd.plug(Y.Plugin.DDProxy, {
+        moveOnEnd: false,
+        cloneNode: true
+    });
+
+    var drop = Y.one('#drop').plug(Y.Plugin.Drop);
+    drop.drop.on('drop:hit', function(e) {
+        drop.set('innerHTML', 'You dropped: <strong>' + e.drag.get('node').get('innerHTML') + '</strong>');
+    });
+    
+
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

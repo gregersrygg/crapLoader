@@ -1,0 +1,580 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: The YUI Global Object: YUI Loader - Dynamically Adding YUI and External Modules</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-debug.js"></script>
+<!-- In this style block, we override some of the css styles for the calendar.
+     We will use the 'insertBefore' config to make the loader insert the css
+     node before our style block so that our styles will be applied in the
+     correct order. -->
+<style type="text/css" id="styleoverrides">
+#cal1Cont {
+    background-color:#004C6D;
+    width: 228px;
+}
+
+#cal1Cont div.calheader {
+    background-color:#004C6D;
+    cursor: move;
+}
+
+#cal1Cont .yui3-calendar {
+    width:auto;
+    background-color:transparent;
+}
+
+#cal1Cont .yui3-calendar tr, #cal1Cont .yui3-calendar th {
+    background-color:transparent;
+    vertical-align:middle;
+    text-transform:none;
+    color:#fff;
+}
+
+#cal1Cont .yui3-calendar a:hover {
+    text-decoration:none;
+}
+
+#results {
+    background-color:#8DD5E7;
+    border:1px solid black;
+    position: absolute;
+    top: 15px;
+    right: 5px;
+    width: 300px;
+}
+</style>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: The YUI Global Object: YUI Loader - Dynamically Adding YUI and External Modules</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>The YUI Global Object: YUI Loader - Dynamically Adding YUI and External Modules</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example uses the dynamic loading capability built into YUI to
+pull in additional components as needed.  In addition, it demonstrates
+how to define external modules that can be loaded alongside YUI.
+</p>
+<p>This example works as follows:</p>
+<ol>
+<li>A <code>YUI</code> instance is created with a configuration object that defines parameters we need to dynamically load new modules.</li>
+<li><code>node</code> is used so that we can bind an event listener to a button.  YUI will dynamically fetch <code>node</code> and its
+dependencies.  By default, these dependencies will be fetched from the Yahoo! CDN and will be combined into a single file.</li>
+<li>A click listener is added to a button.</li>
+<li>When this button is clicked, YUI will dynamically fetch 3.x Drag &amp; Drop and 2.x Calendar files.  
+The CSS file will be fetched first; this helps prevent a flash of unstyled content when the
+Calendar Control is loaded.  This file is inserted above a style block which contains our custom calendar styles (via a YUI config option) so that styles are applied in the correct order.</li>
+<li>A Calendar instance is created, and it is made draggable.</li>
+</ol>
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="yui-loader-ext_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	
+<input id="button1" type="button" value="Click to load YUI Calendar" class="button" />
+
+<div id="cal1Cont"></div>
+
+<script>
+
+YUI({insertBefore: 'styleoverrides', groups: { yui2: { combine: true, base: 'http://yui.yahooapis.com/2.8.0r4/build/', comboBase: 'http://yui.yahooapis.com/combo?', root: '2.8.0r4/build/', modules:  { yui2_yde: { path: 'yahoo-dom-event/yahoo-dom-event.js' }, yui2_calendar: { path: 'calendar/calendar-min.js', requires: ['yui2_yde', 'yui2_calendarcss'] }, yui2_calendarcss: { path: 'calendar/assets/skins/sam/calendar.css', type: 'css' } } } }}).use('node', function(Y, result) {
+
+    // The callback supplied to use() will be executed regardless of
+    // whether the operation was successful or not.  The second parameter
+    // is a result object that has the status of the operation.  We can
+    // use this to try to recover from failures or timeouts.
+    if (!result.success) {
+
+        Y.log('Load failure: ' + result.msg, 'warn', 'Example');
+
+    } else {
+
+        // Add a button click listener to load the calendar
+        var handle = Y.on('click', function(e) {
+
+            // dynamically load the 2.x calendar and 3.x drag and drop
+            Y.use('dd-drag', 'yui2_calendar', function(Y) {
+                var cal1 = new YAHOO.widget.Calendar('cal1', 'cal1Cont');
+
+                // Once the 2.x calendar renders, we will add 3.x drag
+                // functionality to it.
+                cal1.renderEvent.subscribe(function() {
+                    var dd = new Y.DD.Drag({
+                        node: '#cal1Cont'
+                    }).addHandle('div.calheader');
+                });
+                cal1.render();
+            });
+
+            // Remove the button click listener so that we only try to
+            // load the calendar control once.
+            handle.detach();
+
+        }, '#button1');
+    }
+
+
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Creating your YUI instance</h3>
+<p>First, we need to create our YUI instance with the <code>node</code> module, so we can attach a listener to a button.</p>
+<div id="syntax-eef184d47f7b7a195d7bc76b6248230e" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-eef184d47f7b7a195d7bc76b6248230e-plain">YUI().use('node', function(Y) {
+
+});</textarea></div>
+<p>YUI accepts a configuration object when you create an instance.  Your dynamic-loading options can be defined here.</p>
+<div id="syntax-d3a4d07ac0834b9bf72c4fb81ebb4325" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">// We can specify a node that is the insertion point for all new nodes.  This</span></div></li><li class="li1"><div class="de1">    <span class="co1">// is useful for making sure css rules are applied in the correct order.</span></div></li><li class="li1"><div class="de1">    insertBefore<span class="sy0">:</span> <span class="st0">'styleoverrides'</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// This lets you define one or more external modules that will be added to</span></div></li><li class="li1"><div class="de1">    <span class="co1">// the YUI metadata.  You can define dependency relationships between your</span></div></li><li class="li1"><div class="de1">    <span class="co1">// modules and also between your modules and YUI modules.  Here we are</span></div></li><li class="li1"><div class="de1">    <span class="co1">// defining 2.x calendar components as external modules.  See</span></div></li><li class="li2"><div class="de2">    <span class="co1">// &lt;a href=&quot;http://developer.yahoo.com/yui/3/api/Loader.html#method_addModule&quot;&gt;</span></div></li><li class="li1"><div class="de1">    <span class="co1">// the API docs&lt;/a&gt; for a complete list of module configuration options.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Defines a list of groups.  The modules in each group group share the </span></div></li><li class="li1"><div class="de1">    <span class="co1">// base path and combo specification.</span></div></li><li class="li2"><div class="de2">    groups<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        yui2<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            combine<span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            base<span class="sy0">:</span> <span class="st0">'http://yui.yahooapis.com/2.8.0r4/build/'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            comboBase<span class="sy0">:</span> <span class="st0">'http://yui.yahooapis.com/combo?'</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            root<span class="sy0">:</span> <span class="st0">'2.8.0r4/build/'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            modules<span class="sy0">:</span>  <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                yui2_yde<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    path<span class="sy0">:</span> <span class="st0">'yahoo-dom-event/yahoo-dom-event.js'</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                yui2_calendar<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    path<span class="sy0">:</span> <span class="st0">'calendar/calendar-min.js'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                    requires<span class="sy0">:</span> <span class="br0">&#91;</span><span class="st0">'yui2_yde'</span><span class="sy0">,</span> <span class="st0">'yui2_calendarcss'</span><span class="br0">&#93;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                yui2_calendarcss<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                    path<span class="sy0">:</span> <span class="st0">'calendar/assets/skins/sam/calendar.css'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                    type<span class="sy0">:</span> <span class="st0">'css'</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>
+    <span class="co1">// We can specify a node that is the insertion point for all new nodes.  This</span>
+    <span class="co1">// is useful for making sure css rules are applied in the correct order.</span>
+    insertBefore<span class="sy0">:</span> <span class="st0">'styleoverrides'</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co1">// This lets you define one or more external modules that will be added to</span>
+    <span class="co1">// the YUI metadata.  You can define dependency relationships between your</span>
+    <span class="co1">// modules and also between your modules and YUI modules.  Here we are</span>
+    <span class="co1">// defining 2.x calendar components as external modules.  See</span>
+    <span class="co1">// &lt;a href=&quot;http://developer.yahoo.com/yui/3/api/Loader.html#method_addModule&quot;&gt;</span>
+    <span class="co1">// the API docs&lt;/a&gt; for a complete list of module configuration options.</span>
+&nbsp;
+    <span class="co1">// Defines a list of groups.  The modules in each group group share the </span>
+    <span class="co1">// base path and combo specification.</span>
+    groups<span class="sy0">:</span> <span class="br0">&#123;</span>
+        yui2<span class="sy0">:</span> <span class="br0">&#123;</span>
+            combine<span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span>
+            base<span class="sy0">:</span> <span class="st0">'http://yui.yahooapis.com/2.8.0r4/build/'</span><span class="sy0">,</span>
+            comboBase<span class="sy0">:</span> <span class="st0">'http://yui.yahooapis.com/combo?'</span><span class="sy0">,</span>
+            root<span class="sy0">:</span> <span class="st0">'2.8.0r4/build/'</span><span class="sy0">,</span>
+            modules<span class="sy0">:</span>  <span class="br0">&#123;</span>
+                yui2_yde<span class="sy0">:</span> <span class="br0">&#123;</span>
+                    path<span class="sy0">:</span> <span class="st0">'yahoo-dom-event/yahoo-dom-event.js'</span>
+                <span class="br0">&#125;</span><span class="sy0">,</span>
+                yui2_calendar<span class="sy0">:</span> <span class="br0">&#123;</span>
+                    path<span class="sy0">:</span> <span class="st0">'calendar/calendar-min.js'</span><span class="sy0">,</span>
+                    requires<span class="sy0">:</span> <span class="br0">&#91;</span><span class="st0">'yui2_yde'</span><span class="sy0">,</span> <span class="st0">'yui2_calendarcss'</span><span class="br0">&#93;</span>
+                <span class="br0">&#125;</span><span class="sy0">,</span>
+                yui2_calendarcss<span class="sy0">:</span> <span class="br0">&#123;</span>
+                    path<span class="sy0">:</span> <span class="st0">'calendar/assets/skins/sam/calendar.css'</span><span class="sy0">,</span>
+                    type<span class="sy0">:</span> <span class="st0">'css'</span>
+                <span class="br0">&#125;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-d3a4d07ac0834b9bf72c4fb81ebb4325-plain">YUI({
+    // We can specify a node that is the insertion point for all new nodes.  This
+    // is useful for making sure css rules are applied in the correct order.
+    insertBefore: 'styleoverrides',
+
+    // This lets you define one or more external modules that will be added to
+    // the YUI metadata.  You can define dependency relationships between your
+    // modules and also between your modules and YUI modules.  Here we are
+    // defining 2.x calendar components as external modules.  See
+    // <a href="http://developer.yahoo.com/yui/3/api/Loader.html#method_addModule">
+    // the API docs</a> for a complete list of module configuration options.
+
+    // Defines a list of groups.  The modules in each group group share the 
+    // base path and combo specification.
+    groups: {
+        yui2: {
+            combine: true,
+            base: 'http://yui.yahooapis.com/2.8.0r4/build/',
+            comboBase: 'http://yui.yahooapis.com/combo?',
+            root: '2.8.0r4/build/',
+            modules:  {
+                yui2_yde: {
+                    path: 'yahoo-dom-event/yahoo-dom-event.js'
+                },
+                yui2_calendar: {
+                    path: 'calendar/calendar-min.js',
+                    requires: ['yui2_yde', 'yui2_calendarcss']
+                },
+                yui2_calendarcss: {
+                    path: 'calendar/assets/skins/sam/calendar.css',
+                    type: 'css'
+                }
+            }
+        }
+    }
+
+}).use('node', function(Y) {
+
+});</textarea></div>
+<h3>Creating the Calendar</h3>
+<p>Now that we have our core YUI instance in place, we add an event listener to
+a button that will dynamically load YUI 3.x Drag &amp; Drop and YUI 2.x Calendar.</p>
+
+<div id="syntax-cfa421c9e41849121d7255fe2f81e443" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">// The callback supplied to use() will be executed regardless of</span></div></li><li class="li1"><div class="de1"><span class="co1">// whether the operation was successful or not.  The second parameter</span></div></li><li class="li1"><div class="de1"><span class="co1">// is a result object that has the status of the operation.  We can</span></div></li><li class="li1"><div class="de1"><span class="co1">// use this to try to recover from failures or timeouts.</span></div></li><li class="li2"><div class="de2"><span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>result.<span class="me1">success</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">'Load failure: '</span> <span class="sy0">+</span> result.<span class="me1">msg</span><span class="sy0">,</span> <span class="st0">'warn'</span><span class="sy0">,</span> <span class="st0">'Example'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Add a button click listener to load the calendar</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> handle <span class="sy0">=</span> Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// dynamically load the 2.x calendar and 3.x drag and drop</span></div></li><li class="li2"><div class="de2">        Y.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drag'</span><span class="sy0">,</span> <span class="st0">'yui2_calendar'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw2">var</span> cal1 <span class="sy0">=</span> <span class="kw2">new</span> YAHOO.<span class="me1">widget</span>.<span class="me1">Calendar</span><span class="br0">&#40;</span><span class="st0">'cal1'</span><span class="sy0">,</span> <span class="st0">'cal1Cont'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="co1">// Once the 2.x calendar renders, we will add 3.x drag</span></div></li><li class="li1"><div class="de1">            <span class="co1">// functionality t0 it.</span></div></li><li class="li2"><div class="de2">            cal1.<span class="me1">renderEvent</span>.<span class="me1">subscribe</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw2">var</span> dd <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">DD</span>.<span class="me1">Drag</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    node<span class="sy0">:</span> <span class="st0">'#cal1Cont'</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">addHandle</span><span class="br0">&#40;</span><span class="st0">'div.calheader'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">            cal1.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Remove the button click listener so that we only try to</span></div></li><li class="li1"><div class="de1">        <span class="co1">// load the calendar control once.</span></div></li><li class="li2"><div class="de2">        handle.<span class="me1">detach</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">'#button1'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">// The callback supplied to use() will be executed regardless of</span>
+<span class="co1">// whether the operation was successful or not.  The second parameter</span>
+<span class="co1">// is a result object that has the status of the operation.  We can</span>
+<span class="co1">// use this to try to recover from failures or timeouts.</span>
+<span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>result.<span class="me1">success</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">'Load failure: '</span> <span class="sy0">+</span> result.<span class="me1">msg</span><span class="sy0">,</span> <span class="st0">'warn'</span><span class="sy0">,</span> <span class="st0">'Example'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">// Add a button click listener to load the calendar</span>
+    <span class="kw2">var</span> handle <span class="sy0">=</span> Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="co1">// dynamically load the 2.x calendar and 3.x drag and drop</span>
+        Y.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drag'</span><span class="sy0">,</span> <span class="st0">'yui2_calendar'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw2">var</span> cal1 <span class="sy0">=</span> <span class="kw2">new</span> YAHOO.<span class="me1">widget</span>.<span class="me1">Calendar</span><span class="br0">&#40;</span><span class="st0">'cal1'</span><span class="sy0">,</span> <span class="st0">'cal1Cont'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            <span class="co1">// Once the 2.x calendar renders, we will add 3.x drag</span>
+            <span class="co1">// functionality t0 it.</span>
+            cal1.<span class="me1">renderEvent</span>.<span class="me1">subscribe</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="kw2">var</span> dd <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">DD</span>.<span class="me1">Drag</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+                    node<span class="sy0">:</span> <span class="st0">'#cal1Cont'</span>
+                <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">addHandle</span><span class="br0">&#40;</span><span class="st0">'div.calheader'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            cal1.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">// Remove the button click listener so that we only try to</span>
+        <span class="co1">// load the calendar control once.</span>
+        handle.<span class="me1">detach</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">'#button1'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-cfa421c9e41849121d7255fe2f81e443-plain">// The callback supplied to use() will be executed regardless of
+// whether the operation was successful or not.  The second parameter
+// is a result object that has the status of the operation.  We can
+// use this to try to recover from failures or timeouts.
+if (!result.success) {
+
+    Y.log('Load failure: ' + result.msg, 'warn', 'Example');
+
+} else {
+
+    // Add a button click listener to load the calendar
+    var handle = Y.on('click', function(e) {
+
+        // dynamically load the 2.x calendar and 3.x drag and drop
+        Y.use('dd-drag', 'yui2_calendar', function(Y) {
+            var cal1 = new YAHOO.widget.Calendar('cal1', 'cal1Cont');
+
+            // Once the 2.x calendar renders, we will add 3.x drag
+            // functionality t0 it.
+            cal1.renderEvent.subscribe(function() {
+                var dd = new Y.DD.Drag({
+                    node: '#cal1Cont'
+                }).addHandle('div.calheader');
+            });
+            cal1.render();
+        });
+
+        // Remove the button click listener so that we only try to
+        // load the calendar control once.
+        handle.detach();
+
+    }, '#button1');
+}</textarea></div>
+<h3>Full source</h3>
+
+<div id="syntax-4fd1a87bb4b16d974c287d457ef27996" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sy0">&lt;</span>input id<span class="sy0">=</span><span class="st0">&quot;button1&quot;</span> type<span class="sy0">=</span><span class="st0">&quot;button&quot;</span> value<span class="sy0">=</span><span class="st0">&quot;Click to load YUI Calendar&quot;</span> <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="sy0">/&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;cal1Cont&quot;</span><span class="sy0">&gt;&lt;/</span>div<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="sy0">&lt;</span>script<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// We can specify a node that is the insertion point for all new nodes.  This</span></div></li><li class="li2"><div class="de2">    <span class="co1">// is useful for making sure css rules are applied in the correct order.</span></div></li><li class="li1"><div class="de1">    insertBefore<span class="sy0">:</span> <span class="st0">'styleoverrides'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// This lets you define one or more external modules that will be added to</span></div></li><li class="li1"><div class="de1">    <span class="co1">// the YUI metadata.  You can define dependency relationships between your</span></div></li><li class="li2"><div class="de2">    <span class="co1">// modules and also between your modules and YUI modules.  Here we are</span></div></li><li class="li1"><div class="de1">    <span class="co1">// defining 2.x calendar components as external modules.  See</span></div></li><li class="li1"><div class="de1">    <span class="co1">// &lt;a href=&quot;http://developer.yahoo.com/3.x/api/Loader.html#method_addModule&quot;&gt;</span></div></li><li class="li1"><div class="de1">    <span class="co1">// the API docs&lt;/a&gt; for a complete list of module configuration options.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="co1">// Defines a list of groups.  The modules in each group group share the </span></div></li><li class="li1"><div class="de1">    <span class="co1">// base path and combo specification.</span></div></li><li class="li1"><div class="de1">    groups<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        yui2<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            combine<span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            base<span class="sy0">:</span> <span class="st0">'http://yui.yahooapis.com/2.8.0r4/build/'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            comboBase<span class="sy0">:</span> <span class="st0">'http://yui.yahooapis.com/combo?'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            root<span class="sy0">:</span> <span class="st0">'2.8.0r4/build/'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            modules<span class="sy0">:</span>  <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                yui2_yde<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                    path<span class="sy0">:</span> <span class="st0">'yahoo-dom-event/yahoo-dom-event.js'</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                yui2_calendar<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    path<span class="sy0">:</span> <span class="st0">'calendar/calendar-min.js'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                    requires<span class="sy0">:</span> <span class="br0">&#91;</span><span class="st0">'yui2_yde'</span><span class="sy0">,</span> <span class="st0">'yui2_calendarcss'</span><span class="br0">&#93;</span></div></li><li class="li2"><div class="de2">                <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                yui2_calendarcss<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    path<span class="sy0">:</span> <span class="st0">'calendar/assets/skins/sam/calendar.css'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                    type<span class="sy0">:</span> <span class="st0">'css'</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Specifies whether or not optional dependencies should be loaded</span></div></li><li class="li2"><div class="de2">    <span class="co1">// loadOptional: true,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// By default, the minified versions of the files are loaded.  We can specify</span></div></li><li class="li1"><div class="de1">    <span class="co1">// 'debug' to load versions with log statements, or 'raw' to load a version</span></div></li><li class="li1"><div class="de1">    <span class="co1">// that isn't minified, but has log statements stripped.</span></div></li><li class="li2"><div class="de2">    filter<span class="sy0">:</span> <span class="st0">'debug'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Give up if any single node request takes more than 10 seconds.</span></div></li><li class="li1"><div class="de1">    timeout<span class="sy0">:</span> <span class="nu0">10000</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="co1">// 3.x node will be dynamically loaded so we can work with DOM elements</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="sy0">,</span> result<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// The callback supplied to use() will be executed regardless of</span></div></li><li class="li1"><div class="de1">    <span class="co1">// whether the operation was successful or not.  The second parameter</span></div></li><li class="li2"><div class="de2">    <span class="co1">// is a result object that has the status of the operation.  We can</span></div></li><li class="li1"><div class="de1">    <span class="co1">// use this to try to recover from failures or timeouts.</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>result.<span class="me1">success</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">'Load failure: '</span> <span class="sy0">+</span> result.<span class="me1">msg</span><span class="sy0">,</span> <span class="st0">'warn'</span><span class="sy0">,</span> <span class="st0">'Example'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Add a button click listener to load the calendar</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> handle <span class="sy0">=</span> Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="co1">// dynamically load the 2.x calendar and 3.x drag and drop</span></div></li><li class="li1"><div class="de1">            Y.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drag'</span><span class="sy0">,</span> <span class="st0">'yui2-calendar'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw2">var</span> cal1 <span class="sy0">=</span> <span class="kw2">new</span> YAHOO.<span class="me1">widget</span>.<span class="me1">Calendar</span><span class="br0">&#40;</span><span class="st0">'cal1'</span><span class="sy0">,</span> <span class="st0">'cal1Cont'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">                <span class="co1">// Once the 2.x calendar renders, we will add 3.x drag</span></div></li><li class="li1"><div class="de1">                <span class="co1">// functionality to it.</span></div></li><li class="li1"><div class="de1">                cal1.<span class="me1">renderEvent</span>.<span class="me1">subscribe</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    <span class="kw2">var</span> dd <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">DD</span>.<span class="me1">Drag</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                        node<span class="sy0">:</span> <span class="st0">'#cal1Cont'</span></div></li><li class="li2"><div class="de2">                    <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">addHandle</span><span class="br0">&#40;</span><span class="st0">'div.calheader'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                cal1.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">            <span class="co1">// Remove the button click listener so that we only try to</span></div></li><li class="li1"><div class="de1">            <span class="co1">// load the calendar control once.</span></div></li><li class="li1"><div class="de1">            handle.<span class="me1">detach</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">'#button1'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="sy0">&lt;/</span>script<span class="sy0">&gt;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="sy0">&lt;</span>input id<span class="sy0">=</span><span class="st0">&quot;button1&quot;</span> type<span class="sy0">=</span><span class="st0">&quot;button&quot;</span> value<span class="sy0">=</span><span class="st0">&quot;Click to load YUI Calendar&quot;</span> <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="sy0">/&gt;</span>
+&nbsp;
+<span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;cal1Cont&quot;</span><span class="sy0">&gt;&lt;/</span>div<span class="sy0">&gt;</span>
+&nbsp;
+<span class="sy0">&lt;</span>script<span class="sy0">&gt;</span>
+&nbsp;
+YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">// We can specify a node that is the insertion point for all new nodes.  This</span>
+    <span class="co1">// is useful for making sure css rules are applied in the correct order.</span>
+    insertBefore<span class="sy0">:</span> <span class="st0">'styleoverrides'</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co1">// This lets you define one or more external modules that will be added to</span>
+    <span class="co1">// the YUI metadata.  You can define dependency relationships between your</span>
+    <span class="co1">// modules and also between your modules and YUI modules.  Here we are</span>
+    <span class="co1">// defining 2.x calendar components as external modules.  See</span>
+    <span class="co1">// &lt;a href=&quot;http://developer.yahoo.com/3.x/api/Loader.html#method_addModule&quot;&gt;</span>
+    <span class="co1">// the API docs&lt;/a&gt; for a complete list of module configuration options.</span>
+&nbsp;
+    <span class="co1">// Defines a list of groups.  The modules in each group group share the </span>
+    <span class="co1">// base path and combo specification.</span>
+    groups<span class="sy0">:</span> <span class="br0">&#123;</span>
+        yui2<span class="sy0">:</span> <span class="br0">&#123;</span>
+            combine<span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span>
+            base<span class="sy0">:</span> <span class="st0">'http://yui.yahooapis.com/2.8.0r4/build/'</span><span class="sy0">,</span>
+            comboBase<span class="sy0">:</span> <span class="st0">'http://yui.yahooapis.com/combo?'</span><span class="sy0">,</span>
+            root<span class="sy0">:</span> <span class="st0">'2.8.0r4/build/'</span><span class="sy0">,</span>
+            modules<span class="sy0">:</span>  <span class="br0">&#123;</span>
+                yui2_yde<span class="sy0">:</span> <span class="br0">&#123;</span>
+                    path<span class="sy0">:</span> <span class="st0">'yahoo-dom-event/yahoo-dom-event.js'</span>
+                <span class="br0">&#125;</span><span class="sy0">,</span>
+                yui2_calendar<span class="sy0">:</span> <span class="br0">&#123;</span>
+                    path<span class="sy0">:</span> <span class="st0">'calendar/calendar-min.js'</span><span class="sy0">,</span>
+                    requires<span class="sy0">:</span> <span class="br0">&#91;</span><span class="st0">'yui2_yde'</span><span class="sy0">,</span> <span class="st0">'yui2_calendarcss'</span><span class="br0">&#93;</span>
+                <span class="br0">&#125;</span><span class="sy0">,</span>
+                yui2_calendarcss<span class="sy0">:</span> <span class="br0">&#123;</span>
+                    path<span class="sy0">:</span> <span class="st0">'calendar/assets/skins/sam/calendar.css'</span><span class="sy0">,</span>
+                    type<span class="sy0">:</span> <span class="st0">'css'</span>
+                <span class="br0">&#125;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    <span class="co1">// Specifies whether or not optional dependencies should be loaded</span>
+    <span class="co1">// loadOptional: true,</span>
+&nbsp;
+    <span class="co1">// By default, the minified versions of the files are loaded.  We can specify</span>
+    <span class="co1">// 'debug' to load versions with log statements, or 'raw' to load a version</span>
+    <span class="co1">// that isn't minified, but has log statements stripped.</span>
+    filter<span class="sy0">:</span> <span class="st0">'debug'</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co1">// Give up if any single node request takes more than 10 seconds.</span>
+    timeout<span class="sy0">:</span> <span class="nu0">10000</span>
+&nbsp;
+<span class="co1">// 3.x node will be dynamically loaded so we can work with DOM elements</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="sy0">,</span> result<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">// The callback supplied to use() will be executed regardless of</span>
+    <span class="co1">// whether the operation was successful or not.  The second parameter</span>
+    <span class="co1">// is a result object that has the status of the operation.  We can</span>
+    <span class="co1">// use this to try to recover from failures or timeouts.</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>result.<span class="me1">success</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">'Load failure: '</span> <span class="sy0">+</span> result.<span class="me1">msg</span><span class="sy0">,</span> <span class="st0">'warn'</span><span class="sy0">,</span> <span class="st0">'Example'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="co1">// Add a button click listener to load the calendar</span>
+        <span class="kw2">var</span> handle <span class="sy0">=</span> Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            <span class="co1">// dynamically load the 2.x calendar and 3.x drag and drop</span>
+            Y.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drag'</span><span class="sy0">,</span> <span class="st0">'yui2-calendar'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="kw2">var</span> cal1 <span class="sy0">=</span> <span class="kw2">new</span> YAHOO.<span class="me1">widget</span>.<span class="me1">Calendar</span><span class="br0">&#40;</span><span class="st0">'cal1'</span><span class="sy0">,</span> <span class="st0">'cal1Cont'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+                <span class="co1">// Once the 2.x calendar renders, we will add 3.x drag</span>
+                <span class="co1">// functionality to it.</span>
+                cal1.<span class="me1">renderEvent</span>.<span class="me1">subscribe</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    <span class="kw2">var</span> dd <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">DD</span>.<span class="me1">Drag</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+                        node<span class="sy0">:</span> <span class="st0">'#cal1Cont'</span>
+                    <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">addHandle</span><span class="br0">&#40;</span><span class="st0">'div.calheader'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                cal1.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            <span class="co1">// Remove the button click listener so that we only try to</span>
+            <span class="co1">// load the calendar control once.</span>
+            handle.<span class="me1">detach</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">'#button1'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="sy0">&lt;/</span>script<span class="sy0">&gt;</span>
+&nbsp;</pre></div><textarea id="syntax-4fd1a87bb4b16d974c287d457ef27996-plain"><input id="button1" type="button" value="Click to load YUI Calendar" class="button" />
+
+<div id="cal1Cont"></div>
+
+<script>
+
+YUI({
+
+    // We can specify a node that is the insertion point for all new nodes.  This
+    // is useful for making sure css rules are applied in the correct order.
+    insertBefore: 'styleoverrides',
+
+    // This lets you define one or more external modules that will be added to
+    // the YUI metadata.  You can define dependency relationships between your
+    // modules and also between your modules and YUI modules.  Here we are
+    // defining 2.x calendar components as external modules.  See
+    // <a href="http://developer.yahoo.com/3.x/api/Loader.html#method_addModule">
+    // the API docs</a> for a complete list of module configuration options.
+
+    // Defines a list of groups.  The modules in each group group share the 
+    // base path and combo specification.
+    groups: {
+        yui2: {
+            combine: true,
+            base: 'http://yui.yahooapis.com/2.8.0r4/build/',
+            comboBase: 'http://yui.yahooapis.com/combo?',
+            root: '2.8.0r4/build/',
+            modules:  {
+                yui2_yde: {
+                    path: 'yahoo-dom-event/yahoo-dom-event.js'
+                },
+                yui2_calendar: {
+                    path: 'calendar/calendar-min.js',
+                    requires: ['yui2_yde', 'yui2_calendarcss']
+                },
+                yui2_calendarcss: {
+                    path: 'calendar/assets/skins/sam/calendar.css',
+                    type: 'css'
+                }
+            }
+        }
+    }
+
+    // Specifies whether or not optional dependencies should be loaded
+    // loadOptional: true,
+
+    // By default, the minified versions of the files are loaded.  We can specify
+    // 'debug' to load versions with log statements, or 'raw' to load a version
+    // that isn't minified, but has log statements stripped.
+    filter: 'debug',
+
+    // Give up if any single node request takes more than 10 seconds.
+    timeout: 10000
+
+// 3.x node will be dynamically loaded so we can work with DOM elements
+}).use('node', function(Y, result) {
+
+    // The callback supplied to use() will be executed regardless of
+    // whether the operation was successful or not.  The second parameter
+    // is a result object that has the status of the operation.  We can
+    // use this to try to recover from failures or timeouts.
+    if (!result.success) {
+
+        Y.log('Load failure: ' + result.msg, 'warn', 'Example');
+
+    } else {
+
+        // Add a button click listener to load the calendar
+        var handle = Y.on('click', function(e) {
+
+            // dynamically load the 2.x calendar and 3.x drag and drop
+            Y.use('dd-drag', 'yui2-calendar', function(Y) {
+                var cal1 = new YAHOO.widget.Calendar('cal1', 'cal1Cont');
+
+                // Once the 2.x calendar renders, we will add 3.x drag
+                // functionality to it.
+                cal1.renderEvent.subscribe(function() {
+                    var dd = new Y.DD.Drag({
+                        node: '#cal1Cont'
+                    }).addHandle('div.calheader');
+                });
+                cal1.render();
+            });
+
+            // Remove the button click listener so that we only try to
+            // load the calendar control once.
+            handle.detach();
+
+        }, '#button1');
+    }
+
+
+});
+</script>
+</textarea></div>
+				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    The YUI Global Object Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../yui/yui-core.html'>YUI Core</a></li><li><a href='../yui/yui-more.html'>Load All Modules</a></li><li><a href='../yui/yui-multi.html'>Multiple Instances</a></li><li class='selected'><a href='../yui/yui-loader-ext.html'>YUI Loader - Dynamically Adding YUI and External Modules</a></li><li><a href='../yui/yui-extend.html'>Create Class Hierarchies with <code>extend</code></a></li><li><a href='../yui/yui-augment.html'>Compose Classes of Objects with <code>augment</code></a></li><li><a href='../yui/yui-mix.html'>Add Behaviors to Objects with <code>mix</code></a></li><li><a href='../yui/yui-merge.html'>Combine Data Sets with <code>merge</code></a></li><li><a href='../yui/yui-isa.html'>Check Data Types with <code>Lang</code></a></li><li><a href='../yui/yui-ua.html'>Browser Detection with <code>UA</code></a></li><li><a href='../yui/yui-compat.html'>YUI 2 in 3</a></li><li><a href='../yui/yui-gallery.html'>Natively use YUI Gallery Modules</a></li><li><a href='../yui/yui-gallery2.html'>YUI 2 in 3 &amp; Gallery Modules</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More The YUI Global Object Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/yui/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_yui.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="selected "><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {filter:"debug", logInclude: {example:true}};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

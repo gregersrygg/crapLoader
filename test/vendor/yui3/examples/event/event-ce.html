@@ -1,0 +1,484 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Event: Using Custom Events</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+	#fire {margin:1em;}
+	#log {
+		border:1px dotted #999999; background-color:#FFFFFF;
+	}
+	#log li {padding:5px;}
+	#log li highlight {color:#993300;}
+</style>
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Event: Using Custom Events</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Event: Using Custom Events</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>The Custom Event framework is one of the principle communication mechanisms
+in YUI.  An object can be augmented with <code>EventTarget</code>, enabling it
+to be both a host and a target for Custom Events.  Custom Events fire from
+their host and optionally bubble up to one or more targets.  This allows you to
+make the interesting moments of your applications broadly available within a
+module, within a set of modules, or throughout a complex interface populated
+with rich elements.</p>
+
+<p>In this example, a simple Custom Event is illustrated:
+<code>testEvent</code>.  This Custom Event is hosted on a Publisher object and
+bubbles up to a BubbleTarget object.</p>
+
+<p><img src="assets/ce-example.gif" alt="An
+illustration of the relationship between the Custom Event, its host, and its
+Bubble Target."></p>
+
+<p>Custom Events, like DOM events, can be stopped
+(<code>stopPropagation</code>) and their default behavior can be suppressed
+(<code>preventDefault</code>).</p>
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="event-ce_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<button id="fire" value="Fire">Fire publisher:testEvent</button> <br />
+<input type="checkbox" id="stopPropagation"> <label for="stopPropagation">Stop Propagation (testEvent won't bubble to the BubbleTarget.)</label><br />
+<input type="checkbox" id="preventDefault"> <label for="preventDefault">Prevent Default (testEvent's defaultFn won't fire.)</label>
+
+<ol id="log">
+	<li>Custom Event log messages will appear here.</li>
+</ol>
+
+<script language="javascript">
+
+//Create a YUI instance:
+YUI().use("node", "event-custom-complex",
+
+function(Y) {
+
+    //Shortcut for our logging div:
+    var logger = Y.one("#log");
+
+    //Our BubbleTarget object is an object to which our Custom Event
+    //will be allowed to bubble.  It needs itself to be an EventTarget,
+    //so we'll use augment to make it an EventTarget:
+    var BubbleTarget = function() {
+        Y.log("Host constructor executed.", "info", "example");
+    }
+    //Augment BubbleTarget to make it an EventTarget:
+    Y.augment(BubbleTarget, Y.EventTarget);
+
+    //Create an instance of BubbleTarget:
+    var bubbleTarget = new BubbleTarget();
+
+    //Now we'll subscribe to the "publisher:testEvent" -- note
+    //that we can do this even before this event is published:
+    bubbleTarget.subscribe("publisher:testEvent", function(e) {
+        Y.log("publisher:testEvent fired on the BubbleTarget object.", "info", "example");
+    });
+
+    //Now we'll create the constructor for the Publisher, which 
+    //is the direct host of our Custom Event.  It will also be an
+    //EventTarget, so we'll extend it as well:
+    var Publisher = function(bubbleTarget) {
+
+        //We'll specify now that Custom Events hosted by Publisher
+        //should bubble to the bubbleTarget instance passed into the
+        //the Publisher's constructor:
+        this.addTarget(bubbleTarget);
+
+        //Here we publish the Custom Event.  Note that it's not
+        //necessary to publish the event at all if you don't have
+        //options you wish to configure -- firing the event or 
+        //subscribing to it will create it on the fly if necessary:
+        this.publish("publisher:testEvent",
+            {
+                emitFacade: true,
+                //the defaultFn is what you want to have happen
+                //by default when no subscriber calls preventDefault:
+                defaultFn: function() {
+                    Y.log("defaultFn: publisher:testEvent's defaultFn executed.", "info", "example");
+                },
+                //You can prevent the default function from firing by
+                //calling preventDefault from a listener (if the Custom
+                //Event's preventable option is set to true, as it is by
+                //default).  If the default is prevented, the preventedFn
+                //is called, allowing you to respond if necessary.
+                preventedFn: function() {
+                    Y.log("preventedFn: A subscriber to publisher:testEvent called preventDefault().", "info", "example");			
+                },
+                //The stoppedFn is called if a subscriber calls stopPropagation or
+                //stopImmediatePropagation:
+                stoppedFn: function() {
+                    Y.log("stoppedFn: A subscriber to publisher:testEvent called stopPropagation().", "info", "example");
+                }
+            }
+        );
+        Y.log("Publisher constructor executed.");
+    }
+    //Augment Publisher to make it an EventTarget:
+    Y.augment(Publisher, Y.EventTarget);
+
+    //Create a Publisher instance:
+    var p = new Publisher(bubbleTarget);
+
+    //We've already subscribed to the event on the bubbleTarget, but
+    //we can also subscribe to it here on the Publisher instance.
+    //We'll see the event fire here before it bubbles up to the 
+    //bubbleTarget:
+    p.on("publisher:testEvent", function(e) {
+        Y.log("publisher:testEvent subscriber fired on the publisher object.", "info", "example");
+        if(Y.one("#stopPropagation").get("checked")) {
+            //we will stopPropagation on the Custom Event, preventing
+            //it from bubbling to the bubbleTarget:
+            e.stopPropagation();
+        }
+        
+        if(Y.one("#preventDefault").get("checked")) {
+            //we will preventDefault on the Custom Event, preventing
+            //the testEvent's defaultFn from firing:
+            e.preventDefault();
+        }
+    });
+
+    //We can tie our testEvent to an interface gesture -- the click of a
+    //button, for example.
+    Y.on("click", function(e) {
+        //clear out the logger:
+        logger.set("innerHTML", "");
+        p.fire("publisher:testEvent");
+    }, "#fire");
+
+    //write out log messages to the page:
+    Y.on("yui:log", function(e) {
+        var s = logger.get("innerHTML");
+        logger.set("innerHTML", s + "<li>" + e.msg + "</li>");
+    });
+
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h2>Source Code</h2>
+
+<p>The full source code for this example follows.  Read through the comments and code to get an understanding of how you can make use of Custom Events in your own application development.</p>
+
+<div id="syntax-5bbd9e71fccde3cc0e1ecb952c342cce" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">//Create a YUI instance:</span></div></li><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//Shortcut for our logging div:</span></div></li><li class="li2"><div class="de2">    <span class="kw2">var</span> logger <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#log&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//Our BubbleTarget object is an object to which our Custom Event</span></div></li><li class="li1"><div class="de1">    <span class="co1">//will be allowed to bubble.  It needs itself to be an EventTarget,</span></div></li><li class="li1"><div class="de1">    <span class="co1">//so we'll use augment to make it an EventTarget:</span></div></li><li class="li2"><div class="de2">    <span class="kw2">var</span> BubbleTarget <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Host constructor executed.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//Augment BubbleTarget to make it an EventTarget:</span></div></li><li class="li1"><div class="de1">    Y.<span class="me1">augment</span><span class="br0">&#40;</span>BubbleTarget<span class="sy0">,</span> Y.<span class="me1">EventTarget</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//Create an instance of BubbleTarget:</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> bubbleTarget <span class="sy0">=</span> <span class="kw2">new</span> BubbleTarget<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//Now we'll subscribe to the &quot;publisher:testEvent&quot; -- note</span></div></li><li class="li2"><div class="de2">    <span class="co1">//that we can do this even before this event is published:</span></div></li><li class="li1"><div class="de1">    bubbleTarget.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;publisher:testEvent&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;publisher:testEvent fired on the BubbleTarget object.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="co1">//Now we'll create the constructor for the Publisher, which </span></div></li><li class="li1"><div class="de1">    <span class="co1">//is the direct host of our Custom Event.  It will also be an</span></div></li><li class="li1"><div class="de1">    <span class="co1">//EventTarget, so we'll extend it as well:</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> Publisher <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>bubbleTarget<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="co1">//We'll specify now that Custom Events hosted by Publisher</span></div></li><li class="li1"><div class="de1">        <span class="co1">//should bubble to the bubbleTarget instance passed into the</span></div></li><li class="li1"><div class="de1">        <span class="co1">//the Publisher's constructor:</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>.<span class="me1">addTarget</span><span class="br0">&#40;</span>bubbleTarget<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="co1">//Here we publish the Custom Event.  Note that it's not</span></div></li><li class="li1"><div class="de1">        <span class="co1">//necessary to publish the event at all if you don't have</span></div></li><li class="li1"><div class="de1">        <span class="co1">//options you wish to configure -- firing the event or </span></div></li><li class="li1"><div class="de1">        <span class="co1">//subscribing to it will create it on the fly if necessary:</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>.<span class="me1">publish</span><span class="br0">&#40;</span><span class="st0">&quot;publisher:testEvent&quot;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                emitFacade<span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                <span class="co1">//the defaultFn is what you want to have happen</span></div></li><li class="li1"><div class="de1">                <span class="co1">//by default when no subscriber calls preventDefault:</span></div></li><li class="li1"><div class="de1">                defaultFn<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;defaultFn: publisher:testEvent's defaultFn executed.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                <span class="co1">//You can prevent the default function from firing by</span></div></li><li class="li1"><div class="de1">                <span class="co1">//calling preventDefault from a listener (if the Custom</span></div></li><li class="li1"><div class="de1">                <span class="co1">//Event's preventable option is set to true, as it is by</span></div></li><li class="li2"><div class="de2">                <span class="co1">//default).  If the default is prevented, the preventedFn</span></div></li><li class="li1"><div class="de1">                <span class="co1">//is called, allowing you to respond if necessary.</span></div></li><li class="li1"><div class="de1">                preventedFn<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;preventedFn: A subscriber to publisher:testEvent called preventDefault().&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>          </div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                <span class="co1">//The stoppedFn is called if a subscriber calls stopPropagation or</span></div></li><li class="li1"><div class="de1">                <span class="co1">//stopImmediatePropagation:</span></div></li><li class="li1"><div class="de1">                stoppedFn<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;stoppedFn: A subscriber to publisher:testEvent called stopPropagation().&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Publisher constructor executed.&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//Augment Publisher to make it an EventTarget:</span></div></li><li class="li2"><div class="de2">    Y.<span class="me1">augment</span><span class="br0">&#40;</span>Publisher<span class="sy0">,</span> Y.<span class="me1">EventTarget</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//Create a Publisher instance:</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> p <span class="sy0">=</span> <span class="kw2">new</span> Publisher<span class="br0">&#40;</span>bubbleTarget<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="co1">//We've already subscribed to the event on the bubbleTarget, but</span></div></li><li class="li1"><div class="de1">    <span class="co1">//we can also subscribe to it here on the Publisher instance.</span></div></li><li class="li1"><div class="de1">    <span class="co1">//We'll see the event fire here before it bubbles up to the </span></div></li><li class="li1"><div class="de1">    <span class="co1">//bubbleTarget:</span></div></li><li class="li1"><div class="de1">    p.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;publisher:testEvent&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;publisher:testEvent subscriber fired on the publisher object.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">if</span><span class="br0">&#40;</span>Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#stopPropagation&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;checked&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="co1">//we will stopPropagation on the Custom Event, preventing</span></div></li><li class="li1"><div class="de1">            <span class="co1">//it from bubbling to the bubbleTarget:</span></div></li><li class="li1"><div class="de1">            e.<span class="me1">stopPropagation</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span><span class="br0">&#40;</span>Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#preventDefault&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;checked&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="co1">//we will preventDefault on the Custom Event, preventing</span></div></li><li class="li1"><div class="de1">            <span class="co1">//the testEvent's defaultFn from firing:</span></div></li><li class="li2"><div class="de2">            e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//We can tie our testEvent to an interface gesture -- the click of a</span></div></li><li class="li2"><div class="de2">    <span class="co1">//button, for example.</span></div></li><li class="li1"><div class="de1">    Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">//clear out the logger:</span></div></li><li class="li1"><div class="de1">        logger.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        p.<span class="me1">fire</span><span class="br0">&#40;</span><span class="st0">&quot;publisher:testEvent&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#fire&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//write out log messages to the page:</span></div></li><li class="li1"><div class="de1">    Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;yui:log&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> s <span class="sy0">=</span> logger.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        logger.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> s <span class="sy0">+</span> <span class="st0">&quot;&lt;li&gt;&quot;</span> <span class="sy0">+</span> e.<span class="me1">msg</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/li&gt;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">//Create a YUI instance:</span>
+YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">//Shortcut for our logging div:</span>
+    <span class="kw2">var</span> logger <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#log&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//Our BubbleTarget object is an object to which our Custom Event</span>
+    <span class="co1">//will be allowed to bubble.  It needs itself to be an EventTarget,</span>
+    <span class="co1">//so we'll use augment to make it an EventTarget:</span>
+    <span class="kw2">var</span> BubbleTarget <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Host constructor executed.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+    <span class="co1">//Augment BubbleTarget to make it an EventTarget:</span>
+    Y.<span class="me1">augment</span><span class="br0">&#40;</span>BubbleTarget<span class="sy0">,</span> Y.<span class="me1">EventTarget</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//Create an instance of BubbleTarget:</span>
+    <span class="kw2">var</span> bubbleTarget <span class="sy0">=</span> <span class="kw2">new</span> BubbleTarget<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//Now we'll subscribe to the &quot;publisher:testEvent&quot; -- note</span>
+    <span class="co1">//that we can do this even before this event is published:</span>
+    bubbleTarget.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;publisher:testEvent&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;publisher:testEvent fired on the BubbleTarget object.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//Now we'll create the constructor for the Publisher, which </span>
+    <span class="co1">//is the direct host of our Custom Event.  It will also be an</span>
+    <span class="co1">//EventTarget, so we'll extend it as well:</span>
+    <span class="kw2">var</span> Publisher <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>bubbleTarget<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="co1">//We'll specify now that Custom Events hosted by Publisher</span>
+        <span class="co1">//should bubble to the bubbleTarget instance passed into the</span>
+        <span class="co1">//the Publisher's constructor:</span>
+        <span class="kw1">this</span>.<span class="me1">addTarget</span><span class="br0">&#40;</span>bubbleTarget<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">//Here we publish the Custom Event.  Note that it's not</span>
+        <span class="co1">//necessary to publish the event at all if you don't have</span>
+        <span class="co1">//options you wish to configure -- firing the event or </span>
+        <span class="co1">//subscribing to it will create it on the fly if necessary:</span>
+        <span class="kw1">this</span>.<span class="me1">publish</span><span class="br0">&#40;</span><span class="st0">&quot;publisher:testEvent&quot;</span><span class="sy0">,</span>
+            <span class="br0">&#123;</span>
+                emitFacade<span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span>
+                <span class="co1">//the defaultFn is what you want to have happen</span>
+                <span class="co1">//by default when no subscriber calls preventDefault:</span>
+                defaultFn<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;defaultFn: publisher:testEvent's defaultFn executed.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="br0">&#125;</span><span class="sy0">,</span>
+                <span class="co1">//You can prevent the default function from firing by</span>
+                <span class="co1">//calling preventDefault from a listener (if the Custom</span>
+                <span class="co1">//Event's preventable option is set to true, as it is by</span>
+                <span class="co1">//default).  If the default is prevented, the preventedFn</span>
+                <span class="co1">//is called, allowing you to respond if necessary.</span>
+                preventedFn<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;preventedFn: A subscriber to publisher:testEvent called preventDefault().&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>          
+                <span class="br0">&#125;</span><span class="sy0">,</span>
+                <span class="co1">//The stoppedFn is called if a subscriber calls stopPropagation or</span>
+                <span class="co1">//stopImmediatePropagation:</span>
+                stoppedFn<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;stoppedFn: A subscriber to publisher:testEvent called stopPropagation().&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="br0">&#125;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#41;</span><span class="sy0">;</span>
+        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Publisher constructor executed.&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+    <span class="co1">//Augment Publisher to make it an EventTarget:</span>
+    Y.<span class="me1">augment</span><span class="br0">&#40;</span>Publisher<span class="sy0">,</span> Y.<span class="me1">EventTarget</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//Create a Publisher instance:</span>
+    <span class="kw2">var</span> p <span class="sy0">=</span> <span class="kw2">new</span> Publisher<span class="br0">&#40;</span>bubbleTarget<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//We've already subscribed to the event on the bubbleTarget, but</span>
+    <span class="co1">//we can also subscribe to it here on the Publisher instance.</span>
+    <span class="co1">//We'll see the event fire here before it bubbles up to the </span>
+    <span class="co1">//bubbleTarget:</span>
+    p.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;publisher:testEvent&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;publisher:testEvent subscriber fired on the publisher object.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="kw1">if</span><span class="br0">&#40;</span>Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#stopPropagation&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;checked&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="co1">//we will stopPropagation on the Custom Event, preventing</span>
+            <span class="co1">//it from bubbling to the bubbleTarget:</span>
+            e.<span class="me1">stopPropagation</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+        <span class="kw1">if</span><span class="br0">&#40;</span>Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#preventDefault&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;checked&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="co1">//we will preventDefault on the Custom Event, preventing</span>
+            <span class="co1">//the testEvent's defaultFn from firing:</span>
+            e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//We can tie our testEvent to an interface gesture -- the click of a</span>
+    <span class="co1">//button, for example.</span>
+    Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="co1">//clear out the logger:</span>
+        logger.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        p.<span class="me1">fire</span><span class="br0">&#40;</span><span class="st0">&quot;publisher:testEvent&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#fire&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//write out log messages to the page:</span>
+    Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;yui:log&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw2">var</span> s <span class="sy0">=</span> logger.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        logger.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> s <span class="sy0">+</span> <span class="st0">&quot;&lt;li&gt;&quot;</span> <span class="sy0">+</span> e.<span class="me1">msg</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/li&gt;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-5bbd9e71fccde3cc0e1ecb952c342cce-plain">//Create a YUI instance:
+YUI().use('node', function(Y) {
+
+    //Shortcut for our logging div:
+    var logger = Y.one("#log");
+
+    //Our BubbleTarget object is an object to which our Custom Event
+    //will be allowed to bubble.  It needs itself to be an EventTarget,
+    //so we'll use augment to make it an EventTarget:
+    var BubbleTarget = function() {
+        Y.log("Host constructor executed.", "info", "example");
+    }
+    //Augment BubbleTarget to make it an EventTarget:
+    Y.augment(BubbleTarget, Y.EventTarget);
+
+    //Create an instance of BubbleTarget:
+    var bubbleTarget = new BubbleTarget();
+
+    //Now we'll subscribe to the "publisher:testEvent" -- note
+    //that we can do this even before this event is published:
+    bubbleTarget.on("publisher:testEvent", function(e) {
+        Y.log("publisher:testEvent fired on the BubbleTarget object.", "info", "example");
+    });
+
+    //Now we'll create the constructor for the Publisher, which 
+    //is the direct host of our Custom Event.  It will also be an
+    //EventTarget, so we'll extend it as well:
+    var Publisher = function(bubbleTarget) {
+
+        //We'll specify now that Custom Events hosted by Publisher
+        //should bubble to the bubbleTarget instance passed into the
+        //the Publisher's constructor:
+        this.addTarget(bubbleTarget);
+
+        //Here we publish the Custom Event.  Note that it's not
+        //necessary to publish the event at all if you don't have
+        //options you wish to configure -- firing the event or 
+        //subscribing to it will create it on the fly if necessary:
+        this.publish("publisher:testEvent",
+            {
+                emitFacade: true,
+                //the defaultFn is what you want to have happen
+                //by default when no subscriber calls preventDefault:
+                defaultFn: function() {
+                    Y.log("defaultFn: publisher:testEvent's defaultFn executed.", "info", "example");
+                },
+                //You can prevent the default function from firing by
+                //calling preventDefault from a listener (if the Custom
+                //Event's preventable option is set to true, as it is by
+                //default).  If the default is prevented, the preventedFn
+                //is called, allowing you to respond if necessary.
+                preventedFn: function() {
+                    Y.log("preventedFn: A subscriber to publisher:testEvent called preventDefault().", "info", "example");          
+                },
+                //The stoppedFn is called if a subscriber calls stopPropagation or
+                //stopImmediatePropagation:
+                stoppedFn: function() {
+                    Y.log("stoppedFn: A subscriber to publisher:testEvent called stopPropagation().", "info", "example");
+                }
+            }
+        );
+        Y.log("Publisher constructor executed.");
+    }
+    //Augment Publisher to make it an EventTarget:
+    Y.augment(Publisher, Y.EventTarget);
+
+    //Create a Publisher instance:
+    var p = new Publisher(bubbleTarget);
+
+    //We've already subscribed to the event on the bubbleTarget, but
+    //we can also subscribe to it here on the Publisher instance.
+    //We'll see the event fire here before it bubbles up to the 
+    //bubbleTarget:
+    p.on("publisher:testEvent", function(e) {
+        Y.log("publisher:testEvent subscriber fired on the publisher object.", "info", "example");
+        if(Y.one("#stopPropagation").get("checked")) {
+            //we will stopPropagation on the Custom Event, preventing
+            //it from bubbling to the bubbleTarget:
+            e.stopPropagation();
+        }
+        
+        if(Y.one("#preventDefault").get("checked")) {
+            //we will preventDefault on the Custom Event, preventing
+            //the testEvent's defaultFn from firing:
+            e.preventDefault();
+        }
+    });
+
+    //We can tie our testEvent to an interface gesture -- the click of a
+    //button, for example.
+    Y.on("click", function(e) {
+        //clear out the logger:
+        logger.set("innerHTML", "");
+        p.fire("publisher:testEvent");
+    }, "#fire");
+
+    //write out log messages to the page:
+    Y.on("yui:log", function(e) {
+        var s = logger.get("innerHTML");
+        logger.set("innerHTML", s + "<li>" + e.msg + "</li>");
+    });
+
+});</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Event Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../event/event-simple.html'>Simple DOM Events</a></li><li><a href='../event/event-timing.html'>Using 'available', 'contentready', and 'domready'</a></li><li class='selected'><a href='../event/event-ce.html'>Using Custom Events</a></li><li><a href='../event/event-focus-blur.html'>Skinning via Progressive Enhancement using the Event Utility and the Loader</a></li><li><a href='../event/event-synth-hover.html'>Creating a hover event for DOM subscription</a></li><li><a href='../event/swipe-gesture.html'>Supporting A Swipe Left Gesture</a></li><li><a href='../yui/yui-augment.html'>Compose Classes of Objects with <code>augment</code> (included with examples for The YUI Global Object)</a></li><li><a href='../node-focusmanager/node-focusmanager-3.html'>Accessible Menu Button (included with examples for Focus Manager Node Plugin)</a></li><li><a href='../node-focusmanager/node-focusmanager-2.html'>Accessible TabView (included with examples for Focus Manager Node Plugin)</a></li><li><a href='../attribute/attribute-event.html'>Attribute Change Events (included with examples for Attribute)</a></li><li><a href='../attribute/attribute-event-speeddate.html'>Attribute Event Based Speed Dating (included with examples for Attribute)</a></li><li><a href='../attribute/attribute-getset.html'>Attribute Getters, Setters and Validators (included with examples for Attribute)</a></li><li><a href='../widget/widget-extend.html'>Extending the base widget class (included with examples for Widget)</a></li><li><a href='../dd/photo-browser.html'>Photo Browser (included with examples for Drag &amp; Drop)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Event Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/event/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_event.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="selected "><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

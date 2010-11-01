@@ -1,0 +1,532 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Attribute: Attribute Change Events</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+    #example-out .event {
+        padding:2px 2px 2px 5px;
+    }
+    
+    #example-out .event-props {
+        font-family:courier;
+        margin-top:2px;
+    }
+
+    #example-out .event-title {
+        font-weight:bold;
+        font-family:arial;
+        color:#8dd5e7;
+        margin-top:5px;
+        margin-bottom:3px;
+    }
+
+    #example-out {
+        margin:5px;
+        border:1px solid #000;
+        color:#ffffff;
+        background-color:#004c6d;
+        overflow:auto;
+        height:20em;
+    }
+
+    .attrs {
+        border:1px solid #000;
+        background-color:#cdcdcd;
+        margin:5px;
+    }
+
+    .attrs .header {
+        font-weight:bold;
+        background-color:#aaa;
+        padding:5px;
+    }
+
+    .attrs .body {
+        padding:10px;
+    }
+
+    .attrs .footer {
+        padding:5px;
+    }
+
+    .attrs label {
+        display:block;
+        float:left;
+        clear:left;
+        font-weight:bold;
+        width:8em;
+    }
+
+    .attrs #preventFoobar.hidden {
+        display:none;
+    }
+
+    .attrs #preventFoobar {
+        margin-left:5px;
+        display:inline;
+        float:none;
+        clear:none;
+    }
+</style>
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Attribute: Attribute Change Events</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Attribute: Attribute Change Events</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	Attribute change events are one of the key benefits of using attributes to maintain state for your objects, instead of regular object properties. This example shows how you can listen for attribute change events and work with the event payload they receive. 
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="attribute-event_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div class="attrs">
+    <div class="header">Enter a new value and click the "Change Value" button:</div>
+    <div class="body">
+        <p>
+            <label for="attrSel">Attribute</label>: 
+            <select id="attrSel">
+                <option value="foo">foo</option>
+                <option value="bar">bar</option>
+                <option value="foobar">foobar</option>
+            </select>
+            <label id="preventFoobar" class="hidden"><input type="checkbox" checked="true"> Prevent change</label>
+        </p>
+        <p><label for="currentVal">Current Value</label>: <span id="currentVal"></span></p>
+        <p><label for="newVal">New Value</label>: <input type="text" id="newVal" /></p>
+    </div>
+    <div class="footer">
+        <button type="button" id="changeValue">Change Value</button>
+    </div>
+</div>
+
+<div id="example-out"></div>
+
+<script type="text/javascript">
+// Get a new YUI instance 
+YUI().use("node", "attribute", function(Y) {
+
+    // Setup a custom class with attribute support
+    function MyClass(cfg) {
+
+        // Setup attribute configuration
+        var attrs = {
+            "foo" : {
+                value:5
+            },
+     
+            "bar" : {
+                value:"Hello World!"
+            },
+    
+            "foobar" : {
+                value:true
+            }
+        };
+
+        this.addAttrs(attrs, cfg);
+    }
+
+    Y.augment(MyClass, Y.Attribute);
+
+    var o1 = new MyClass();
+
+    function displayEvent(e, title) {
+        var str = '<div class="event"><div class="event-title">' + title + '</div>';
+
+        if (e) {
+            str += 
+            '<ul class="event-props"><li>e.attrName: ' 
+            + e.attrName 
+            + '</li><li>e.prevVal: '
+            + e.prevVal
+            + '</li><li>e.newVal: '
+            + e.newVal
+            + '</li></ul></div>';
+        }
+
+        str += '</div>';
+ 
+        Y.one("#example-out").prepend(str);
+    }
+
+    // Start Example Form Handling
+    var attrSel = Y.one("#attrSel");
+    var newValTxt = Y.one("#newVal");
+    var currentValSpan = Y.one("#currentVal");
+    var preventFoobarChk = Y.one("#preventFoobar input[type=checkbox]");
+    var preventFoobarLbl = Y.one("#preventFoobar");
+
+    var attrOpts = attrSel.get("options");
+
+    function updateVal() {
+        var selIndex = attrSel.get("selectedIndex");
+        var attr = attrOpts.item(selIndex).get("value");
+        o1.set(attr, newValTxt.get("value"));
+    }
+
+    Y.on("click", updateVal, "#changeValue");
+
+    function populateCurrentValue() {
+        var selIndex = attrSel.get("selectedIndex");
+        var attr = attrOpts.item(selIndex).get("value");
+
+        currentValSpan.set("innerHTML", o1.get(attr));
+        newValTxt.set("value", "");
+
+        if (attr === "foobar") {
+            preventFoobarLbl.removeClass("hidden");
+        } else {
+            preventFoobarLbl.addClass("hidden");
+        }
+    }
+
+    populateCurrentValue();
+
+    Y.on("change", populateCurrentValue, attrSel);
+    // End Example Form Handling
+
+    // Attribute Change Event Listners
+
+    o1.after("fooChange", function(e) {
+        displayEvent(e, "After fooChange");
+        currentValSpan.set("innerHTML", e.newVal);
+    });
+
+    o1.after("barChange", function(e) {
+        displayEvent(e, "After barChange");
+        currentValSpan.set("innerHTML", e.newVal);
+    });
+
+    o1.on("foobarChange", function(e) {
+
+        if (preventFoobarChk.get("checked")) {
+
+            // Calling preventDefault, in an "on" listener
+            // will prevent the attribute change from occuring
+            // and the after listener being called.
+
+            e.preventDefault();
+            displayEvent(null, "On foobarChange (prevented)");
+        }
+
+    });
+
+    o1.after("foobarChange", function(e) {
+
+        // This foobar after listener will not get called, 
+        // if we end up preventing default in the "on" 
+        // listener above.
+
+        displayEvent(e, "After foobarChange");
+        currentValSpan.set("innerHTML", e.newVal);
+    });
+
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Listening For Attribute Change Events</h3>
+
+<p>In this example, we'll look at how you can setup listeners for attribute change events, and work with the event payload which the listeners receive.</p>
+
+<h4>Setting Up A Custom Class With Attribute</h4>
+
+<p>We start by setting up the same custom class we created for the <a href="attribute-basic.html">basic example</a> with 3 attributes <code>foo</code>, <code>bar</code> and <code>foobar</code>, using the code below:</p>
+
+<div id="syntax-382efb64cb7c6587aaefe62aeee7e28e" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;attribute&quot;</span><span class="sy0">,</span> <span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Setup a custom class with attribute support</span></div></li><li class="li1"><div class="de1">    <span class="kw2">function</span> MyClass<span class="br0">&#40;</span>cfg<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Setup attribute configuration</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> attrs <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="st0">&quot;foo&quot;</span> <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                value<span class="sy0">:</span><span class="nu0">5</span></div></li><li class="li2"><div class="de2">            <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="st0">&quot;bar&quot;</span> <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                value<span class="sy0">:</span><span class="st0">&quot;Hello World!&quot;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="st0">&quot;foobar&quot;</span> <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                value<span class="sy0">:</span><span class="kw2">true</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>.<span class="me1">addAttrs</span><span class="br0">&#40;</span>attrs<span class="sy0">,</span> cfg<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">augment</span><span class="br0">&#40;</span>MyClass<span class="sy0">,</span> Y.<span class="me1">Attribute</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;attribute&quot;</span><span class="sy0">,</span> <span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">// Setup a custom class with attribute support</span>
+    <span class="kw2">function</span> MyClass<span class="br0">&#40;</span>cfg<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="co1">// Setup attribute configuration</span>
+        <span class="kw2">var</span> attrs <span class="sy0">=</span> <span class="br0">&#123;</span>
+            <span class="st0">&quot;foo&quot;</span> <span class="sy0">:</span> <span class="br0">&#123;</span>
+                value<span class="sy0">:</span><span class="nu0">5</span>
+            <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+            <span class="st0">&quot;bar&quot;</span> <span class="sy0">:</span> <span class="br0">&#123;</span>
+                value<span class="sy0">:</span><span class="st0">&quot;Hello World!&quot;</span>
+            <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+            <span class="st0">&quot;foobar&quot;</span> <span class="sy0">:</span> <span class="br0">&#123;</span>
+                value<span class="sy0">:</span><span class="kw2">true</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">this</span>.<span class="me1">addAttrs</span><span class="br0">&#40;</span>attrs<span class="sy0">,</span> cfg<span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    Y.<span class="me1">augment</span><span class="br0">&#40;</span>MyClass<span class="sy0">,</span> Y.<span class="me1">Attribute</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-382efb64cb7c6587aaefe62aeee7e28e-plain">YUI().use("attribute", "node", function(Y) {
+
+    // Setup a custom class with attribute support
+    function MyClass(cfg) {
+
+        // Setup attribute configuration
+        var attrs = {
+            "foo" : {
+                value:5
+            },
+     
+            "bar" : {
+                value:"Hello World!"
+            },
+    
+            "foobar" : {
+                value:true
+            }
+        };
+
+        this.addAttrs(attrs, cfg);
+    }
+
+    Y.augment(MyClass, Y.Attribute);
+
+});</textarea></div>
+<h4>Registering Event Listeners</h4>
+
+<p>Once we have an instance of the custom class, we can use the <code>on</code> and <code>after</code> methods provided by Attribute, to listen for changes in the value of each of the attributes:</p>
+
+<div id="syntax-1c10687bd8234966b4c2e9f021ec85ca" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> o1 <span class="sy0">=</span> <span class="kw2">new</span> MyClass<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">...</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="co1">// Event Listners</span></div></li><li class="li1"><div class="de1">o1.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;fooChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    displayEvent<span class="br0">&#40;</span>e<span class="sy0">,</span> <span class="st0">&quot;After fooChange&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    currentValSpan.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> e.<span class="me1">newVal</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">o1.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;barChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    displayEvent<span class="br0">&#40;</span>e<span class="sy0">,</span> <span class="st0">&quot;After barChange&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    currentValSpan.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> e.<span class="me1">newVal</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">o1.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;foobarChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>preventFoobarChk.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;checked&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="co1">// Calling preventDefault, in an &quot;on&quot; listener</span></div></li><li class="li1"><div class="de1">        <span class="co1">// will prevent the attribute change from occuring</span></div></li><li class="li1"><div class="de1">        <span class="co1">// and the after listener being called.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        displayEvent<span class="br0">&#40;</span><span class="kw2">null</span><span class="sy0">,</span> <span class="st0">&quot;On foobarChange (prevented)&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">o1.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;foobarChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// This foobar after listener will not get called, </span></div></li><li class="li1"><div class="de1">    <span class="co1">// if we end up preventing default in the &quot;on&quot; </span></div></li><li class="li1"><div class="de1">    <span class="co1">// listener above.</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    displayEvent<span class="br0">&#40;</span>e<span class="sy0">,</span> <span class="st0">&quot;After foobarChange&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    currentValSpan.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> e.<span class="me1">newVal</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> o1 <span class="sy0">=</span> <span class="kw2">new</span> MyClass<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+...
+&nbsp;
+<span class="co1">// Event Listners</span>
+o1.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;fooChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    displayEvent<span class="br0">&#40;</span>e<span class="sy0">,</span> <span class="st0">&quot;After fooChange&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    currentValSpan.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> e.<span class="me1">newVal</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+o1.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;barChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    displayEvent<span class="br0">&#40;</span>e<span class="sy0">,</span> <span class="st0">&quot;After barChange&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    currentValSpan.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> e.<span class="me1">newVal</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+o1.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;foobarChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">&#40;</span>preventFoobarChk.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;checked&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="co1">// Calling preventDefault, in an &quot;on&quot; listener</span>
+        <span class="co1">// will prevent the attribute change from occuring</span>
+        <span class="co1">// and the after listener being called.</span>
+&nbsp;
+        e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        displayEvent<span class="br0">&#40;</span><span class="kw2">null</span><span class="sy0">,</span> <span class="st0">&quot;On foobarChange (prevented)&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+o1.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;foobarChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">// This foobar after listener will not get called, </span>
+    <span class="co1">// if we end up preventing default in the &quot;on&quot; </span>
+    <span class="co1">// listener above.</span>
+&nbsp;
+    displayEvent<span class="br0">&#40;</span>e<span class="sy0">,</span> <span class="st0">&quot;After foobarChange&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    currentValSpan.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> e.<span class="me1">newVal</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-1c10687bd8234966b4c2e9f021ec85ca-plain">var o1 = new MyClass();
+
+...
+
+// Event Listners
+o1.after("fooChange", function(e) {
+    displayEvent(e, "After fooChange");
+    currentValSpan.set("innerHTML", e.newVal);
+});
+
+o1.after("barChange", function(e) {
+    displayEvent(e, "After barChange");
+    currentValSpan.set("innerHTML", e.newVal);
+});
+
+o1.on("foobarChange", function(e) {
+
+    if (preventFoobarChk.get("checked")) {
+
+        // Calling preventDefault, in an "on" listener
+        // will prevent the attribute change from occuring
+        // and the after listener being called.
+
+        e.preventDefault();
+        displayEvent(null, "On foobarChange (prevented)");
+    }
+
+});
+
+o1.after("foobarChange", function(e) {
+
+    // This foobar after listener will not get called, 
+    // if we end up preventing default in the "on" 
+    // listener above.
+
+    displayEvent(e, "After foobarChange");
+    currentValSpan.set("innerHTML", e.newVal);
+});</textarea></div>
+<p>As seen in the above code, the event type for attribute change events is created by concatenating the attribute name with <code>"Change"</code> (e.g. <code>"fooChange"</code>), and this event type is used for both the <code>on</code> and <code>after</code> subscription methods. Whenever an attribute value is changed through Attribute's <code>set</code> method, both "on" and "after" subscribers are notified.</p>
+
+<h4>On vs. After</h4>
+
+<p><strong>on :</strong> Subscribers to the "on" moment, will be notified <em>before</em> any actual state change has occurred. This provides the opportunity to prevent the state change from occurring, using the <code>preventDefault</code> method of the event facade object passed to the subscriber. If you use <code>get</code> to retrieve the value of the attribute in an "on" subscriber, you will receive the current, unchanged value. However the event facade provides access to the value which the attribute is being set to, through it's <code>newVal</code> property.</p>
+
+<p><strong>after :</strong> Subscribers to the "after" moment, will be notified <em>after</em> the attribute's state has been updated. This provides the opportunity to update state in other parts of your application, in response to a change in the attribute's state.</p>
+
+<p>Based on the definition above, <code>after</code> listeners are not invoked if state change is prevented, for example, due to one of the <code>on</code> listeners calling <code>preventDefault</code> on the event object, as is done in the <code>on</code> listener for the <code>foobar</code> attribute:</p>
+
+<div id="syntax-60d558c00c69cca87237c6a01659f01e" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">o1.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;foobarChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Calling preventDefault, in an &quot;on&quot; listener</span></div></li><li class="li1"><div class="de1">    <span class="co1">// will prevent the attribute change from occurring</span></div></li><li class="li2"><div class="de2">    <span class="co1">// and prevent the after listeners from being called</span></div></li><li class="li1"><div class="de1">    displayEvent<span class="br0">&#40;</span>event<span class="sy0">,</span> <span class="st0">&quot;on foobarChange (change prevented)&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    event.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">o1.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;foobarChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">// Calling preventDefault, in an &quot;on&quot; listener</span>
+    <span class="co1">// will prevent the attribute change from occurring</span>
+    <span class="co1">// and prevent the after listeners from being called</span>
+    displayEvent<span class="br0">&#40;</span>event<span class="sy0">,</span> <span class="st0">&quot;on foobarChange (change prevented)&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    event.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-60d558c00c69cca87237c6a01659f01e-plain">o1.on("foobarChange", function(event) {
+
+    // Calling preventDefault, in an "on" listener
+    // will prevent the attribute change from occurring
+    // and prevent the after listeners from being called
+    displayEvent(event, "on foobarChange (change prevented)");
+
+    event.preventDefault();
+});</textarea></div>
+<p>For primitive values (non-Object values), the <code>after</code> listeners will also not be invoked if there is no change in the actual value of the attribute. That is, if the new value of the attribute is the same as the current value (based on the identity operator, <code>===</code>), the <code>after</code> listeners will not be notified because there is no change in state. You can see this, by setting an attribute to the same value twice in a row.</p>
+
+<h4>Event Facade</h4>
+
+<p>The event object (an instance of <a href="../../api/EventFacade.html">EventFacade</a>) passed to attribute change event subscribers, has the following interesting properties and methods related to attribute management:</p>
+
+<dl>
+    <dt>newVal</dt>
+    <dd>The value which the attribute will be set to (in the case of "on" subscribers), or has been set to (in the case of "after" subscribers</dd>
+    <dt>prevVal</dt>
+    <dd>The value which the attribute is currently set to (in the case of "on" subscribers), or was previously set to (in the case of "after" subscribers</dd>
+    <dt>attrName</dt>
+    <dd>The name of the attribute which is being set</dd>
+    <dt>subAttrName</dt>
+    <dd>Attribute also allows you to set nested properties of attributes which have values which are objects through the 
+    <code>set</code> method (e.g. <code>o1.set("x.y.z")</code>). This property will contain the path to the property which was changed.</dd>
+    <dt>preventDefault()<dt>
+    <dd>This method can be called in an "on" subscriber to prevent the attribute's value from being updated (the default behavior). Calling this method in an "after" listener has no impact, since the default behavior has already been invoked.</dd>
+    <dt>stopImmediatePropagation()</dt>
+    <dd>This method can be called in "on" or "after" subscribers, and will prevent the rest of the subscriber stack from
+    being invoked, but will not prevent the attribute's value from being updated.</dd>
+</dl>
+
+<p>The <a href="attribute-event-speeddate.html">"Attribute Event Based Speed Dating" example</a> provides a look at how you can leverage attribute change events in your applications, to decouple logic both within your class, and when interacting with other objects.</p>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Attribute Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../attribute/attribute-basic.html'>Basic Attribute Configuration</a></li><li><a href='../attribute/attribute-rw.html'>Read-Only and Write-Once Attributes</a></li><li class='selected'><a href='../attribute/attribute-event.html'>Attribute Change Events</a></li><li><a href='../attribute/attribute-basic-speeddate.html'>Attribute Based Speed Dating</a></li><li><a href='../attribute/attribute-event-speeddate.html'>Attribute Event Based Speed Dating</a></li><li><a href='../attribute/attribute-getset.html'>Attribute Getters, Setters and Validators</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Attribute Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/attribute/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_attribute.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="selected "><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

@@ -1,0 +1,445 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Overlay: Standard Module Support</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+/* Hide overlay markup while loading, if js is enabled */
+.yui3-js-enabled .yui3-overlay-loading {
+    top:-1000em;
+    left:-1000em;
+    position:absolute;
+}
+
+/* Overlay Look/Feel */
+.yui3-overlay-content {
+    padding:3px;
+    border:1px solid #000;
+    background-color:#aaa;
+}
+
+.yui3-overlay-content .yui3-widget-hd {
+    padding:5px;
+    border:2px solid #aa0000;
+    background-color:#fff;
+}
+
+.yui3-overlay-content .yui3-widget-bd {
+    padding:5px;
+    border:2px solid #0000aa;
+    background-color:#fff;
+}
+
+.yui3-overlay-content .yui3-widget-ft {
+    padding:5px;
+    border:2px solid #00aa00;
+    background-color:#fff;
+}
+
+/* Example Layout CSS */
+.overlay-example {
+    border:1px solid #000;
+    background-color:#eee;
+    padding:5px;
+    zoom:1;
+}
+
+.overlay-example .fields {
+    float:left;
+    width:20em;
+}
+
+.overlay-example label {
+    display:block;
+    font-weight:bold;
+    margin-bottom:3px
+}
+
+.overlay-example select {
+    width:19em;
+} 
+
+.overlay-example textarea {
+    width:19em;
+    height:15em;
+}
+
+.overlay-example .filler {
+    margin-left:21em;
+    margin-top:1em;
+    color:#999;
+}
+
+.overlay-example:after {
+    content:".";
+    display:block;
+    height:0;
+    clear:both;
+}
+</style>
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Overlay: Standard Module Support</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Overlay: Standard Module Support</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example shows how you can work either the <code>headerContent, bodyContent, footerContent</code> attributes, to replace content in the Overlay's standard module sections, or use the <code>setStdModContent(section, content, where)</code> method to insert content <em>before</em>, or append it <em>after</em> existing content in the section.</p>	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="overlay-stdmod_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div class="overlay-example" id="overlay-stdmod">
+    <div id="overlay" class="yui3-overlay-loading">
+        <div class="yui3-widget-hd">Overlay Header</div>
+        <div class="yui3-widget-bd">Overlay Body</div>
+        <div class="yui3-widget-ft">Overlay Footer</div>
+    </div>
+
+    <div class="fields">
+        <p>
+            <label for="content">New content:</label>
+            <textarea name="content" id="content"></textarea>
+        </p>
+        <p>
+            <label for="section">Section to add content to:</label>
+            <select name="section" id="section">
+                <option value="header">Header</option>
+                <option value="body">Body</option>
+                <option value="footer">Footer</option>
+            </select>
+        </p>
+        <p>
+            <label for="where">Replace, insert before or append after existing content:</label>
+            <select name="where" id="where">
+                <option value="before">Before</option>
+                <option value="after">After</option>
+                <option value="replace">Replace</option>
+            </select>
+        </p>
+        <p>
+            <label>Set new content as a string: <input type="checkbox" name="asString" id="asString" checked="true"></label>
+        </p>
+        <button type="button" id="setContent">Set Content</button>
+    </div>
+    <div class="filler">
+        Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed tellus pede, aliquet vitae, faucibus quis, lobortis non, metus. Pellentesque at metus ac mi condimentum egestas. In vel neque a massa porttitor ultrices. Nunc lorem. Vivamus ullamcorper fringilla tortor. Etiam at nunc pellentesque lectus cursus pretium. Integer velit. In quis nunc eget leo rhoncus scelerisque. In in ante ac ante pharetra vestibulum. Praesent sit amet metus. Nam egestas ipsum. Nulla facilisi. Quisque rhoncus, eros sed convallis faucibus, erat felis pretium nisi, non bibendum magna mauris non metus. Integer mauris eros, volutpat non, pretium vitae, rutrum at, tellus. 
+    </div>
+</div>
+
+<script type="text/javascript">
+YUI().use("overlay", function(Y) {
+
+    var overlay = new Y.Overlay({
+        srcNode:"#overlay",
+        width:"20em",
+        align: {
+            node:"#overlay-stdmod > .filler",
+            points:["tl", "tl"]
+        }
+    });
+    overlay.render();
+
+    var content = Y.one("#content");
+    var where = Y.one("#where");
+    var section = Y.one("#section");
+    var asString = Y.one("#asString");
+
+    Y.on("click", function() {
+        var newContent = content.get("value");
+        if (! asString.get("checked") ) {
+            // Set new content using Node references
+            newContent = Y.Node.create(newContent);
+        }
+        overlay.setStdModContent(section.get("value"), newContent, where.get("value"));
+    }, "#setContent");
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Overlay's Standard Module Support</h3>
+
+<h4>Setting Up The YUI Instance</h4>
+
+<p>To create an instance of an Overlay on you page, the only module you need to request is the <code>overlay</code> module. The <code>overlay</code> module will pull in the <code>widget</code>, <code>widget-stack</code>, <code>widget-position</code>, <code>widget-position-align</code>, <code>widget-position-constrain</code> and <code>widget-stdmod</code> extensions it uses.</p>
+
+<div id="syntax-79a0d897db5a4878eeef6dff77f8706c" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;overlay&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">// We'll write example code here, where we have a Y.Overlay class available.</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;overlay&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">// We'll write example code here, where we have a Y.Overlay class available.</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-79a0d897db5a4878eeef6dff77f8706c-plain">YUI({...}).use("overlay", function(Y) {
+    // We'll write example code here, where we have a Y.Overlay class available.
+});</textarea></div>
+<p>Note, using the <code>overlay</code> module, will also pull down the default CSS required for overlay, on top of which we only need to add our required look/feel CSS for the example.</p>
+
+<h4>Creating The Overlay From Markup</h4>
+
+<p>For this example, we'll create the overlay instance from markup which already exists on the page, and is shown below. We mark the existing markup with the <code>yui3-overlay-loading</code> class, so that we can hide it while the rich control is being instantiated:</p>
+
+<div id="syntax-49aada2d94781585aa6f28fe6219360a" class="yui-syntax-highlight"><div class="numbers"><pre class="html4strict" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;overlay&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-overlay-loading&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-widget-hd&quot;</span>&gt;</span>Overlay Header<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-widget-bd&quot;</span>&gt;</span>Overlay Body<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-widget-ft&quot;</span>&gt;</span>Overlay Footer<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li2"><div class="de2"><span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="html4strict" style="font-family:monospace;"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;overlay&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-overlay-loading&quot;</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-widget-hd&quot;</span>&gt;</span>Overlay Header<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-widget-bd&quot;</span>&gt;</span>Overlay Body<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-widget-ft&quot;</span>&gt;</span>Overlay Footer<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></pre></div><textarea id="syntax-49aada2d94781585aa6f28fe6219360a-plain"><div id="overlay" class="yui3-overlay-loading">
+    <div class="yui3-widget-hd">Overlay Header</div>
+    <div class="yui3-widget-bd">Overlay Body</div>
+    <div class="yui3-widget-ft">Overlay Footer</div>
+</div></textarea></div>
+<h4>Instantiating The Overlay</h4>
+
+<p>To create an overlay instance, we use the overlay constructor <code>Y.Overlay</code>, and pass it the <code>srcNode</code> reference for the existing markup on the page:</p>
+
+<div id="syntax-1c924c419c2baec9ff39f0270fadb62c" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> overlay <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Overlay</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    srcNode<span class="sy0">:</span><span class="st0">&quot;#overlay&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    width<span class="sy0">:</span><span class="st0">&quot;20em&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    align<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        node<span class="sy0">:</span><span class="st0">&quot;#overlay-stdmod &gt; .filler&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        points<span class="sy0">:</span><span class="br0">&#91;</span><span class="st0">&quot;tl&quot;</span><span class="sy0">,</span> <span class="st0">&quot;tl&quot;</span><span class="br0">&#93;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">overlay.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> overlay <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Overlay</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+    srcNode<span class="sy0">:</span><span class="st0">&quot;#overlay&quot;</span><span class="sy0">,</span>
+    width<span class="sy0">:</span><span class="st0">&quot;20em&quot;</span><span class="sy0">,</span>
+    align<span class="sy0">:</span> <span class="br0">&#123;</span>
+        node<span class="sy0">:</span><span class="st0">&quot;#overlay-stdmod &gt; .filler&quot;</span><span class="sy0">,</span>
+        points<span class="sy0">:</span><span class="br0">&#91;</span><span class="st0">&quot;tl&quot;</span><span class="sy0">,</span> <span class="st0">&quot;tl&quot;</span><span class="br0">&#93;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+overlay.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-1c924c419c2baec9ff39f0270fadb62c-plain">var overlay = new Y.Overlay({
+    srcNode:"#overlay",
+    width:"20em",
+    align: {
+        node:"#overlay-stdmod > .filler",
+        points:["tl", "tl"]
+    }
+});
+overlay.render();</textarea></div>
+<p>We also set it's width and align it to the filler paragraph in the example box ("#overlay-stdmod > .filler"). We don't pass any node references to the <code>render</code> method, so the Overlay is rendered in the location of the contentBox provided.</p>
+
+<h4>Setting Content</h4>
+
+<p>
+The example provides a set of input fields, allowing the user to set content in either of the 3 standard module sections which Overlay supports using Overlay's <code>setStdModContent</code> method. 
+The content can either be inserted before, appended after, or replace existing content in the specified section.</p>
+
+<p>
+Additionally the new content can be converted to a node instance before being added to the specified section. Although it has no impact on the example, if the new content is added as a string, innerHTML is used to insert before or append after the existing section content, removing any event listeners which may have been attached to elements inside the section. The ability to convert the content to a node instance is provided in the example to illustrate Overlay's ability to handle both content formats.
+</p>
+
+<div id="syntax-41444d1cb2594fa90fffe01350a29f0e" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">// Hold onto input field references.</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> content <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#content&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> where <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#where&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> section <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#section&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="kw2">var</span> asString <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#asString&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// New content to be added.</span></div></li><li class="li2"><div class="de2">    <span class="kw2">var</span> newContent <span class="sy0">=</span> content.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// If the &quot;Set content as string&quot; checkbox is checked, we pass new content into the </span></div></li><li class="li1"><div class="de1">    <span class="co1">// setStdModContent method as string (innerHTML will be used to set the new content).</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="co1">// If it's not checked, we create a node reference from the string,</span></div></li><li class="li1"><div class="de1">    <span class="co1">// and pass the new content into the setStdModContent as a node reference.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span> asString.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;checked&quot;</span><span class="br0">&#41;</span> <span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        newContent <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span>newContent<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    overlay.<span class="me1">setStdModContent</span><span class="br0">&#40;</span>section.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span> newContent<span class="sy0">,</span> where.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#setContent&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">// Hold onto input field references.</span>
+<span class="kw2">var</span> content <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#content&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="kw2">var</span> where <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#where&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="kw2">var</span> section <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#section&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="kw2">var</span> asString <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#asString&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">// New content to be added.</span>
+    <span class="kw2">var</span> newContent <span class="sy0">=</span> content.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// If the &quot;Set content as string&quot; checkbox is checked, we pass new content into the </span>
+    <span class="co1">// setStdModContent method as string (innerHTML will be used to set the new content).</span>
+&nbsp;
+    <span class="co1">// If it's not checked, we create a node reference from the string,</span>
+    <span class="co1">// and pass the new content into the setStdModContent as a node reference.</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span> asString.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;checked&quot;</span><span class="br0">&#41;</span> <span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        newContent <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span>newContent<span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    overlay.<span class="me1">setStdModContent</span><span class="br0">&#40;</span>section.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span> newContent<span class="sy0">,</span> where.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#setContent&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-41444d1cb2594fa90fffe01350a29f0e-plain">// Hold onto input field references.
+var content = Y.one("#content");
+var where = Y.one("#where");
+var section = Y.one("#section");
+var asString = Y.one("#asString");
+
+Y.on("click", function() {
+
+    // New content to be added.
+    var newContent = content.get("value");
+
+    // If the "Set content as string" checkbox is checked, we pass new content into the 
+    // setStdModContent method as string (innerHTML will be used to set the new content).
+    
+    // If it's not checked, we create a node reference from the string,
+    // and pass the new content into the setStdModContent as a node reference.
+
+    if (! asString.get("checked") ) {
+        newContent = Y.Node.create(newContent);
+    }
+
+    overlay.setStdModContent(section.get("value"), newContent, where.get("value"));
+
+}, "#setContent");</textarea></div>
+<h4>CSS: Overlay Look/Feel</h4>
+
+<p>As with the other basic overlay examples, the overlay.css Sam Skin file (build/overlay/assets/skins/sam/overlay.css) provides the default functional CSS for the overlay. Namely the CSS rules to hide the overlay, and position it absolutely. However there's no default out-of-the-box look/feel applied to the Overlay widget.</p>
+
+<p>The example provides it's own look and feel for the Overlay, by defining rules for the content box, header, body and footer sections:</p>
+
+<div id="syntax-4e352494e4bc81bb8fe53906aa604caa" class="yui-syntax-highlight"><div class="numbers"><pre class="css" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="coMULTI">/* Hide overlay markup while loading, if js is enabled */</span></div></li><li class="li1"><div class="de1"><span class="re1">.yui3-js-enabled</span> <span class="re1">.yui3-overlay-loading</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">top</span><span class="sy0">:</span><span class="re3">-1000em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">left</span><span class="sy0">:</span><span class="re3">-1000em</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">position</span><span class="sy0">:</span><span class="kw2">absolute</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="coMULTI">/* Overlay Look/Feel */</span></div></li><li class="li1"><div class="de1"><span class="re1">.yui3-overlay-content</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">padding</span><span class="sy0">:</span><span class="re3">3px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">border</span><span class="sy0">:</span><span class="re3">1px</span> <span class="kw2">solid</span> <span class="re0">#000</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background-color</span><span class="sy0">:</span><span class="re0">#aaa</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="re1">.yui3-overlay-content</span> <span class="re1">.yui3-widget-hd</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">padding</span><span class="sy0">:</span><span class="re3">5px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">border</span><span class="sy0">:</span><span class="re3">2px</span> <span class="kw2">solid</span> <span class="re0">#aa0000</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background-color</span><span class="sy0">:</span><span class="re0">#fff</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="re1">.yui3-overlay-content</span> <span class="re1">.yui3-widget-bd</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">padding</span><span class="sy0">:</span><span class="re3">5px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">border</span><span class="sy0">:</span><span class="re3">2px</span> <span class="kw2">solid</span> <span class="re0">#0000aa</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background-color</span><span class="sy0">:</span><span class="re0">#fff</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="re1">.yui3-overlay-content</span> <span class="re1">.yui3-widget-ft</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">padding</span><span class="sy0">:</span><span class="re3">5px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">border</span><span class="sy0">:</span><span class="re3">2px</span> <span class="kw2">solid</span> <span class="re0">#00aa00</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">background-color</span><span class="sy0">:</span><span class="re0">#fff</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="css" style="font-family:monospace;"><span class="coMULTI">/* Hide overlay markup while loading, if js is enabled */</span>
+<span class="re1">.yui3-js-enabled</span> <span class="re1">.yui3-overlay-loading</span> <span class="br0">&#123;</span>
+    <span class="kw1">top</span><span class="sy0">:</span><span class="re3">-1000em</span><span class="sy0">;</span>
+    <span class="kw1">left</span><span class="sy0">:</span><span class="re3">-1000em</span><span class="sy0">;</span>
+    <span class="kw1">position</span><span class="sy0">:</span><span class="kw2">absolute</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="coMULTI">/* Overlay Look/Feel */</span>
+<span class="re1">.yui3-overlay-content</span> <span class="br0">&#123;</span>
+    <span class="kw1">padding</span><span class="sy0">:</span><span class="re3">3px</span><span class="sy0">;</span>
+    <span class="kw1">border</span><span class="sy0">:</span><span class="re3">1px</span> <span class="kw2">solid</span> <span class="re0">#000</span><span class="sy0">;</span>
+    <span class="kw1">background-color</span><span class="sy0">:</span><span class="re0">#aaa</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="re1">.yui3-overlay-content</span> <span class="re1">.yui3-widget-hd</span> <span class="br0">&#123;</span>
+    <span class="kw1">padding</span><span class="sy0">:</span><span class="re3">5px</span><span class="sy0">;</span>
+    <span class="kw1">border</span><span class="sy0">:</span><span class="re3">2px</span> <span class="kw2">solid</span> <span class="re0">#aa0000</span><span class="sy0">;</span>
+    <span class="kw1">background-color</span><span class="sy0">:</span><span class="re0">#fff</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="re1">.yui3-overlay-content</span> <span class="re1">.yui3-widget-bd</span> <span class="br0">&#123;</span>
+    <span class="kw1">padding</span><span class="sy0">:</span><span class="re3">5px</span><span class="sy0">;</span>
+    <span class="kw1">border</span><span class="sy0">:</span><span class="re3">2px</span> <span class="kw2">solid</span> <span class="re0">#0000aa</span><span class="sy0">;</span>
+    <span class="kw1">background-color</span><span class="sy0">:</span><span class="re0">#fff</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="re1">.yui3-overlay-content</span> <span class="re1">.yui3-widget-ft</span> <span class="br0">&#123;</span>
+    <span class="kw1">padding</span><span class="sy0">:</span><span class="re3">5px</span><span class="sy0">;</span>
+    <span class="kw1">border</span><span class="sy0">:</span><span class="re3">2px</span> <span class="kw2">solid</span> <span class="re0">#00aa00</span><span class="sy0">;</span>
+    <span class="kw1">background-color</span><span class="sy0">:</span><span class="re0">#fff</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-4e352494e4bc81bb8fe53906aa604caa-plain">/* Hide overlay markup while loading, if js is enabled */
+.yui3-js-enabled .yui3-overlay-loading {
+    top:-1000em;
+    left:-1000em;
+    position:absolute;
+}
+
+/* Overlay Look/Feel */
+.yui3-overlay-content {
+    padding:3px;
+    border:1px solid #000;
+    background-color:#aaa;
+}
+
+.yui3-overlay-content .yui3-widget-hd {
+    padding:5px;
+    border:2px solid #aa0000;
+    background-color:#fff;
+}
+
+.yui3-overlay-content .yui3-widget-bd {
+    padding:5px;
+    border:2px solid #0000aa;
+    background-color:#fff;
+}
+
+.yui3-overlay-content .yui3-widget-ft {
+    padding:5px;
+    border:2px solid #00aa00;
+    background-color:#fff;
+}</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Overlay Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../overlay/overlay-xy.html'>Basic XY Positioning</a></li><li><a href='../overlay/overlay-align.html'>Alignment Support</a></li><li><a href='../overlay/overlay-stack.html'>Stack Support</a></li><li class='selected'><a href='../overlay/overlay-stdmod.html'>Standard Module Support</a></li><li><a href='../overlay/overlay-constrain.html'>Constrain Support</a></li><li><a href='../overlay/overlay-io-plugin.html'>IO Plugin</a></li><li><a href='../overlay/overlay-anim-plugin.html'>Animation Plugin</a></li><li><a href='../node-focusmanager/node-focusmanager-3.html'>Accessible Menu Button (included with examples for Focus Manager Node Plugin)</a></li><li><a href='../stylesheet/stylesheet_theme.html'>Adjusting a page theme on the fly (included with examples for StyleSheet)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Overlay Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/overlay/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_overlay.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="selected "><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

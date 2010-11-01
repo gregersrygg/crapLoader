@@ -1,0 +1,277 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Attribute Based Speed Dating</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+    #speeddate h1 {
+        font-size: 108%;
+        color:#000;
+        margin-bottom:2em;
+    }
+
+    #john {
+        margin-bottom:10px;
+    }
+
+    .sd-nametag {
+        border:1px solid #000;
+        text-align:center;
+        width:25em;
+        margin:20px;
+        
+        background-color:#00f;
+
+        border-radius: 10px;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+                
+        box-shadow: 3px 3px 3px #888;
+        -moz-box-shadow: 3px 3px 3px #888;
+        -webkit-box-shadow: 3px 3px 3px #888;
+    }
+
+    .sd-nametag .sd-hd, .sd-nametag .sd-ft {
+        padding:5px;
+        text-align:center;
+        font-size:108%;
+        font-weight:900;
+        color:#fff;
+    }
+
+    .sd-nametag .sd-hd {    
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        -moz-border-radius-topright: 10px;
+        -moz-border-radius-topleft: 10px;
+        -webkit-border-top-right-radius: 10px;
+        -webkit-border-top-left-radius: 10px;
+    }
+
+    .sd-nametag .sd-ft {    
+        border-bottom-right-radius: 10px;
+        border-bottom-left-radius: 10px;
+        -moz-border-radius-bottomright: 10px;
+        -moz-border-radius-bottomleft: 10px;
+        -webkit-border-bottom-right-radius: 10px;
+        -webkit-border-bottom-left-radius: 10px;
+    }
+
+    .sd-nametag .sd-bd {
+        background-color:#fff;
+        padding:1em;
+    }
+
+    .sd-nametag .sd-bd .sd-name, 
+    .sd-nametag .sd-bd .sd-personality {
+        font-size:108%;
+        font-weight:900;
+        font-family:monospace;
+        text-decoration:underline;
+        color:#00a;
+    }
+
+    .sd-nametag .sd-bd .sd-personality.sd-max {
+        color:#f00;
+    }
+
+</style>
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Attribute Based Speed Dating</h1>
+
+<div class="exampleIntro">
+	<p>
+This example builds on the <a href="attribute-basic.html">"Basic Configuration" example</a>, 
+showing how you can use attribute to model objects in your application.
+</p>
+
+<p>
+As with the basic example, it is geared towards users who want to create their own classes from 
+scratch and add attribute support. In most cases you should consider extending the 
+<a href="http://developer.yahoo.com/yui/3/base/index.html"><code>Base</code></a> class when you need attribute support, instead 
+of augmenting Attribute directly. <a href="http://developer.yahoo.com/yui/3/base/index.html"><code>Base</code></a> does the work described 
+in this example for you, in addition to making it easier for users to extend you class.
+</p>			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<div id="speeddate">
+
+    <h1>Speed Dating With Attributes</h1>
+
+    <div id="john">
+        <button type="button" class="hi">Hi I'm John</button>
+        <button type="button" class="taken" disabled="disabled">I like Jane</button>
+        <div class="shirt"></div>
+    </div>
+
+    <div id="jane">
+        <button type="button" disabled="disabled" class="hi">Hey, I'm Jane</button>
+        <button type="button" class="upgrade" disabled="disabled">No way!, I save whales too!</button>
+        <button type="button" class="taken" disabled="disabled">I like John</button>
+        <div class="shirt"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+// Get a new instance of YUI and 
+// load it with the required set of modules
+
+YUI().use("node", "attribute", "substitute", function(Y) {
+
+    // Setup custom class which we want to 
+    // add managed attribute support to
+
+    function SpeedDater(cfg) {
+
+        // When constructed, setup the initial attributes for the
+        // instance, by calling the addAttrs method.
+
+        var attrs = {
+            // Add 3 attributes: name, personality, available
+            name : {
+                writeOnce:true
+            },
+    
+            personality : {
+                value:50
+            },
+    
+            available : {
+                value:true
+            }
+        };
+
+        this.addAttrs(attrs, cfg);
+    }
+
+    // Setup static property to hold attribute config
+
+    SpeedDater.NAMETAG = '<div class="sd-nametag"><div class="sd-hd">Hello!</div><div class="sd-bd">I\'m <span class="sd-name">{name}</span> and my PersonalityQuotientIndex is <span class="sd-personality">{personality}</span></div><div class="sd-ft sd-availability">{available}</div></div>';
+
+    SpeedDater.prototype.applyNameTag = function(where) {
+
+        var tokens = {
+            name: this.get("name"),
+            available: (this.get("available")) ? "I'm still looking " : "Sorry, I'm taken",
+            personality: this.get("personality")
+        };
+
+        this.nameTag = Y.Node.create(Y.substitute(SpeedDater.NAMETAG, tokens));
+
+        Y.one(where).appendChild(this.nameTag);
+    };
+
+    SpeedDater.prototype.updateNameTag = function() {
+
+        var taken = (this.get("available")) ? "I'm still looking " : "Sorry, I'm taken";
+        var name = this.get("name");
+        var personality = this.get("personality");
+
+        this.nameTag.one(".sd-name").set("innerHTML", name);
+        this.nameTag.one(".sd-availability").set("innerHTML", taken);
+
+        var personalityEl = this.nameTag.one(".sd-personality"); 
+        personalityEl.set("innerHTML", personality);
+
+        if (personality > 90) {
+            personalityEl.addClass("sd-max");
+        }
+    }
+
+    // Augment custom class with Attribute
+    Y.augment(SpeedDater, Y.Attribute);
+    
+    var john, jane;
+
+    Y.on("click", function() {
+
+        if (!john) {
+
+            // Set both name and personality during construction 
+            john = new SpeedDater({
+                name: "John",
+                personality: 76.43
+            });
+            john.applyNameTag("#john .shirt");
+
+            Y.one("#jane .hi").set("disabled", false); 
+        }
+
+    }, "#john .hi");
+
+    Y.on("click", function() {
+
+        if (!jane) {
+
+            // Set name during construction
+            jane = new SpeedDater({
+                name: "Jane"
+            });
+
+            // Set personality after construction
+            jane.set("personality", 82);
+
+            jane.applyNameTag("#jane .shirt");
+
+            Y.all("#jane button").set("disabled", false);
+            Y.all("#john button").set("disabled", false); 
+        }
+
+    }, "#jane .hi");
+
+    Y.on("click", function() {
+
+        john.set("available", false);
+        john.updateNameTag();
+        
+    }, "#john .taken");
+
+    Y.on("click", function() {
+
+        jane.set("available", false);
+        jane.updateNameTag();
+
+    }, "#jane .taken");
+
+    Y.on("click", function() {
+
+        jane.set("personality", 98);
+        jane.updateNameTag();
+
+    }, "#jane .upgrade");
+
+ });
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

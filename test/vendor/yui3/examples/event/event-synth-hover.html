@@ -1,0 +1,495 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Event: Creating a hover event for DOM subscription</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+    #demo p {
+        background: #fff;
+        border: 1px solid #999;
+        width: 250px;
+        height: 100px;
+        line-height: 100px;
+        text-align: center;
+    }
+
+    #demo .hover {
+        background: #000;
+        color: #fff;
+    }
+</style>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Event: Creating a hover event for DOM subscription</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Event: Creating a hover event for DOM subscription</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example will illustrate how to use the synthetic event creation API.
+We'll create a <code>hover</code> event that accepts two functions at
+subscription time, the first being the function that executes when the hover
+begins, and the second when the hover ends.</p>
+
+<p>Subscribing to this new event will look like this:</p>
+<div id="syntax-1ff5f11603c4945422515db77e5944f9" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">node.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> onHover<span class="sy0">,</span> endHover<span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">node.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> onHover<span class="sy0">,</span> endHover<span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-1ff5f11603c4945422515db77e5944f9-plain">node.on("hover", onHover, endHover);</textarea></div>	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="event-synth-hover_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div id="demo">
+    <p>Hover over me</p>
+    <button type="button" id="attach">Attach hover event</button>
+    <button type="button" id="detach">Detach hover event</button>
+</div>
+<script>
+YUI().use("event-synthetic", "event-mouseenter", function (Y) {
+
+    Y.Event.define("hover", {
+        processArgs: function (args) {
+            // Args received here match the Y.on(...) order, so
+            // [ 'hover', onHover, "#demo p", endHover, etc ]
+            var mouseleave = args[3];
+            args.splice(3,1);
+
+            // This will be stored in the subscription's '_extra' property
+            return mouseleave;
+        },
+
+        on: function (node, sub, notifier) {
+            var mouseleave = sub._extra;
+
+            // To make detaching the associated DOM events easy, use a
+            // detach category, but keep the category unique per subscription
+            // by creating the category with Y.guid()
+            sub._evtGuid = Y.guid() + '|';
+
+            node.on( sub._evtGuid + "mouseenter", function (e) {
+                // Firing the notifier event executes the hover subscribers
+                notifier.fire(e);
+            });
+
+            node.on(sub._evtGuid + "mouseleave", mouseleave);
+        },
+
+        detach: function (node, sub, notifier) {
+            // Detach the mouseenter and mouseout subscriptions using the
+            // detach category
+            node.detach(this._evtGuid + '*');
+        }
+    } );
+
+    function onHover(e) {
+        this.addClass("hover");
+    }
+    function endHover(e) {
+        this.removeClass("hover");
+    }
+
+    Y.one("#attach").on("click", function (e) {
+        Y.one("#demo p").on("hover", onHover, endHover);
+    });
+
+    Y.one("#detach").on("click", function (e) {
+        Y.one("#demo p").detach("hover");
+    });
+
+} );
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3 class="first"><code>on</code>, <code>fire</code>, and <code>detach</code></h3>
+<p>The three interesting moments in the lifecycle of an event subscription
+are</p>
+<ol>
+    <li>The event is subscribed to</li>
+    <li>The event is fired</li>
+    <li>The event is unsubscribed from</li>
+</ol>
+
+<p>Create a new synthetic DOM event with <code>Y.Event.define( <em>name</em>,
+<em>config</em> )</code>.  Define the implementation logic for the
+<code>on</code> and <code>detach</code> moments in the configuration.
+Typically the condition triggering the event firing is set up in the
+<code>on</code> phase.</p>
+
+<div id="syntax-838a98884d9e877a7a33b8e114cf97ae" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">Y.<span class="me1">Event</span>.<span class="me1">define</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    on<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="sy0">,</span> sub<span class="sy0">,</span> notifier<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// what happens when a subscription is made</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="co1">// if (condition) {</span></div></li><li class="li1"><div class="de1">            notifier.<span class="me1">fire</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// subscribers executed</span></div></li><li class="li1"><div class="de1">        <span class="co1">// }</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    detach<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="sy0">,</span> sub<span class="sy0">,</span> notifier<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// what happens when a subscription is removed</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">Y.<span class="me1">Event</span>.<span class="me1">define</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+    on<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="sy0">,</span> sub<span class="sy0">,</span> notifier<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="co1">// what happens when a subscription is made</span>
+&nbsp;
+        <span class="co1">// if (condition) {</span>
+            notifier.<span class="me1">fire</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// subscribers executed</span>
+        <span class="co1">// }</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    detach<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="sy0">,</span> sub<span class="sy0">,</span> notifier<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="co1">// what happens when a subscription is removed</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span> <span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-838a98884d9e877a7a33b8e114cf97ae-plain">Y.Event.define("hover", {
+    on: function (node, sub, notifier) {
+        // what happens when a subscription is made
+
+        // if (condition) {
+            notifier.fire(); // subscribers executed
+        // }
+    },
+
+    detach: function (node, sub, notifier) {
+        // what happens when a subscription is removed
+    }
+} );</textarea></div>
+<p>In the case of hovering, the trigger is simply a <code>mouseover</code>, or
+better yet, a <a href="http://developer.yahoo.com/yui/3/event/#mouseentermouseleave"><code>mouseenter</code></a> event.</p>
+
+<div id="syntax-4627b0e617c62b17b106a2c5e0bd63d4" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">Y.<span class="me1">Event</span>.<span class="me1">define</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    on<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="sy0">,</span> sub<span class="sy0">,</span> notifier<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// To make detaching the associated DOM events easy, use a</span></div></li><li class="li1"><div class="de1">        <span class="co1">// detach category, but keep the category unique per subscription</span></div></li><li class="li2"><div class="de2">        <span class="co1">// by creating the category with Y.guid()</span></div></li><li class="li1"><div class="de1">        sub._evtGuid <span class="sy0">=</span> Y.<span class="me1">guid</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">'|'</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        node.<span class="me1">on</span><span class="br0">&#40;</span>sub._evtGuid <span class="sy0">+</span> <span class="st0">&quot;mouseenter&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="co1">// Firing the notifier event executes the hover subscribers</span></div></li><li class="li2"><div class="de2">            <span class="co1">// Pass along the mouseenter event, which will renamed &quot;hover&quot;</span></div></li><li class="li1"><div class="de1">            notifier.<span class="me1">fire</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    detach<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="sy0">,</span> sub<span class="sy0">,</span> notifier<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// Detach the mouseenter and mouseout subscriptions using the detach</span></div></li><li class="li1"><div class="de1">        <span class="co1">// category - node.detach( 'foo|*' ) detaches everything in category foo</span></div></li><li class="li1"><div class="de1">        node.<span class="me1">detach</span><span class="br0">&#40;</span>sub._evtGuid <span class="sy0">+</span> <span class="st0">'*'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">Y.<span class="me1">Event</span>.<span class="me1">define</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+    on<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="sy0">,</span> sub<span class="sy0">,</span> notifier<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="co1">// To make detaching the associated DOM events easy, use a</span>
+        <span class="co1">// detach category, but keep the category unique per subscription</span>
+        <span class="co1">// by creating the category with Y.guid()</span>
+        sub._evtGuid <span class="sy0">=</span> Y.<span class="me1">guid</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">'|'</span><span class="sy0">;</span>
+&nbsp;
+        node.<span class="me1">on</span><span class="br0">&#40;</span>sub._evtGuid <span class="sy0">+</span> <span class="st0">&quot;mouseenter&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="co1">// Firing the notifier event executes the hover subscribers</span>
+            <span class="co1">// Pass along the mouseenter event, which will renamed &quot;hover&quot;</span>
+            notifier.<span class="me1">fire</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    detach<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="sy0">,</span> sub<span class="sy0">,</span> notifier<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="co1">// Detach the mouseenter and mouseout subscriptions using the detach</span>
+        <span class="co1">// category - node.detach( 'foo|*' ) detaches everything in category foo</span>
+        node.<span class="me1">detach</span><span class="br0">&#40;</span>sub._evtGuid <span class="sy0">+</span> <span class="st0">'*'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span> <span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-4627b0e617c62b17b106a2c5e0bd63d4-plain">Y.Event.define("hover", {
+    on: function (node, sub, notifier) {
+        // To make detaching the associated DOM events easy, use a
+        // detach category, but keep the category unique per subscription
+        // by creating the category with Y.guid()
+        sub._evtGuid = Y.guid() + '|';
+
+        node.on(sub._evtGuid + "mouseenter", function (e) {
+            // Firing the notifier event executes the hover subscribers
+            // Pass along the mouseenter event, which will renamed "hover"
+            notifier.fire(e);
+        });
+    },
+
+    detach: function (node, sub, notifier) {
+        // Detach the mouseenter and mouseout subscriptions using the detach
+        // category - node.detach( 'foo|*' ) detaches everything in category foo
+        node.detach(sub._evtGuid + '*');
+    }
+} );</textarea></div>
+<h3>Extended subscription signature</h3>
+<p>The target subscription API for the <code>hover</code> event will be</p>
+<div id="syntax-1ff5f11603c4945422515db77e5944f9" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">node.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> onHover<span class="sy0">,</span> endHover<span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">node.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> onHover<span class="sy0">,</span> endHover<span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-1ff5f11603c4945422515db77e5944f9-plain">node.on("hover", onHover, endHover);</textarea></div>
+<p>This differs from the normal subscription signature by introducing a second
+handler for the end of the hover.  In the configuration passed to
+<code>Y.Event.define</code>, you can include an argument pre-processor function
+in <code>processArgs</code>.  Inside that function, extract any additional info
+from the subscription arguments, <em>then remove them</em>.  What's returned
+from the function is stored in the subscription object's <code>_extra</code>
+property.</p>
+
+<div id="syntax-5fbac25b91f17ecc4865e2f83366c5e9" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">Y.<span class="me1">Event</span>.<span class="me1">define</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    processArgs<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// Args received here match the Y.on(...) order, so</span></div></li><li class="li1"><div class="de1">        <span class="co1">// [ 'hover', onHover, node, endHover, etc ]</span></div></li><li class="li2"><div class="de2">        <span class="kw2">var</span> mouseleave <span class="sy0">=</span> args<span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span><span class="sy0">;</span> <span class="co1">// capture the second function</span></div></li><li class="li1"><div class="de1">        args.<span class="me1">splice</span><span class="br0">&#40;</span><span class="nu0">3</span><span class="sy0">,</span><span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span>         <span class="co1">// then remove it from the arguments</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// This will be stored in the subscription's '_extra' property</span></div></li><li class="li1"><div class="de1">        <span class="kw1">return</span> mouseleave<span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    on<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="sy0">,</span> sub<span class="sy0">,</span> notifier<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> mouseleave <span class="sy0">=</span> sub._extra<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="co1">// To make detaching the associated DOM events easy, use a</span></div></li><li class="li1"><div class="de1">        <span class="co1">// detach category, but keep the category unique per subscription</span></div></li><li class="li1"><div class="de1">        <span class="co1">// by creating the category with Y.guid()</span></div></li><li class="li1"><div class="de1">        sub._evtGuid <span class="sy0">=</span> Y.<span class="me1">guid</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">'|'</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        node.<span class="me1">on</span><span class="br0">&#40;</span>sub._evtGuid <span class="sy0">+</span> <span class="st0">&quot;mouseenter&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="co1">// Firing the notifier event executes the hover subscribers</span></div></li><li class="li1"><div class="de1">            <span class="co1">// Pass along the mouseenter event, which will renamed &quot;hover&quot;</span></div></li><li class="li1"><div class="de1">            notifier.<span class="me1">fire</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        node.<span class="me1">on</span><span class="br0">&#40;</span>sub._evtGuid <span class="sy0">+</span> <span class="st0">&quot;mouseleave&quot;</span><span class="sy0">,</span> mouseleave<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    ...</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">Y.<span class="me1">Event</span>.<span class="me1">define</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+    processArgs<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="co1">// Args received here match the Y.on(...) order, so</span>
+        <span class="co1">// [ 'hover', onHover, node, endHover, etc ]</span>
+        <span class="kw2">var</span> mouseleave <span class="sy0">=</span> args<span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span><span class="sy0">;</span> <span class="co1">// capture the second function</span>
+        args.<span class="me1">splice</span><span class="br0">&#40;</span><span class="nu0">3</span><span class="sy0">,</span><span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span>         <span class="co1">// then remove it from the arguments</span>
+&nbsp;
+        <span class="co1">// This will be stored in the subscription's '_extra' property</span>
+        <span class="kw1">return</span> mouseleave<span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    on<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="sy0">,</span> sub<span class="sy0">,</span> notifier<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw2">var</span> mouseleave <span class="sy0">=</span> sub._extra<span class="sy0">;</span>
+&nbsp;
+        <span class="co1">// To make detaching the associated DOM events easy, use a</span>
+        <span class="co1">// detach category, but keep the category unique per subscription</span>
+        <span class="co1">// by creating the category with Y.guid()</span>
+        sub._evtGuid <span class="sy0">=</span> Y.<span class="me1">guid</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">'|'</span><span class="sy0">;</span>
+&nbsp;
+        node.<span class="me1">on</span><span class="br0">&#40;</span>sub._evtGuid <span class="sy0">+</span> <span class="st0">&quot;mouseenter&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="co1">// Firing the notifier event executes the hover subscribers</span>
+            <span class="co1">// Pass along the mouseenter event, which will renamed &quot;hover&quot;</span>
+            notifier.<span class="me1">fire</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        node.<span class="me1">on</span><span class="br0">&#40;</span>sub._evtGuid <span class="sy0">+</span> <span class="st0">&quot;mouseleave&quot;</span><span class="sy0">,</span> mouseleave<span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+    ...</pre></div><textarea id="syntax-5fbac25b91f17ecc4865e2f83366c5e9-plain">Y.Event.define("hover", {
+    processArgs: function (args) {
+        // Args received here match the Y.on(...) order, so
+        // [ 'hover', onHover, node, endHover, etc ]
+        var mouseleave = args[3]; // capture the second function
+        args.splice(3,1);         // then remove it from the arguments
+
+        // This will be stored in the subscription's '_extra' property
+        return mouseleave;
+    },
+
+    on: function (node, sub, notifier) {
+        var mouseleave = sub._extra;
+
+        // To make detaching the associated DOM events easy, use a
+        // detach category, but keep the category unique per subscription
+        // by creating the category with Y.guid()
+        sub._evtGuid = Y.guid() + '|';
+
+        node.on(sub._evtGuid + "mouseenter", function (e) {
+            // Firing the notifier event executes the hover subscribers
+            // Pass along the mouseenter event, which will renamed "hover"
+            notifier.fire(e);
+        });
+
+        node.on(sub._evtGuid + "mouseleave", mouseleave);
+    },
+    ...</textarea></div>
+<h3>Use it</h3>
+<p>Subscribe to the new event or detach the event as you would any other DOM event.</p>
+
+<div id="syntax-85cbee91c7ab14d1adfc8a701765a2ea" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">function</span> onHover<span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="kw2">function</span> endHover<span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">this</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#attach&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo p&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> onHover<span class="sy0">,</span> endHover<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#detach&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo p&quot;</span><span class="br0">&#41;</span>.<span class="me1">detach</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">function</span> onHover<span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="kw2">function</span> endHover<span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#attach&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo p&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> onHover<span class="sy0">,</span> endHover<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#detach&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo p&quot;</span><span class="br0">&#41;</span>.<span class="me1">detach</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-85cbee91c7ab14d1adfc8a701765a2ea-plain">function onHover(e) {
+    this.addClass("hover");
+}
+function endHover(e) {
+    this.removeClass("hover");
+}
+
+Y.one("#attach").on("click", function (e) {
+    Y.one("#demo p").on("hover", onHover, endHover);
+});
+
+Y.one("#detach").on("click", function (e) {
+    Y.one("#demo p").detach("hover");
+});</textarea></div>
+<h3>Full Code Listing</h3>
+<div id="syntax-efc685703e05ca9a861b24e1f4938e25" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;event-synthetic&quot;</span><span class="sy0">,</span> <span class="st0">&quot;event-mouseenter&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">Event</span>.<span class="me1">define</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        processArgs<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            <span class="co1">// Args received here match the Y.on(...) order, so</span></div></li><li class="li1"><div class="de1">            <span class="co1">// [ 'hover', onHover, &quot;#demo p&quot;, endHover, etc ]</span></div></li><li class="li1"><div class="de1">            <span class="kw2">var</span> mouseleave <span class="sy0">=</span> args<span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            args.<span class="me1">splice</span><span class="br0">&#40;</span><span class="nu0">3</span><span class="sy0">,</span><span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">            <span class="co1">// This will be stored in the subscription's '_extra' property</span></div></li><li class="li1"><div class="de1">            <span class="kw1">return</span> mouseleave<span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        on<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="sy0">,</span> sub<span class="sy0">,</span> notifier<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            <span class="kw2">var</span> mouseleave <span class="sy0">=</span> sub._extra<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="co1">// To make detaching the associated DOM events easy, use a</span></div></li><li class="li1"><div class="de1">            <span class="co1">// detach category, but keep the category unique per subscription</span></div></li><li class="li1"><div class="de1">            <span class="co1">// by creating the category with Y.guid()</span></div></li><li class="li2"><div class="de2">            sub._evtGuid <span class="sy0">=</span> Y.<span class="me1">guid</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">'|'</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            node.<span class="me1">on</span><span class="br0">&#40;</span> sub._evtGuid <span class="sy0">+</span> <span class="st0">&quot;mouseenter&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="co1">// Firing the notifier event executes the hover subscribers</span></div></li><li class="li1"><div class="de1">                notifier.<span class="me1">fire</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            node.<span class="me1">on</span><span class="br0">&#40;</span>sub._evtGuid <span class="sy0">+</span> <span class="st0">&quot;mouseleave&quot;</span><span class="sy0">,</span> mouseleave<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        detach<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="sy0">,</span> sub<span class="sy0">,</span> notifier<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="co1">// Detach the mouseenter and mouseout subscriptions using the</span></div></li><li class="li1"><div class="de1">            <span class="co1">// detach category</span></div></li><li class="li1"><div class="de1">            node.<span class="me1">detach</span><span class="br0">&#40;</span>sub._evtGuid <span class="sy0">+</span> <span class="st0">'*'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">function</span> onHover<span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">    <span class="kw2">function</span> endHover<span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#attach&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo p&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> onHover<span class="sy0">,</span> endHover<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#detach&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo p&quot;</span><span class="br0">&#41;</span>.<span class="me1">detach</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;event-synthetic&quot;</span><span class="sy0">,</span> <span class="st0">&quot;event-mouseenter&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    Y.<span class="me1">Event</span>.<span class="me1">define</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+        processArgs<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="co1">// Args received here match the Y.on(...) order, so</span>
+            <span class="co1">// [ 'hover', onHover, &quot;#demo p&quot;, endHover, etc ]</span>
+            <span class="kw2">var</span> mouseleave <span class="sy0">=</span> args<span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span><span class="sy0">;</span>
+            args.<span class="me1">splice</span><span class="br0">&#40;</span><span class="nu0">3</span><span class="sy0">,</span><span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            <span class="co1">// This will be stored in the subscription's '_extra' property</span>
+            <span class="kw1">return</span> mouseleave<span class="sy0">;</span>
+        <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+        on<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="sy0">,</span> sub<span class="sy0">,</span> notifier<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw2">var</span> mouseleave <span class="sy0">=</span> sub._extra<span class="sy0">;</span>
+&nbsp;
+            <span class="co1">// To make detaching the associated DOM events easy, use a</span>
+            <span class="co1">// detach category, but keep the category unique per subscription</span>
+            <span class="co1">// by creating the category with Y.guid()</span>
+            sub._evtGuid <span class="sy0">=</span> Y.<span class="me1">guid</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">'|'</span><span class="sy0">;</span>
+&nbsp;
+            node.<span class="me1">on</span><span class="br0">&#40;</span> sub._evtGuid <span class="sy0">+</span> <span class="st0">&quot;mouseenter&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="co1">// Firing the notifier event executes the hover subscribers</span>
+                notifier.<span class="me1">fire</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            node.<span class="me1">on</span><span class="br0">&#40;</span>sub._evtGuid <span class="sy0">+</span> <span class="st0">&quot;mouseleave&quot;</span><span class="sy0">,</span> mouseleave<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+        detach<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="sy0">,</span> sub<span class="sy0">,</span> notifier<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="co1">// Detach the mouseenter and mouseout subscriptions using the</span>
+            <span class="co1">// detach category</span>
+            node.<span class="me1">detach</span><span class="br0">&#40;</span>sub._evtGuid <span class="sy0">+</span> <span class="st0">'*'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span> <span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw2">function</span> onHover<span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">this</span>.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+    <span class="kw2">function</span> endHover<span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">this</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#attach&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo p&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> onHover<span class="sy0">,</span> endHover<span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#detach&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#demo p&quot;</span><span class="br0">&#41;</span>.<span class="me1">detach</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-efc685703e05ca9a861b24e1f4938e25-plain">YUI().use("event-synthetic", "event-mouseenter", function (Y) {
+
+    Y.Event.define("hover", {
+        processArgs: function (args) {
+            // Args received here match the Y.on(...) order, so
+            // [ 'hover', onHover, "#demo p", endHover, etc ]
+            var mouseleave = args[3];
+            args.splice(3,1);
+
+            // This will be stored in the subscription's '_extra' property
+            return mouseleave;
+        },
+
+        on: function (node, sub, notifier) {
+            var mouseleave = sub._extra;
+
+            // To make detaching the associated DOM events easy, use a
+            // detach category, but keep the category unique per subscription
+            // by creating the category with Y.guid()
+            sub._evtGuid = Y.guid() + '|';
+
+            node.on( sub._evtGuid + "mouseenter", function (e) {
+                // Firing the notifier event executes the hover subscribers
+                notifier.fire(e);
+            });
+
+            node.on(sub._evtGuid + "mouseleave", mouseleave);
+        },
+
+        detach: function (node, sub, notifier) {
+            // Detach the mouseenter and mouseout subscriptions using the
+            // detach category
+            node.detach(sub._evtGuid + '*');
+        }
+    } );
+
+    function onHover(e) {
+        this.addClass("hover");
+    }
+    function endHover(e) {
+        this.removeClass("hover");
+    }
+
+    Y.one("#attach").on("click", function (e) {
+        Y.one("#demo p").on("hover", onHover, endHover);
+    });
+
+    Y.one("#detach").on("click", function (e) {
+        Y.one("#demo p").detach("hover");
+    });
+
+});</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Event Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../event/event-simple.html'>Simple DOM Events</a></li><li><a href='../event/event-timing.html'>Using 'available', 'contentready', and 'domready'</a></li><li><a href='../event/event-ce.html'>Using Custom Events</a></li><li><a href='../event/event-focus-blur.html'>Skinning via Progressive Enhancement using the Event Utility and the Loader</a></li><li class='selected'><a href='../event/event-synth-hover.html'>Creating a hover event for DOM subscription</a></li><li><a href='../event/swipe-gesture.html'>Supporting A Swipe Left Gesture</a></li><li><a href='../yui/yui-augment.html'>Compose Classes of Objects with <code>augment</code> (included with examples for The YUI Global Object)</a></li><li><a href='../node-focusmanager/node-focusmanager-3.html'>Accessible Menu Button (included with examples for Focus Manager Node Plugin)</a></li><li><a href='../node-focusmanager/node-focusmanager-2.html'>Accessible TabView (included with examples for Focus Manager Node Plugin)</a></li><li><a href='../attribute/attribute-event.html'>Attribute Change Events (included with examples for Attribute)</a></li><li><a href='../attribute/attribute-event-speeddate.html'>Attribute Event Based Speed Dating (included with examples for Attribute)</a></li><li><a href='../attribute/attribute-getset.html'>Attribute Getters, Setters and Validators (included with examples for Attribute)</a></li><li><a href='../widget/widget-extend.html'>Extending the base widget class (included with examples for Widget)</a></li><li><a href='../dd/photo-browser.html'>Photo Browser (included with examples for Drag &amp; Drop)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Event Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/event/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_event.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="selected "><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

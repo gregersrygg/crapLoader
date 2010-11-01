@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>crapLoader test</title>
+	<link rel="stylesheet" type="text/css" href="yui-test.css" />
+	
+	<script type="text/javascript" charset="utf-8" src="yui-min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="../src/crapLoader.js"></script>
+</head>
+<body class="yui3-skin-sam  yui-skin-sam">
+	<h1>crapLoader test</h1>
+	<div id="testLogger"></div>
+	<div id="test"></div>
+	<script>
+	
+	(function () {
+	    YUI({
+	        base : "vendor/yui3/build/",
+	        filter : "debug",
+	        useConsole : true
+	    }).use("test", "console", function(Y) {
+
+	        new Y.Console({logLevel: "warn"}).render();
+	
+			crapLoader.captureDocWrite();
+
+	        Y.Test.Runner.add(new Y.Test.Case({
+	            name: "crapLoader test",
+	
+				tearDown: function() {
+					document.getElementById("test").innerHTML = "";
+				},
+
+			    "test script should load and execute": function () {
+					var test = this;
+					
+			        crapLoader.loadScript("http://localhost:8081/document.write('crap')", "test1", {
+						success: function() {
+							test.resume(function(){
+								var testEl = document.getElementById("test1");
+								Y.Assert.isNotNull(testEl);
+								Y.Assert.areEqual("crap", testEl.innerHTML, "test1 should contain crap");
+							});
+						}
+					});
+					this.wait(3000);
+			    },
+			
+				"test script inside a script should output in right position": function () {
+					var test = this;
+					var scriptSrc = "http://localhost:8081/document.write(\"<script src=\'http://localhost:8081/document.write(\"crap\");\'></script>\");";
+					createMockScript( ["<p>Before</p>", ["crap"], "<p>After</p>"] );
+					
+			        crapLoader.loadScript(scriptSrc, "test1", {
+						success: function() {
+							test.resume(function(){
+								var testEl = document.getElementById("test1");
+								Y.Assert.isNotNull(testEl);
+								Y.Assert.areEqual("crap", testEl.innerHTML, "test1 should contain crap");
+							});
+						}
+					});
+					this.wait(3000);
+			    }
+	        }));
+	        Y.Test.Runner.run();
+	
+			function createMockScript(outputArr) {
+				var scriptSrc = "http://localhost:8081/", item;
+				for(var i=0,l=outputArr.length; i<l; i++) {
+					item = outputArr[i];
+					if(typeof item == "string") {
+						scriptSrc += encodeURIComponent("document.write('" + item + "');");
+					} else {
+						scriptSrc += encodeURIComponent("document.write('" + createMockScript(item).replace(/'/g, "\\'"); + "');");
+					}
+				}
+				return scriptSrc;
+			}
+	
+	    });
+	})();
+	</script>
+</body>
+</html>

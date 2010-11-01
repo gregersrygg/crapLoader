@@ -1,0 +1,934 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Widget: Creating a hierarchical ListBox widget</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+
+    #mylistbox em {
+        font-style:normal;
+    }
+
+    #selected {
+        border:1px solid #aaa;
+        padding:2px;
+        width:15em;
+    }
+
+    .yui3-listbox {
+        padding:0;       
+        margin: .25em;
+        border: solid 1px #000;
+        background-color:#fff;
+        white-space:nowrap;
+    }
+
+    .yui3-listbox .yui3-listbox {
+        margin-top: .25em;
+        margin-bottom: .25em;
+        border: none;
+    }
+
+    .yui3-listbox .yui3-option, 
+    .yui3-listbox .yui3-listbox-option {
+        margin:0;
+        padding:0;
+        cursor:default;
+        list-style-image:none;
+        list-style-position:outside;
+        list-style-type:none;
+    }
+
+    .yui3-option-content,
+    .yui3-listbox-label {
+        display: block;
+        padding: .25em .5em;
+    }
+
+    .yui3-listbox-content {
+        margin:0;
+        padding:0;
+        overflow:auto;
+    }
+
+    .yui3-listbox .yui3-listbox .yui3-option-content {
+        margin-left:.5em;
+    }
+
+    .yui3-listbox-label {
+        font-weight: bold;
+    }
+
+    .yui3-option-selected {
+        background-color: #cccccc;
+    }
+
+    .yui3-option-focused {
+        outline: none;
+        background-color: blue;
+        color: #fff;
+    }
+</style>
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Widget: Creating a hierarchical ListBox widget</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Widget: Creating a hierarchical ListBox widget</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This is an advanced example, in which we create a ListBox widget with nested Option widgets, by extending the base <code>Widget</code> class, and adding <code>WidgetParent</code> and <code>WidgetChild</code> extensions, through <code>Base.build</code>.</p>
+
+<p><a href="../tabview">TabView</a> which ships with 3.1.0, is also built using the WidgetParent and WidgetChild extensions.</p>	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="widget-parentchild-listbox_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<p id="selected">Selected: <span id="selection">None</span></p>
+
+<div id="exampleContainer"></div>
+
+<script type="text/javascript">
+    YUI({ 
+        modules: {
+            "listbox": {
+                fullpath: "assets/listbox.js",
+                requires: ["substitute", "widget", "widget-parent", "widget-child", "node-focusmanager"]
+            }
+        }
+     }).use("listbox", function (Y) {
+
+        var listbox = new Y.ListBox({  
+            id:"mylistbox", 
+            width:"13em", 
+            height:"15em", 
+            children: [ 
+                { label: "Item One" },
+                { label: "Item Two" } 
+            ]
+        });
+
+        listbox.add({ 
+            type: "ListBox", 
+            label: "Item Three", 
+            children: [ 
+                { label: "Item Three - One" },
+                { label: "Item Three - Two" } 
+            ]
+        });
+
+        listbox.add({ label: "Item Four" });
+
+        listbox.add(
+            new Y.Option({ label: "Item Five" })
+        );
+
+        listbox.add({ 
+            type: "ListBox", 
+            label: "Item Six", 
+            children: [ 
+                { label: "Item Six - One" },
+                { label: "Item Six - Two" }
+            ]
+        });
+
+        listbox.after("selectionChange", function(e) {
+
+            var selection = this.get("selection");
+            if (selection instanceof Y.ListBox) {
+                selection = selection.get("selection");
+            }
+
+            if (selection) {
+                Y.one("#selection").setContent(selection.get("label"));
+            }
+        });
+
+        listbox.render("#exampleContainer");
+    });
+</script>	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h4>The WidgetParent and WidgetChild Extensions</h4>
+
+<p><a href="../../api/WidgetParent.html">WidgetParent</a> is an extension, designed to be used with <code>Base.build</code> to create a class of Widget which is designed to contain child Widgets (for example a Tree widget, which contains TreeNode children). 
+WidgetParent itself augments <a href="../../api/ArrayList.html">ArrayList</a> providing a convenient set of array iteration and convenience methods, allowing users of your class to easily work with parent's list of children.</p>
+
+<p><a href="../../api/WidgetChild.html">WidgetChild</a> is also an extension, designed to be used with <code>Base.build</code> to create a class of Widget which is designed to nested inside parent Widgets (for example a TreeNode widget, which sits inside a Tree widget).</p>
+
+<p>A Widget can be built with both the WidgetParent and WidgetChild extensions (it can be both a Parent and a Child), in cases where we want to support multi-level hierarchies, such as the ListBox example below.</p>
+
+<p>In addition to providing the basic support to manage (add/remove/iterate/render) children the Widget Parent/Child implementations also provides support for both single and multiple selection models.</p>
+
+<h4>Using WidgetParent and WidgetChild to Create the ListBox Class</h4>
+
+<p>For ListBox, since we're creating a new class from scratch, we use the sugar version of <code>Base.build</code>, called <code>Base.create</code>, which allows us to easily create a new class and define it's prototype and static properties/methods, in a single call, as shown below:</p>
+
+<div id="syntax-3839e26589225485bcfaaf6bc518b763" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// Create a new class, ListBox, which extends Widget, and mixes in both the WidgetParent and WidgetChild </span></div></li><li class="li1"><div class="de1"><span class="co1">// extensions since we want to be able to nest one ListBox inside another, to create heirarchical listboxes</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">Y.<span class="me1">ListBox</span> <span class="sy0">=</span> Y.<span class="me1">Base</span>.<span class="me1">create</span><span class="br0">&#40;</span><span class="st0">&quot;listbox&quot;</span><span class="sy0">,</span> Y.<span class="me1">Widget</span><span class="sy0">,</span> <span class="br0">&#91;</span>Y.<span class="me1">WidgetParent</span><span class="sy0">,</span> Y.<span class="me1">WidgetChild</span><span class="br0">&#93;</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// Prototype Properties for ListBox</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// Static Properties for ListBox</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">&nbsp;
+<span class="co1">// Create a new class, ListBox, which extends Widget, and mixes in both the WidgetParent and WidgetChild </span>
+<span class="co1">// extensions since we want to be able to nest one ListBox inside another, to create heirarchical listboxes</span>
+&nbsp;
+Y.<span class="me1">ListBox</span> <span class="sy0">=</span> Y.<span class="me1">Base</span>.<span class="me1">create</span><span class="br0">&#40;</span><span class="st0">&quot;listbox&quot;</span><span class="sy0">,</span> Y.<span class="me1">Widget</span><span class="sy0">,</span> <span class="br0">&#91;</span>Y.<span class="me1">WidgetParent</span><span class="sy0">,</span> Y.<span class="me1">WidgetChild</span><span class="br0">&#93;</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+        <span class="co1">// Prototype Properties for ListBox</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+        <span class="co1">// Static Properties for ListBox</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-3839e26589225485bcfaaf6bc518b763-plain">
+// Create a new class, ListBox, which extends Widget, and mixes in both the WidgetParent and WidgetChild 
+// extensions since we want to be able to nest one ListBox inside another, to create heirarchical listboxes
+
+Y.ListBox = Y.Base.create("listbox", Y.Widget, [Y.WidgetParent, Y.WidgetChild], {
+        // Prototype Properties for ListBox
+    }, {
+        // Static Properties for ListBox
+    });</textarea></div>
+<p>We can then go ahead and fill out the prototype and static properties we want to override in our ListBox implementation, while Widget, WidgetParent and WidgetChild provide the basic Widget rendering and parent-child relationship support. Comments inline below provide the background:</p>
+
+<h5>Prototype Method and Properties</h5>
+
+<div id="syntax-0f5f1539796aba1fd55406924882f43c" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">Y.<span class="me1">ListBox</span> <span class="sy0">=</span> Y.<span class="me1">Base</span>.<span class="me1">create</span><span class="br0">&#40;</span><span class="st0">&quot;listbox&quot;</span><span class="sy0">,</span> Y.<span class="me1">Widget</span><span class="sy0">,</span> <span class="br0">&#91;</span>Y.<span class="me1">WidgetParent</span><span class="sy0">,</span> Y.<span class="me1">WidgetChild</span><span class="br0">&#93;</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// The default content box for ListBoxes will be a UL (Widget uses a DIV by default)</span></div></li><li class="li1"><div class="de1">    CONTENT_TEMPLATE <span class="sy0">:</span> <span class="st0">&quot;&lt;ul&gt;&lt;/ul&gt;&quot;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Setup Custom Listeners</span></div></li><li class="li1"><div class="de1">    bindUI<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">isRoot</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="co1">// Setup custom focus handling, using the NodeFocusManager plugin</span></div></li><li class="li1"><div class="de1">            <span class="co1">// This will help us easily crete next/previous item handling using the arrow keys</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFocusManager</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                descendants<span class="sy0">:</span> <span class="st0">&quot;.yui3-option&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                keys<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    next<span class="sy0">:</span> <span class="st0">&quot;down:40&quot;</span><span class="sy0">,</span>    <span class="co1">// Down arrow</span></div></li><li class="li1"><div class="de1">                    previous<span class="sy0">:</span> <span class="st0">&quot;down:38&quot;</span> <span class="co1">// Up arrow </span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                circular<span class="sy0">:</span> <span class="kw2">true</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;contextmenu&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            event.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Setup listener to control keyboard based single/multiple item selection</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;option:keydown&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw2">var</span> <span class="kw1">item</span> <span class="sy0">=</span> event.<span class="me1">target</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                domEvent <span class="sy0">=</span> event.<span class="me1">domEvent</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                keyCode <span class="sy0">=</span> domEvent.<span class="me1">keyCode</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                direction <span class="sy0">=</span> <span class="br0">&#40;</span>keyCode <span class="sy0">==</span> <span class="nu0">40</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;multiple&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw1">if</span> <span class="br0">&#40;</span>keyCode <span class="sy0">==</span> <span class="nu0">40</span> <span class="sy0">||</span> keyCode <span class="sy0">==</span> <span class="nu0">38</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    <span class="kw1">if</span> <span class="br0">&#40;</span>domEvent.<span class="me1">shiftKey</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                        <span class="kw1">this</span>._selectNextSibling<span class="br0">&#40;</span><span class="kw1">item</span><span class="sy0">,</span> direction<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">                    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                        <span class="kw1">this</span>.<span class="me1">deselectAll</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                        <span class="kw1">this</span>._selectNextSibling<span class="br0">&#40;</span><span class="kw1">item</span><span class="sy0">,</span> direction<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">            <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw1">if</span> <span class="br0">&#40;</span>keyCode <span class="sy0">==</span> <span class="nu0">13</span> <span class="sy0">||</span> keyCode <span class="sy0">==</span> <span class="nu0">32</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    domEvent.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                    <span class="kw1">item</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;selected&quot;</span><span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Setup listener to control mouse based single/multiple item selection</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;option:mousedown&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw2">var</span> <span class="kw1">item</span> <span class="sy0">=</span> event.<span class="me1">target</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                domEvent <span class="sy0">=</span> event.<span class="me1">domEvent</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                selection<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">            <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;multiple&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw1">if</span> <span class="br0">&#40;</span>domEvent.<span class="me1">metaKey</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    <span class="kw1">item</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;selected&quot;</span><span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    <span class="kw1">this</span>.<span class="me1">deselectAll</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">                    <span class="kw1">item</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;selected&quot;</span><span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw1">item</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;selected&quot;</span><span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Helper Method, to find the correct next sibling, taking into account nested ListBoxes    </span></div></li><li class="li2"><div class="de2">    _selectNextSibling <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="kw1">item</span><span class="sy0">,</span> direction<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> parent <span class="sy0">=</span> <span class="kw1">item</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parent&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            method <span class="sy0">=</span>  <span class="br0">&#40;</span>direction<span class="br0">&#41;</span> <span class="sy0">?</span> <span class="st0">&quot;next&quot;</span> <span class="sy0">:</span> <span class="st0">&quot;previous&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">            <span class="co1">// Only go circular for the root listbox</span></div></li><li class="li1"><div class="de1">            circular <span class="sy0">=</span> <span class="br0">&#40;</span>parent <span class="sy0">===</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            sibling <span class="sy0">=</span> <span class="kw1">item</span><span class="br0">&#91;</span>method<span class="br0">&#93;</span><span class="br0">&#40;</span>circular<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>sibling<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            <span class="co1">// If we found a sibling, it's either an Option or a ListBox</span></div></li><li class="li1"><div class="de1">            <span class="kw1">if</span> <span class="br0">&#40;</span>sibling <span class="kw1">instanceof</span> Y.<span class="me1">ListBox</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="co1">// If it's a ListBox, select it's first child (in the direction we're headed)</span></div></li><li class="li1"><div class="de1">                sibling.<span class="me1">selectChild</span><span class="br0">&#40;</span><span class="br0">&#40;</span>direction<span class="br0">&#41;</span> <span class="sy0">?</span> <span class="nu0">0</span> <span class="sy0">:</span> sibling.<span class="me1">size</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">-</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                <span class="co1">// If it's an Option, select it</span></div></li><li class="li1"><div class="de1">                sibling.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;selected&quot;</span><span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="co1">// If we didn't find a sibling, we're at the last leaf in a nested ListBox</span></div></li><li class="li2"><div class="de2">            parent<span class="br0">&#91;</span>method<span class="br0">&#93;</span><span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;selected&quot;</span><span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// The markup template we use internally to render nested ListBox children    </span></div></li><li class="li2"><div class="de2">    NESTED_TEMPLATE <span class="sy0">:</span> <span class="st0">'&lt;li class=&quot;{nestedOptionClassName}&quot;&gt;&lt;em class=&quot;{labelClassName}&quot;&gt;{label}&lt;/em&gt;&lt;/li&gt;'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    renderUI<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Handling Nested Child Element Rendering</span></div></li><li class="li2"><div class="de2">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;depth&quot;</span><span class="br0">&#41;</span> <span class="sy0">&gt;</span> <span class="sy0">-</span><span class="nu0">1</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw2">var</span> tokens <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    labelClassName <span class="sy0">:</span> <span class="kw1">this</span>.<span class="me1">getClassName</span><span class="br0">&#40;</span><span class="st0">&quot;label&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                    nestedOptionClassName <span class="sy0">:</span> <span class="kw1">this</span>.<span class="me1">getClassName</span><span class="br0">&#40;</span><span class="st0">&quot;option&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                    label <span class="sy0">:</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;label&quot;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                liHtml <span class="sy0">=</span> Y.<span class="me1">substitute</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">NESTED_TEMPLATE</span><span class="sy0">,</span> tokens<span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                li <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span>liHtml<span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">                boundingBox <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                parent <span class="sy0">=</span> boundingBox.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            li.<span class="me1">appendChild</span><span class="br0">&#40;</span>boundingBox<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            parent.<span class="me1">appendChild</span><span class="br0">&#40;</span>li<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span> <span class="br0">&#123;</span> <span class="co2">/* static properties */</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">Y.<span class="me1">ListBox</span> <span class="sy0">=</span> Y.<span class="me1">Base</span>.<span class="me1">create</span><span class="br0">&#40;</span><span class="st0">&quot;listbox&quot;</span><span class="sy0">,</span> Y.<span class="me1">Widget</span><span class="sy0">,</span> <span class="br0">&#91;</span>Y.<span class="me1">WidgetParent</span><span class="sy0">,</span> Y.<span class="me1">WidgetChild</span><span class="br0">&#93;</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">// The default content box for ListBoxes will be a UL (Widget uses a DIV by default)</span>
+    CONTENT_TEMPLATE <span class="sy0">:</span> <span class="st0">&quot;&lt;ul&gt;&lt;/ul&gt;&quot;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co1">// Setup Custom Listeners</span>
+    bindUI<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">isRoot</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            <span class="co1">// Setup custom focus handling, using the NodeFocusManager plugin</span>
+            <span class="co1">// This will help us easily crete next/previous item handling using the arrow keys</span>
+&nbsp;
+            <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFocusManager</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+                descendants<span class="sy0">:</span> <span class="st0">&quot;.yui3-option&quot;</span><span class="sy0">,</span>
+                keys<span class="sy0">:</span> <span class="br0">&#123;</span>
+                    next<span class="sy0">:</span> <span class="st0">&quot;down:40&quot;</span><span class="sy0">,</span>    <span class="co1">// Down arrow</span>
+                    previous<span class="sy0">:</span> <span class="st0">&quot;down:38&quot;</span> <span class="co1">// Up arrow </span>
+                <span class="br0">&#125;</span><span class="sy0">,</span>
+                circular<span class="sy0">:</span> <span class="kw2">true</span>
+            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+        <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;contextmenu&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            event.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">// Setup listener to control keyboard based single/multiple item selection</span>
+        <span class="kw1">this</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;option:keydown&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            <span class="kw2">var</span> <span class="kw1">item</span> <span class="sy0">=</span> event.<span class="me1">target</span><span class="sy0">,</span>
+                domEvent <span class="sy0">=</span> event.<span class="me1">domEvent</span><span class="sy0">,</span>
+                keyCode <span class="sy0">=</span> domEvent.<span class="me1">keyCode</span><span class="sy0">,</span>
+                direction <span class="sy0">=</span> <span class="br0">&#40;</span>keyCode <span class="sy0">==</span> <span class="nu0">40</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;multiple&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="kw1">if</span> <span class="br0">&#40;</span>keyCode <span class="sy0">==</span> <span class="nu0">40</span> <span class="sy0">||</span> keyCode <span class="sy0">==</span> <span class="nu0">38</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    <span class="kw1">if</span> <span class="br0">&#40;</span>domEvent.<span class="me1">shiftKey</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                        <span class="kw1">this</span>._selectNextSibling<span class="br0">&#40;</span><span class="kw1">item</span><span class="sy0">,</span> direction<span class="br0">&#41;</span><span class="sy0">;</span>
+                    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+                        <span class="kw1">this</span>.<span class="me1">deselectAll</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                        <span class="kw1">this</span>._selectNextSibling<span class="br0">&#40;</span><span class="kw1">item</span><span class="sy0">,</span> direction<span class="br0">&#41;</span><span class="sy0">;</span>
+                    <span class="br0">&#125;</span>
+                <span class="br0">&#125;</span>
+            <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+                <span class="kw1">if</span> <span class="br0">&#40;</span>keyCode <span class="sy0">==</span> <span class="nu0">13</span> <span class="sy0">||</span> keyCode <span class="sy0">==</span> <span class="nu0">32</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    domEvent.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                    <span class="kw1">item</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;selected&quot;</span><span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="br0">&#125;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">// Setup listener to control mouse based single/multiple item selection</span>
+        <span class="kw1">this</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;option:mousedown&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            <span class="kw2">var</span> <span class="kw1">item</span> <span class="sy0">=</span> event.<span class="me1">target</span><span class="sy0">,</span>
+                domEvent <span class="sy0">=</span> event.<span class="me1">domEvent</span><span class="sy0">,</span>
+                selection<span class="sy0">;</span>
+&nbsp;
+            <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;multiple&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="kw1">if</span> <span class="br0">&#40;</span>domEvent.<span class="me1">metaKey</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    <span class="kw1">item</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;selected&quot;</span><span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+                    <span class="kw1">this</span>.<span class="me1">deselectAll</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                    <span class="kw1">item</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;selected&quot;</span><span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="br0">&#125;</span>
+            <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+                <span class="kw1">item</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;selected&quot;</span><span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+&nbsp;
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co1">// Helper Method, to find the correct next sibling, taking into account nested ListBoxes    </span>
+    _selectNextSibling <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="kw1">item</span><span class="sy0">,</span> direction<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="kw2">var</span> parent <span class="sy0">=</span> <span class="kw1">item</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parent&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+            method <span class="sy0">=</span>  <span class="br0">&#40;</span>direction<span class="br0">&#41;</span> <span class="sy0">?</span> <span class="st0">&quot;next&quot;</span> <span class="sy0">:</span> <span class="st0">&quot;previous&quot;</span><span class="sy0">,</span>
+&nbsp;
+            <span class="co1">// Only go circular for the root listbox</span>
+            circular <span class="sy0">=</span> <span class="br0">&#40;</span>parent <span class="sy0">===</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="sy0">,</span>
+            sibling <span class="sy0">=</span> <span class="kw1">item</span><span class="br0">&#91;</span>method<span class="br0">&#93;</span><span class="br0">&#40;</span>circular<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span>sibling<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="co1">// If we found a sibling, it's either an Option or a ListBox</span>
+            <span class="kw1">if</span> <span class="br0">&#40;</span>sibling <span class="kw1">instanceof</span> Y.<span class="me1">ListBox</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="co1">// If it's a ListBox, select it's first child (in the direction we're headed)</span>
+                sibling.<span class="me1">selectChild</span><span class="br0">&#40;</span><span class="br0">&#40;</span>direction<span class="br0">&#41;</span> <span class="sy0">?</span> <span class="nu0">0</span> <span class="sy0">:</span> sibling.<span class="me1">size</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">-</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+                <span class="co1">// If it's an Option, select it</span>
+                sibling.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;selected&quot;</span><span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+            <span class="co1">// If we didn't find a sibling, we're at the last leaf in a nested ListBox</span>
+            parent<span class="br0">&#91;</span>method<span class="br0">&#93;</span><span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;selected&quot;</span><span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co1">// The markup template we use internally to render nested ListBox children    </span>
+    NESTED_TEMPLATE <span class="sy0">:</span> <span class="st0">'&lt;li class=&quot;{nestedOptionClassName}&quot;&gt;&lt;em class=&quot;{labelClassName}&quot;&gt;{label}&lt;/em&gt;&lt;/li&gt;'</span><span class="sy0">,</span>
+&nbsp;
+    renderUI<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="co1">// Handling Nested Child Element Rendering</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;depth&quot;</span><span class="br0">&#41;</span> <span class="sy0">&gt;</span> <span class="sy0">-</span><span class="nu0">1</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            <span class="kw2">var</span> tokens <span class="sy0">=</span> <span class="br0">&#123;</span>
+                    labelClassName <span class="sy0">:</span> <span class="kw1">this</span>.<span class="me1">getClassName</span><span class="br0">&#40;</span><span class="st0">&quot;label&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+                    nestedOptionClassName <span class="sy0">:</span> <span class="kw1">this</span>.<span class="me1">getClassName</span><span class="br0">&#40;</span><span class="st0">&quot;option&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+                    label <span class="sy0">:</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;label&quot;</span><span class="br0">&#41;</span>
+                <span class="br0">&#125;</span><span class="sy0">,</span>
+                liHtml <span class="sy0">=</span> Y.<span class="me1">substitute</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">NESTED_TEMPLATE</span><span class="sy0">,</span> tokens<span class="br0">&#41;</span><span class="sy0">,</span>
+                li <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span>liHtml<span class="br0">&#41;</span><span class="sy0">,</span>
+&nbsp;
+                boundingBox <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+                parent <span class="sy0">=</span> boundingBox.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            li.<span class="me1">appendChild</span><span class="br0">&#40;</span>boundingBox<span class="br0">&#41;</span><span class="sy0">;</span>
+            parent.<span class="me1">appendChild</span><span class="br0">&#40;</span>li<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+<span class="br0">&#125;</span> <span class="br0">&#123;</span> <span class="co2">/* static properties */</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;</pre></div><textarea id="syntax-0f5f1539796aba1fd55406924882f43c-plain">Y.ListBox = Y.Base.create("listbox", Y.Widget, [Y.WidgetParent, Y.WidgetChild], {
+
+    // The default content box for ListBoxes will be a UL (Widget uses a DIV by default)
+    CONTENT_TEMPLATE : "<ul></ul>",
+
+    // Setup Custom Listeners
+    bindUI: function() {
+
+        if (this.isRoot()) {
+
+            // Setup custom focus handling, using the NodeFocusManager plugin
+            // This will help us easily crete next/previous item handling using the arrow keys
+        
+            this.get("boundingBox").plug(Y.Plugin.NodeFocusManager, {
+                descendants: ".yui3-option",
+                keys: {
+                    next: "down:40",    // Down arrow
+                    previous: "down:38" // Up arrow 
+                },
+                circular: true
+            });
+        }
+
+        this.get("boundingBox").on("contextmenu", function (event) {
+            event.preventDefault();
+        });
+
+        // Setup listener to control keyboard based single/multiple item selection
+        this.on("option:keydown", function (event) {
+
+            var item = event.target,
+                domEvent = event.domEvent,
+                keyCode = domEvent.keyCode,
+                direction = (keyCode == 40);
+
+            if (this.get("multiple")) {
+                if (keyCode == 40 || keyCode == 38) {
+                    if (domEvent.shiftKey) {
+                        this._selectNextSibling(item, direction);
+                    } else {
+                        this.deselectAll();
+                        this._selectNextSibling(item, direction);
+                    }
+                }
+            } else {
+                if (keyCode == 13 || keyCode == 32) {
+                    domEvent.preventDefault();
+                    item.set("selected", 1);
+                }
+            }
+        });
+
+        // Setup listener to control mouse based single/multiple item selection
+        this.on("option:mousedown", function (event) {
+
+            var item = event.target,
+                domEvent = event.domEvent,
+                selection;
+
+            if (this.get("multiple")) {
+                if (domEvent.metaKey) {
+                    item.set("selected", 1);
+                } else {
+                    this.deselectAll();
+                    item.set("selected", 1);
+                }
+            } else {
+                item.set("selected", 1);
+            }
+
+        });
+    },
+
+    // Helper Method, to find the correct next sibling, taking into account nested ListBoxes    
+    _selectNextSibling : function(item, direction) {
+
+        var parent = item.get("parent"),
+            method =  (direction) ? "next" : "previous",
+
+            // Only go circular for the root listbox
+            circular = (parent === this),
+            sibling = item[method](circular);
+
+        if (sibling) {
+            // If we found a sibling, it's either an Option or a ListBox
+            if (sibling instanceof Y.ListBox) {
+                // If it's a ListBox, select it's first child (in the direction we're headed)
+                sibling.selectChild((direction) ? 0 : sibling.size() - 1);
+            } else {
+                // If it's an Option, select it
+                sibling.set("selected", 1);
+            }
+        } else {
+            // If we didn't find a sibling, we're at the last leaf in a nested ListBox
+            parent[method](true).set("selected", 1);
+        }
+    },
+
+    // The markup template we use internally to render nested ListBox children    
+    NESTED_TEMPLATE : '<li class="{nestedOptionClassName}"><em class="{labelClassName}">{label}</em></li>',
+
+    renderUI: function () {
+
+        // Handling Nested Child Element Rendering
+        if (this.get("depth") > -1) {
+
+            var tokens = {
+                    labelClassName : this.getClassName("label"),
+                    nestedOptionClassName : this.getClassName("option"),
+                    label : this.get("label")
+                },
+                liHtml = Y.substitute(this.NESTED_TEMPLATE, tokens),
+                li = Y.Node.create(liHtml),
+
+                boundingBox = this.get("boundingBox"),
+                parent = boundingBox.get("parentNode");
+
+            li.appendChild(boundingBox);
+            parent.appendChild(li);
+        }
+    }
+
+} { /* static properties */ });
+</textarea></div>
+<h5>Static Properties</h5>
+
+<p>The only static property we're interested in defining for the ListBox class is the <code>ATTRS</code> property. Comments inline below provide the background:</p>
+
+<div id="syntax-0050ec01e13aa2d37a2c3b52f903328d" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="br0">&#123;</span> </div></li><li class="li1"><div class="de1">    <span class="co1">// Define any new attributes, or override existing ones</span></div></li><li class="li1"><div class="de1">    ATTRS <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="co1">// We need to define the default child class to use,</span></div></li><li class="li1"><div class="de1">        <span class="co1">// when we need to create children from the configuration </span></div></li><li class="li1"><div class="de1">        <span class="co1">// object passed to add or to the &quot;children&quot; attribute (which is provided by WidgetParent)</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// In this case, when a configuration object (e.g. { label:&quot;My Option&quot; }),</span></div></li><li class="li2"><div class="de2">        <span class="co1">// is passed into the add method,or as the value of the &quot;children&quot;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// attribute, we want to create instances of Y.Option</span></div></li><li class="li1"><div class="de1">        defaultChildType<span class="sy0">:</span> <span class="br0">&#123;</span>  </div></li><li class="li1"><div class="de1">            value<span class="sy0">:</span> <span class="st0">&quot;Option&quot;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Setup Label Attribute</span></div></li><li class="li1"><div class="de1">        label <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            validator<span class="sy0">:</span> Y.<span class="me1">Lang</span>.<span class="me1">isString</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="br0">&#123;</span> 
+    <span class="co1">// Define any new attributes, or override existing ones</span>
+    ATTRS <span class="sy0">:</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="co1">// We need to define the default child class to use,</span>
+        <span class="co1">// when we need to create children from the configuration </span>
+        <span class="co1">// object passed to add or to the &quot;children&quot; attribute (which is provided by WidgetParent)</span>
+&nbsp;
+        <span class="co1">// In this case, when a configuration object (e.g. { label:&quot;My Option&quot; }),</span>
+        <span class="co1">// is passed into the add method,or as the value of the &quot;children&quot;</span>
+        <span class="co1">// attribute, we want to create instances of Y.Option</span>
+        defaultChildType<span class="sy0">:</span> <span class="br0">&#123;</span>  
+            value<span class="sy0">:</span> <span class="st0">&quot;Option&quot;</span>
+        <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+        <span class="co1">// Setup Label Attribute</span>
+        label <span class="sy0">:</span> <span class="br0">&#123;</span>
+            validator<span class="sy0">:</span> Y.<span class="me1">Lang</span>.<span class="me1">isString</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-0050ec01e13aa2d37a2c3b52f903328d-plain">{ 
+    // Define any new attributes, or override existing ones
+    ATTRS : {
+
+        // We need to define the default child class to use,
+        // when we need to create children from the configuration 
+        // object passed to add or to the "children" attribute (which is provided by WidgetParent)
+
+        // In this case, when a configuration object (e.g. { label:"My Option" }),
+        // is passed into the add method,or as the value of the "children"
+        // attribute, we want to create instances of Y.Option
+        defaultChildType: {  
+            value: "Option"
+        },
+
+        // Setup Label Attribute
+        label : {
+            validator: Y.Lang.isString
+        }
+    }
+}</textarea></div>
+<h4>Using WidgetChild to Create the Option (leaf) Class</h4>
+
+<p>The Option class is pretty simple, and largely just needs the attribute and API provided by WidgetChild. We only need to over-ride the default templates and tabIndex handling:</p>
+
+<div id="syntax-c5277792375393aa1fb2f7c2cac5eb33" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">Y.<span class="me1">Option</span> <span class="sy0">=</span> Y.<span class="me1">Base</span>.<span class="me1">create</span><span class="br0">&#40;</span><span class="st0">&quot;option&quot;</span><span class="sy0">,</span> Y.<span class="me1">Widget</span><span class="sy0">,</span> <span class="br0">&#91;</span>Y.<span class="me1">WidgetChild</span><span class="br0">&#93;</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Override the default DIVs used for rendering the bounding box and content box.</span></div></li><li class="li2"><div class="de2">    CONTENT_TEMPLATE <span class="sy0">:</span> <span class="st0">&quot;&lt;em&gt;&lt;/em&gt;&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    BOUNDING_TEMPLATE <span class="sy0">:</span> <span class="st0">&quot;&lt;li&gt;&lt;/li&gt;&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Handle rendering the label attribute</span></div></li><li class="li1"><div class="de1">    renderUI<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;contentBox&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;label&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    ATTRS <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Setup Label Attribute</span></div></li><li class="li1"><div class="de1">        label <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            validator<span class="sy0">:</span> Y.<span class="me1">Lang</span>.<span class="me1">isString</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Override the default tabIndex for an Option,</span></div></li><li class="li1"><div class="de1">        <span class="co1">// since we want FocusManager to control keboard</span></div></li><li class="li1"><div class="de1">        <span class="co1">// based focus</span></div></li><li class="li2"><div class="de2">        tabIndex<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            value<span class="sy0">:</span> <span class="sy0">-</span><span class="nu0">1</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">&nbsp;
+Y.<span class="me1">Option</span> <span class="sy0">=</span> Y.<span class="me1">Base</span>.<span class="me1">create</span><span class="br0">&#40;</span><span class="st0">&quot;option&quot;</span><span class="sy0">,</span> Y.<span class="me1">Widget</span><span class="sy0">,</span> <span class="br0">&#91;</span>Y.<span class="me1">WidgetChild</span><span class="br0">&#93;</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">// Override the default DIVs used for rendering the bounding box and content box.</span>
+    CONTENT_TEMPLATE <span class="sy0">:</span> <span class="st0">&quot;&lt;em&gt;&lt;/em&gt;&quot;</span><span class="sy0">,</span>
+    BOUNDING_TEMPLATE <span class="sy0">:</span> <span class="st0">&quot;&lt;li&gt;&lt;/li&gt;&quot;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co1">// Handle rendering the label attribute</span>
+    renderUI<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;contentBox&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;label&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+&nbsp;
+    ATTRS <span class="sy0">:</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="co1">// Setup Label Attribute</span>
+        label <span class="sy0">:</span> <span class="br0">&#123;</span>
+            validator<span class="sy0">:</span> Y.<span class="me1">Lang</span>.<span class="me1">isString</span>
+        <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+        <span class="co1">// Override the default tabIndex for an Option,</span>
+        <span class="co1">// since we want FocusManager to control keboard</span>
+        <span class="co1">// based focus</span>
+        tabIndex<span class="sy0">:</span> <span class="br0">&#123;</span>
+            value<span class="sy0">:</span> <span class="sy0">-</span><span class="nu0">1</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;</pre></div><textarea id="syntax-c5277792375393aa1fb2f7c2cac5eb33-plain">
+Y.Option = Y.Base.create("option", Y.Widget, [Y.WidgetChild], {
+
+    // Override the default DIVs used for rendering the bounding box and content box.
+    CONTENT_TEMPLATE : "<em></em>",
+    BOUNDING_TEMPLATE : "<li></li>",
+
+    // Handle rendering the label attribute
+    renderUI: function () {
+        this.get("contentBox").setContent(this.get("label"));
+    }
+
+}, {
+
+    ATTRS : {
+
+        // Setup Label Attribute
+        label : {
+            validator: Y.Lang.isString
+        },
+
+        // Override the default tabIndex for an Option,
+        // since we want FocusManager to control keboard
+        // based focus
+        tabIndex: {
+            value: -1
+        }
+    }
+
+});
+</textarea></div>
+<h4>Adding The Code As A "listbox" Custom Module</h4>
+
+<p>This example also shows how you can package code for re-use as a module, by registering it through the <code>YUI.add</code> method, specifying any requirements it has (the packaged code is available in examples/widget/assets/listbox.js).</p>
+
+<div id="syntax-36d7c1919d56fc36cf2eafd8c64cd734" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI.<span class="me1">add</span><span class="br0">&#40;</span><span class="st0">'listbox'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">  Y.<span class="me1">ListBox</span> <span class="sy0">=</span> ...</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">  <span class="me1">Y</span>.<span class="me1">Option</span> <span class="sy0">=</span> ...</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">'3.1.0'</span> <span class="sy0">,</span><span class="br0">&#123;</span>requires<span class="sy0">:</span><span class="br0">&#91;</span><span class="st0">'substitute'</span><span class="sy0">,</span> <span class="st0">'widget'</span><span class="sy0">,</span> <span class="st0">'widget-parent'</span><span class="sy0">,</span> <span class="st0">'widget-child'</span><span class="sy0">,</span> <span class="st0">'node-focusmanager'</span><span class="br0">&#93;</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI.<span class="me1">add</span><span class="br0">&#40;</span><span class="st0">'listbox'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+  Y.<span class="me1">ListBox</span> <span class="sy0">=</span> ...
+&nbsp;
+  <span class="me1">Y</span>.<span class="me1">Option</span> <span class="sy0">=</span> ...
+&nbsp;
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">'3.1.0'</span> <span class="sy0">,</span><span class="br0">&#123;</span>requires<span class="sy0">:</span><span class="br0">&#91;</span><span class="st0">'substitute'</span><span class="sy0">,</span> <span class="st0">'widget'</span><span class="sy0">,</span> <span class="st0">'widget-parent'</span><span class="sy0">,</span> <span class="st0">'widget-child'</span><span class="sy0">,</span> <span class="st0">'node-focusmanager'</span><span class="br0">&#93;</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-36d7c1919d56fc36cf2eafd8c64cd734-plain">YUI.add('listbox', function(Y) {
+ 
+  Y.ListBox = ...
+
+  Y.Option = ...
+ 
+}, '3.1.0' ,{requires:['substitute', 'widget', 'widget-parent', 'widget-child', 'node-focusmanager']});</textarea></div>
+<h4>Using the Custom "listbox" Module</h4>
+
+<p>To create an instance of a ListBox, we ask for the "listbox" module we packaged in the previous step, through <code>YUI().use("listbox")</code>:</p>
+
+<div id="syntax-40f4a765f11fd526d76818f900cfef73" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">    YUI<span class="br0">&#40;</span><span class="br0">&#123;</span> </div></li><li class="li1"><div class="de1">        modules<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="st0">&quot;listbox&quot;</span><span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                fullpath<span class="sy0">:</span> <span class="st0">&quot;listbox.js&quot;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                requires<span class="sy0">:</span> <span class="br0">&#91;</span><span class="st0">&quot;substitute&quot;</span><span class="sy0">,</span> <span class="st0">&quot;widget&quot;</span><span class="sy0">,</span> <span class="st0">&quot;widget-parent&quot;</span><span class="sy0">,</span> <span class="st0">&quot;widget-child&quot;</span><span class="sy0">,</span> <span class="st0">&quot;node-focusmanager&quot;</span><span class="br0">&#93;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">     <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;listbox&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="co1">// Create the top level ListBox instance, and start it off with</span></div></li><li class="li1"><div class="de1">        <span class="co1">// 2 children (the defaultChildType will be used to create instances of Y.Option with the </span></div></li><li class="li1"><div class="de1">        <span class="co1">// children configuration passed in below).</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> listbox <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">ListBox</span><span class="br0">&#40;</span><span class="br0">&#123;</span>  </div></li><li class="li2"><div class="de2">            id<span class="sy0">:</span><span class="st0">&quot;mylistbox&quot;</span><span class="sy0">,</span> </div></li><li class="li1"><div class="de1">            width<span class="sy0">:</span><span class="st0">&quot;13em&quot;</span><span class="sy0">,</span> </div></li><li class="li1"><div class="de1">            height<span class="sy0">:</span><span class="st0">&quot;15em&quot;</span><span class="sy0">,</span> </div></li><li class="li1"><div class="de1">            children<span class="sy0">:</span> <span class="br0">&#91;</span> </div></li><li class="li1"><div class="de1">                <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item One&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item Two&quot;</span> <span class="br0">&#125;</span> </div></li><li class="li1"><div class="de1">            <span class="br0">&#93;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        ...</div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">    YUI<span class="br0">&#40;</span><span class="br0">&#123;</span> 
+        modules<span class="sy0">:</span> <span class="br0">&#123;</span>
+            <span class="st0">&quot;listbox&quot;</span><span class="sy0">:</span> <span class="br0">&#123;</span>
+                fullpath<span class="sy0">:</span> <span class="st0">&quot;listbox.js&quot;</span><span class="sy0">,</span>
+                requires<span class="sy0">:</span> <span class="br0">&#91;</span><span class="st0">&quot;substitute&quot;</span><span class="sy0">,</span> <span class="st0">&quot;widget&quot;</span><span class="sy0">,</span> <span class="st0">&quot;widget-parent&quot;</span><span class="sy0">,</span> <span class="st0">&quot;widget-child&quot;</span><span class="sy0">,</span> <span class="st0">&quot;node-focusmanager&quot;</span><span class="br0">&#93;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span>
+     <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;listbox&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="co1">// Create the top level ListBox instance, and start it off with</span>
+        <span class="co1">// 2 children (the defaultChildType will be used to create instances of Y.Option with the </span>
+        <span class="co1">// children configuration passed in below).</span>
+&nbsp;
+        <span class="kw2">var</span> listbox <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">ListBox</span><span class="br0">&#40;</span><span class="br0">&#123;</span>  
+            id<span class="sy0">:</span><span class="st0">&quot;mylistbox&quot;</span><span class="sy0">,</span> 
+            width<span class="sy0">:</span><span class="st0">&quot;13em&quot;</span><span class="sy0">,</span> 
+            height<span class="sy0">:</span><span class="st0">&quot;15em&quot;</span><span class="sy0">,</span> 
+            children<span class="sy0">:</span> <span class="br0">&#91;</span> 
+                <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item One&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span>
+                <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item Two&quot;</span> <span class="br0">&#125;</span> 
+            <span class="br0">&#93;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        ...
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-40f4a765f11fd526d76818f900cfef73-plain">    YUI({ 
+        modules: {
+            "listbox": {
+                fullpath: "listbox.js",
+                requires: ["substitute", "widget", "widget-parent", "widget-child", "node-focusmanager"]
+            }
+        }
+     }).use("listbox", function (Y) {
+
+        // Create the top level ListBox instance, and start it off with
+        // 2 children (the defaultChildType will be used to create instances of Y.Option with the 
+        // children configuration passed in below).
+
+        var listbox = new Y.ListBox({  
+            id:"mylistbox", 
+            width:"13em", 
+            height:"15em", 
+            children: [ 
+                { label: "Item One" },
+                { label: "Item Two" } 
+            ]
+        });
+
+        ...
+    });</textarea></div>
+<p>We can also use the <code>add</code> method provided by WidgetParent, to add children after contruction, and then render to the DOM:</p>
+
+<div id="syntax-0a9253d0c9c1f60558519af8173b6bd7" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">    <span class="co1">// Then we add a nested ListBox which itself has 2 children, using </span></div></li><li class="li1"><div class="de1">    <span class="co1">// the add API provided by WidgetParent</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    listbox.<span class="me1">add</span><span class="br0">&#40;</span><span class="br0">&#123;</span> </div></li><li class="li2"><div class="de2">        type<span class="sy0">:</span> <span class="st0">&quot;ListBox&quot;</span><span class="sy0">,</span> </div></li><li class="li1"><div class="de1">        label<span class="sy0">:</span> <span class="st0">&quot;Item Three&quot;</span><span class="sy0">,</span> </div></li><li class="li1"><div class="de1">        children<span class="sy0">:</span> <span class="br0">&#91;</span> </div></li><li class="li1"><div class="de1">            <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item Three - One&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item Three - Two&quot;</span> <span class="br0">&#125;</span> </div></li><li class="li2"><div class="de2">        <span class="br0">&#93;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// One more Option child</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    listbox.<span class="me1">add</span><span class="br0">&#40;</span><span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item Four&quot;</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// One more Option child, using providing an actual</span></div></li><li class="li1"><div class="de1">    <span class="co1">// instance, as opposed to just the configuration</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    listbox.<span class="me1">add</span><span class="br0">&#40;</span></div></li><li class="li1"><div class="de1">        <span class="kw2">new</span> Y.<span class="me1">Option</span><span class="br0">&#40;</span><span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item Five&quot;</span> <span class="br0">&#125;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// And finally, a last nested ListBox, again with</span></div></li><li class="li2"><div class="de2">    <span class="co1">// 2 children</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    listbox.<span class="me1">add</span><span class="br0">&#40;</span><span class="br0">&#123;</span> </div></li><li class="li1"><div class="de1">        type<span class="sy0">:</span> <span class="st0">&quot;ListBox&quot;</span><span class="sy0">,</span> </div></li><li class="li1"><div class="de1">        label<span class="sy0">:</span> <span class="st0">&quot;Item Six&quot;</span><span class="sy0">,</span> </div></li><li class="li2"><div class="de2">        children<span class="sy0">:</span> <span class="br0">&#91;</span> </div></li><li class="li1"><div class="de1">            <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item Six - One&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item Six - Two&quot;</span> <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#93;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Render it, using Widget's render method,</span></div></li><li class="li1"><div class="de1">    <span class="co1">// to the &quot;#exampleContainer&quot; element.</span></div></li><li class="li1"><div class="de1">    listbox.<span class="me1">render</span><span class="br0">&#40;</span><span class="st0">&quot;#exampleContainer&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">    <span class="co1">// Then we add a nested ListBox which itself has 2 children, using </span>
+    <span class="co1">// the add API provided by WidgetParent</span>
+&nbsp;
+    listbox.<span class="me1">add</span><span class="br0">&#40;</span><span class="br0">&#123;</span> 
+        type<span class="sy0">:</span> <span class="st0">&quot;ListBox&quot;</span><span class="sy0">,</span> 
+        label<span class="sy0">:</span> <span class="st0">&quot;Item Three&quot;</span><span class="sy0">,</span> 
+        children<span class="sy0">:</span> <span class="br0">&#91;</span> 
+            <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item Three - One&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span>
+            <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item Three - Two&quot;</span> <span class="br0">&#125;</span> 
+        <span class="br0">&#93;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// One more Option child</span>
+&nbsp;
+    listbox.<span class="me1">add</span><span class="br0">&#40;</span><span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item Four&quot;</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// One more Option child, using providing an actual</span>
+    <span class="co1">// instance, as opposed to just the configuration</span>
+&nbsp;
+    listbox.<span class="me1">add</span><span class="br0">&#40;</span>
+        <span class="kw2">new</span> Y.<span class="me1">Option</span><span class="br0">&#40;</span><span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item Five&quot;</span> <span class="br0">&#125;</span><span class="br0">&#41;</span>
+    <span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// And finally, a last nested ListBox, again with</span>
+    <span class="co1">// 2 children</span>
+&nbsp;
+    listbox.<span class="me1">add</span><span class="br0">&#40;</span><span class="br0">&#123;</span> 
+        type<span class="sy0">:</span> <span class="st0">&quot;ListBox&quot;</span><span class="sy0">,</span> 
+        label<span class="sy0">:</span> <span class="st0">&quot;Item Six&quot;</span><span class="sy0">,</span> 
+        children<span class="sy0">:</span> <span class="br0">&#91;</span> 
+            <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item Six - One&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span>
+            <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Item Six - Two&quot;</span> <span class="br0">&#125;</span>
+        <span class="br0">&#93;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Render it, using Widget's render method,</span>
+    <span class="co1">// to the &quot;#exampleContainer&quot; element.</span>
+    listbox.<span class="me1">render</span><span class="br0">&#40;</span><span class="st0">&quot;#exampleContainer&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-0a9253d0c9c1f60558519af8173b6bd7-plain">    // Then we add a nested ListBox which itself has 2 children, using 
+    // the add API provided by WidgetParent
+    
+    listbox.add({ 
+        type: "ListBox", 
+        label: "Item Three", 
+        children: [ 
+            { label: "Item Three - One" },
+            { label: "Item Three - Two" } 
+        ]
+    });
+
+    // One more Option child
+    
+    listbox.add({ label: "Item Four" });
+
+    // One more Option child, using providing an actual
+    // instance, as opposed to just the configuration
+    
+    listbox.add(
+        new Y.Option({ label: "Item Five" })
+    );
+
+    // And finally, a last nested ListBox, again with
+    // 2 children
+    
+    listbox.add({ 
+        type: "ListBox", 
+        label: "Item Six", 
+        children: [ 
+            { label: "Item Six - One" },
+            { label: "Item Six - Two" }
+        ]
+    });
+
+    // Render it, using Widget's render method,
+    // to the "#exampleContainer" element.
+    listbox.render("#exampleContainer");</textarea></div>
+<p>The ListBox fires selectionChange events, every time it's selection state changes (provided by WidgetParent), which we can listen and respond to:</p>
+
+<div id="syntax-27a4f0f412224f02de9261a1586e9941" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">    listbox.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;selectionChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> selection <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;selection&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>selection <span class="kw1">instanceof</span> Y.<span class="me1">ListBox</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            selection <span class="sy0">=</span> selection.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;selection&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>selection<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#selection&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span>selection.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;label&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">    listbox.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;selectionChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="kw2">var</span> selection <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;selection&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span>selection <span class="kw1">instanceof</span> Y.<span class="me1">ListBox</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            selection <span class="sy0">=</span> selection.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;selection&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span>selection<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#selection&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span>selection.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;label&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-27a4f0f412224f02de9261a1586e9941-plain">    listbox.after("selectionChange", function(e) {
+
+        var selection = this.get("selection");
+        if (selection instanceof Y.ListBox) {
+            selection = selection.get("selection");
+        }
+
+        if (selection) {
+            Y.one("#selection").setContent(selection.get("label"));
+        }
+
+    });</textarea></div>
+<h4>The CSS</h4>
+
+<div id="syntax-c9a004247a1579371f932b4a3605aa49" class="yui-syntax-highlight"><div class="numbers"><pre class="css" style="font-family:monospace;"><ol><li class="li1"><div class="de1">    <span class="re1">.yui3-listbox</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">padding</span><span class="sy0">:</span><span class="nu0">0</span><span class="sy0">;</span>       </div></li><li class="li1"><div class="de1">        <span class="kw1">margin</span><span class="sy0">:</span> <span class="re3">.25em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">border</span><span class="sy0">:</span> <span class="kw2">solid</span> <span class="re3">1px</span> <span class="re0">#000</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="kw1">background-color</span><span class="sy0">:</span><span class="re0">#fff</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">white-space</span><span class="sy0">:</span><span class="kw2">nowrap</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="re1">.yui3-listbox</span> <span class="re1">.yui3-listbox</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="kw1">margin-top</span><span class="sy0">:</span> <span class="re3">.25em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">margin-bottom</span><span class="sy0">:</span> <span class="re3">.25em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">border</span><span class="sy0">:</span> <span class="kw2">none</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="re1">.yui3-listbox</span> <span class="re1">.yui3-option</span><span class="sy0">,</span> </div></li><li class="li1"><div class="de1">    <span class="re1">.yui3-listbox</span> <span class="re1">.yui3-listbox-option</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">margin</span><span class="sy0">:</span><span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">padding</span><span class="sy0">:</span><span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">cursor</span><span class="sy0">:</span><span class="kw2">default</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="kw1">list-style-image</span><span class="sy0">:</span><span class="kw2">none</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">list-style-position</span><span class="sy0">:</span><span class="kw2">outside</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">list-style-type</span><span class="sy0">:</span><span class="kw2">none</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    .yui3-option-<span class="kw1">content</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    <span class="re1">.yui3-listbox-label</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">display</span><span class="sy0">:</span> <span class="kw2">block</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">padding</span><span class="sy0">:</span> <span class="re3">.25em</span> <span class="re3">.5em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="re1">.yui3-listbox-content</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">margin</span><span class="sy0">:</span><span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">padding</span><span class="sy0">:</span><span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">overflow</span><span class="sy0">:</span><span class="kw2">auto</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="re1">.yui3-listbox</span> <span class="re1">.yui3-listbox</span> <span class="re1">.yui3-option-content</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">margin-left</span><span class="sy0">:</span><span class="re3">.5em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="re1">.yui3-listbox-label</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">font-weight</span><span class="sy0">:</span> <span class="kw2">bold</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="re1">.yui3-option-selected</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#cccccc</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="re1">.yui3-option-focused</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="kw1">outline</span><span class="sy0">:</span> <span class="kw2">none</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">background-color</span><span class="sy0">:</span> <span class="kw1">blue</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">color</span><span class="sy0">:</span> <span class="re0">#fff</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="css" style="font-family:monospace;">    <span class="re1">.yui3-listbox</span> <span class="br0">&#123;</span>
+        <span class="kw1">padding</span><span class="sy0">:</span><span class="nu0">0</span><span class="sy0">;</span>       
+        <span class="kw1">margin</span><span class="sy0">:</span> <span class="re3">.25em</span><span class="sy0">;</span>
+        <span class="kw1">border</span><span class="sy0">:</span> <span class="kw2">solid</span> <span class="re3">1px</span> <span class="re0">#000</span><span class="sy0">;</span>
+        <span class="kw1">background-color</span><span class="sy0">:</span><span class="re0">#fff</span><span class="sy0">;</span>
+        <span class="kw1">white-space</span><span class="sy0">:</span><span class="kw2">nowrap</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    <span class="re1">.yui3-listbox</span> <span class="re1">.yui3-listbox</span> <span class="br0">&#123;</span>
+        <span class="kw1">margin-top</span><span class="sy0">:</span> <span class="re3">.25em</span><span class="sy0">;</span>
+        <span class="kw1">margin-bottom</span><span class="sy0">:</span> <span class="re3">.25em</span><span class="sy0">;</span>
+        <span class="kw1">border</span><span class="sy0">:</span> <span class="kw2">none</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    <span class="re1">.yui3-listbox</span> <span class="re1">.yui3-option</span><span class="sy0">,</span> 
+    <span class="re1">.yui3-listbox</span> <span class="re1">.yui3-listbox-option</span> <span class="br0">&#123;</span>
+        <span class="kw1">margin</span><span class="sy0">:</span><span class="nu0">0</span><span class="sy0">;</span>
+        <span class="kw1">padding</span><span class="sy0">:</span><span class="nu0">0</span><span class="sy0">;</span>
+        <span class="kw1">cursor</span><span class="sy0">:</span><span class="kw2">default</span><span class="sy0">;</span>
+        <span class="kw1">list-style-image</span><span class="sy0">:</span><span class="kw2">none</span><span class="sy0">;</span>
+        <span class="kw1">list-style-position</span><span class="sy0">:</span><span class="kw2">outside</span><span class="sy0">;</span>
+        <span class="kw1">list-style-type</span><span class="sy0">:</span><span class="kw2">none</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    .yui3-option-<span class="kw1">content</span><span class="sy0">,</span>
+    <span class="re1">.yui3-listbox-label</span> <span class="br0">&#123;</span>
+        <span class="kw1">display</span><span class="sy0">:</span> <span class="kw2">block</span><span class="sy0">;</span>
+        <span class="kw1">padding</span><span class="sy0">:</span> <span class="re3">.25em</span> <span class="re3">.5em</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    <span class="re1">.yui3-listbox-content</span> <span class="br0">&#123;</span>
+        <span class="kw1">margin</span><span class="sy0">:</span><span class="nu0">0</span><span class="sy0">;</span>
+        <span class="kw1">padding</span><span class="sy0">:</span><span class="nu0">0</span><span class="sy0">;</span>
+        <span class="kw1">overflow</span><span class="sy0">:</span><span class="kw2">auto</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    <span class="re1">.yui3-listbox</span> <span class="re1">.yui3-listbox</span> <span class="re1">.yui3-option-content</span> <span class="br0">&#123;</span>
+        <span class="kw1">margin-left</span><span class="sy0">:</span><span class="re3">.5em</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    <span class="re1">.yui3-listbox-label</span> <span class="br0">&#123;</span>
+        <span class="kw1">font-weight</span><span class="sy0">:</span> <span class="kw2">bold</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    <span class="re1">.yui3-option-selected</span> <span class="br0">&#123;</span>
+        <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#cccccc</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    <span class="re1">.yui3-option-focused</span> <span class="br0">&#123;</span>
+        <span class="kw1">outline</span><span class="sy0">:</span> <span class="kw2">none</span><span class="sy0">;</span>
+        <span class="kw1">background-color</span><span class="sy0">:</span> <span class="kw1">blue</span><span class="sy0">;</span>
+        <span class="kw1">color</span><span class="sy0">:</span> <span class="re0">#fff</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span></pre></div><textarea id="syntax-c9a004247a1579371f932b4a3605aa49-plain">    .yui3-listbox {
+        padding:0;       
+        margin: .25em;
+        border: solid 1px #000;
+        background-color:#fff;
+        white-space:nowrap;
+    }
+
+    .yui3-listbox .yui3-listbox {
+        margin-top: .25em;
+        margin-bottom: .25em;
+        border: none;
+    }
+
+    .yui3-listbox .yui3-option, 
+    .yui3-listbox .yui3-listbox-option {
+        margin:0;
+        padding:0;
+        cursor:default;
+        list-style-image:none;
+        list-style-position:outside;
+        list-style-type:none;
+    }
+
+    .yui3-option-content,
+    .yui3-listbox-label {
+        display: block;
+        padding: .25em .5em;
+    }
+
+    .yui3-listbox-content {
+        margin:0;
+        padding:0;
+        overflow:auto;
+    }
+
+    .yui3-listbox .yui3-listbox .yui3-option-content {
+        margin-left:.5em;
+    }
+
+    .yui3-listbox-label {
+        font-weight: bold;
+    }
+
+    .yui3-option-selected {
+        background-color: #cccccc;
+    }
+
+    .yui3-option-focused {
+        outline: none;
+        background-color: blue;
+        color: #fff;
+    }</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Widget Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../widget/widget-extend.html'>Extending the base widget class</a></li><li><a href='../widget/widget-build.html'>Creating custom widget classes</a></li><li><a href='../widget/widget-plugin.html'>Creating a widget plugin</a></li><li><a href='../widget/widget-tooltip.html'>Creating a simple Tooltip widget</a></li><li class='selected'><a href='../widget/widget-parentchild-listbox.html'>Creating a hierarchical ListBox widget</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Widget Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/widget/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_widget.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="selected "><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

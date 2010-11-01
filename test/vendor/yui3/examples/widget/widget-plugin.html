@@ -1,0 +1,568 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Widget: Creating a widget plugin</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style>
+#demo {
+    width: 50em;
+}
+.yui3-widget-content {
+    border:1px solid #000;
+    padding:1em;
+}
+.yui3-tab-loading {
+    background: #fff url(http://developer.yahoo.com/yui/3/examples/overlay/assets/img/ajax-loader.gif) no-repeat center center;
+    height:40px;
+}
+</style>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Widget: Creating a widget plugin</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Widget: Creating a widget plugin</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example shows how you can use Widget's plugin infrastructure to add
+additional features to an existing widget.</p>
+<p>We create an IO plugin class for <code>Widget</code> called
+<code>WidgetIO</code>. The plugin adds IO capabilities to the Widget,
+which, by default, outputs to the <code>Widget</code>'s <code>contentBox</code>.</p>
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="widget-plugin_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div id="demo"></div>
+<script type="text/javascript">
+YUI().use("widget", "gallery-widget-io", function(Y) {
+    var widget = new Y.Widget();
+
+    widget.plug(Y.Plugin.WidgetIO, {
+        uri : 'assets/news.php?query=web+browser',
+        loading: '<img class="yui3-loading" width="32px" height="32px" src="assets/img/ajax-loader.gif">'
+    });
+
+    widget.render('#demo');
+    widget.io.refresh();
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Creating an IO Plugin For Widget</h3>
+
+<h4>Setting Up The YUI Instance</h4>
+
+<p>For this example, we'll pull in <code>widget</code>; the <code>io</code>, and
+the <code>plugin</code> module. The <code>io</code> module provides the XHR
+support we need for the IO plugin. The <code>Plugin</code> base class is the class we'll
+extend to create our io plugin class for <code>Widget</code>. 
+The code to set up our sandbox instance is shown below:</p>
+
+<div id="syntax-55ea60a546c4f7a3e895dc3e9ee21bb7" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;widget&quot;</span><span class="sy0">,</span> <span class="st0">&quot;io&quot;</span><span class="sy0">,</span> <span class="st0">&quot;plugin&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">// We'll write our code here, after pulling in the default Widget module, </span></div></li><li class="li1"><div class="de1">    <span class="co1">// the IO utility, and the Plugin base class.</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;widget&quot;</span><span class="sy0">,</span> <span class="st0">&quot;io&quot;</span><span class="sy0">,</span> <span class="st0">&quot;plugin&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">// We'll write our code here, after pulling in the default Widget module, </span>
+    <span class="co1">// the IO utility, and the Plugin base class.</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-55ea60a546c4f7a3e895dc3e9ee21bb7-plain">YUI({...}).use("widget", "io", "plugin", function(Y) {
+    // We'll write our code here, after pulling in the default Widget module, 
+    // the IO utility, and the Plugin base class.
+}</textarea></div>
+<p>Using the <code>widget</code> module will also pull down the default CSS required for widget, on top of which we only need to add our required look/feel CSS for the example.</p>
+
+<h4>WidgetIO Class Structure</h4>
+
+<p>The <code>WidgetIO</code> class will extend the <code>Plugin</code> base class. Since <code>Plugin</code> derives from <code>Base</code>, we follow the same pattern we use for widgets and other utilities which extend Base to setup our new class.</p>
+
+<p>Namely:</p>
+
+<ul>
+    <li>Setting up the constructor to invoke the superclass constructor</li>
+    <li>Setting up a <code>NAME</code> property, to identify the class</li>
+    <li>Setting up the default attributes, using the <code>ATTRS</code> property</li>
+    <li>Providing prototype implementations for anything we want executed during initialization and destruction using the <code>initializer</code> and <code>destructor</code> lifecycle methods</li>
+</ul>
+
+<p>Additionally, since this is a plugin, we provide a <code>NS</code> property for the class, which defines the property which will refer to the <code>WidgetIO</code> instance on the host class (e.g. <code>widget.io</code> will be an instance of <code>WidgetIO</code>)</p>.
+
+<div id="syntax-4568dcc15f550b8f99159ec91ae0d3b5" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="coMULTI">/* Widget IO Plugin Constructor */</span></div></li><li class="li1"><div class="de1"><span class="kw2">function</span> WidgetIO<span class="br0">&#40;</span>config<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    WidgetIO.<span class="me1">superclass</span>.<span class="me1">constructor</span>.<span class="me1">apply</span><span class="br0">&#40;</span><span class="kw1">this</span><span class="sy0">,</span> arguments<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="coMULTI">/* </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;* The namespace for the plugin. This will be the property on the widget, </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;* which will reference the plugin instance, when it's plugged in</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;*/</span></div></li><li class="li2"><div class="de2">WidgetIO.<span class="me1">NS</span> <span class="sy0">=</span> <span class="st0">&quot;io&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;* The NAME of the WidgetIO class. Used to prefix events generated</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;* by the plugin class.</span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;*/</span></div></li><li class="li1"><div class="de1">WidgetIO.<span class="kw3">NAME</span> <span class="sy0">=</span> <span class="st0">&quot;ioPlugin&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;* The default set of attributes for the WidgetIO class.</span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;*/</span></div></li><li class="li1"><div class="de1">WidgetIO.<span class="me1">ATTRS</span> <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    uri <span class="sy0">:</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    cfg <span class="sy0">:</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    formatter <span class="sy0">:</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">    loading<span class="sy0">:</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co2">/* Extend the base plugin class */</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">extend</span><span class="br0">&#40;</span>WidgetIO<span class="sy0">,</span> Y.<span class="me1">Plugin</span>.<span class="me1">Base</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Lifecycle methods.</span></div></li><li class="li1"><div class="de1">    initializer<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// IO Plugin specific methods</span></div></li><li class="li2"><div class="de2">    refresh <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Default IO transaction handlers</span></div></li><li class="li1"><div class="de1">    _defSuccessHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    _defFailureHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">    _defStartHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    _defCompleteHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    _defFormatter <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="coMULTI">/* Widget IO Plugin Constructor */</span>
+<span class="kw2">function</span> WidgetIO<span class="br0">&#40;</span>config<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    WidgetIO.<span class="me1">superclass</span>.<span class="me1">constructor</span>.<span class="me1">apply</span><span class="br0">&#40;</span><span class="kw1">this</span><span class="sy0">,</span> arguments<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="coMULTI">/* 
+ * The namespace for the plugin. This will be the property on the widget, 
+ * which will reference the plugin instance, when it's plugged in
+ */</span>
+WidgetIO.<span class="me1">NS</span> <span class="sy0">=</span> <span class="st0">&quot;io&quot;</span><span class="sy0">;</span>
+&nbsp;
+<span class="coMULTI">/*
+ * The NAME of the WidgetIO class. Used to prefix events generated
+ * by the plugin class.
+ */</span>
+WidgetIO.<span class="kw3">NAME</span> <span class="sy0">=</span> <span class="st0">&quot;ioPlugin&quot;</span><span class="sy0">;</span>
+&nbsp;
+<span class="coMULTI">/*
+ * The default set of attributes for the WidgetIO class.
+ */</span>
+WidgetIO.<span class="me1">ATTRS</span> <span class="sy0">=</span> <span class="br0">&#123;</span>
+    uri <span class="sy0">:</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span>
+    cfg <span class="sy0">:</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span>
+    formatter <span class="sy0">:</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span>
+    loading<span class="sy0">:</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co2">/* Extend the base plugin class */</span>
+Y.<span class="me1">extend</span><span class="br0">&#40;</span>WidgetIO<span class="sy0">,</span> Y.<span class="me1">Plugin</span>.<span class="me1">Base</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">// Lifecycle methods.</span>
+    initializer<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co1">// IO Plugin specific methods</span>
+    refresh <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co1">// Default IO transaction handlers</span>
+    _defSuccessHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span>
+    _defFailureHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span>
+    _defStartHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span>
+    _defCompleteHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="sy0">,</span>
+    _defFormatter <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span>...<span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-4568dcc15f550b8f99159ec91ae0d3b5-plain">/* Widget IO Plugin Constructor */
+function WidgetIO(config) {
+    WidgetIO.superclass.constructor.apply(this, arguments);
+}
+
+/* 
+ * The namespace for the plugin. This will be the property on the widget, 
+ * which will reference the plugin instance, when it's plugged in
+ */
+WidgetIO.NS = "io";
+
+/*
+ * The NAME of the WidgetIO class. Used to prefix events generated
+ * by the plugin class.
+ */
+WidgetIO.NAME = "ioPlugin";
+
+/*
+ * The default set of attributes for the WidgetIO class.
+ */
+WidgetIO.ATTRS = {
+    uri : {...},
+    cfg : {...},
+    formatter : {...},
+    loading: {...}
+};
+
+/* Extend the base plugin class */
+Y.extend(WidgetIO, Y.Plugin.Base, {
+
+    // Lifecycle methods.
+    initializer: function() {...},
+
+    // IO Plugin specific methods
+    refresh : function() {...},
+
+    // Default IO transaction handlers
+    _defSuccessHandler : function(id, o) {...},
+    _defFailureHandler : function(id, o) {...},
+    _defStartHandler : function(id, o) {...},
+    _defCompleteHandler : function(id, o) {...},
+    _defFormatter : function(val) {...}
+});</textarea></div>
+<h4>Plugin Attributes</h4>
+
+<p>The <code>WidgetIO</code> is a fairly simple plugin class. It provides incremental functionality. It does not need to modify the behavior of any methods on the host Widget instance, or monitor any Widget events (unlike the <a href="overlay-anim-plugin.html">AnimPlugin</a> example).</p>
+
+<p>It sets up the following attributes, which are used to control how the IO plugin's <code>refresh</code> method behaves:</p>
+
+<dl>
+    <dt>uri</dt>
+    <dd>The uri to use for the io request</dd>
+    <dt>cfg</dt>
+    <dd>The io configuration object, to pass to io when initiating a transaction</dd>
+    <dt>formatter</dt>
+    <dd>The formatter to use to formatting response data. The default implementation simply passes back the response data passed in, unchanged.</dd>
+    <dt>loading</dt>
+    <dd>The default content to display while an io transaction is in progress</dd>
+</dl>
+
+<p>In terms of code, the attributes for the plugin are set up using the standard <code>ATTRS</code> property:</p>
+
+<div id="syntax-a6e7713376777bf35e3e71ad1de693eb" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="coMULTI">/* Setup local variable for Y.WidgetStdMod, since we use it </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;  multiple times to reference static properties */</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> WidgetIO <span class="sy0">=</span> Y.<span class="me1">WidgetIO</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">...</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co2">/* Attribute definition */</span></div></li><li class="li1"><div class="de1">WidgetIO.<span class="me1">ATTRS</span> <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="coMULTI">/*</span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;    * The node that will contain the IO content </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li1"><div class="de1">    contentNode<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        value<span class="sy0">:</span> <span class="st0">'.yui3-widget-content'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        setter<span class="sy0">:</span> <span class="st0">'_defContentNodeSetter'</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * The uri to use for the io request</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li2"><div class="de2">    uri <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        value<span class="sy0">:</span><span class="kw2">null</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="coMULTI">/*</span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;    * The io configuration object, to pass to io when initiating </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * a transaction</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li1"><div class="de1">    cfg <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        value<span class="sy0">:</span><span class="kw2">null</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * The default formatter to use when formatting response data. The default</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * implementation simply passes back the response data passed in. </span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li1"><div class="de1">    formatter <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        valueFn<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">return</span> <span class="kw1">this</span>._defFormatter<span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * The default loading indicator to use, when an io transaction is in progress.</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li2"><div class="de2">    loading<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        value<span class="sy0">:</span> <span class="st0">'&lt;img class=&quot;yui3-loading&quot; width=&quot;32px&quot; <span class="es0">\ </span></span></div></li><li class="li1"><div class="de1"><span class="st0">                    height=&quot;32px&quot; src=&quot;assets/img/ajax-loader.gif&quot;&gt;'</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="coMULTI">/* Setup local variable for Y.WidgetStdMod, since we use it 
+   multiple times to reference static properties */</span>
+<span class="kw2">var</span> WidgetIO <span class="sy0">=</span> Y.<span class="me1">WidgetIO</span><span class="sy0">;</span>
+&nbsp;
+...
+&nbsp;
+<span class="co2">/* Attribute definition */</span>
+WidgetIO.<span class="me1">ATTRS</span> <span class="sy0">=</span> <span class="br0">&#123;</span>
+    <span class="coMULTI">/*
+     * The node that will contain the IO content 
+     */</span>
+    contentNode<span class="sy0">:</span> <span class="br0">&#123;</span>
+        value<span class="sy0">:</span> <span class="st0">'.yui3-widget-content'</span><span class="sy0">,</span>
+        setter<span class="sy0">:</span> <span class="st0">'_defContentNodeSetter'</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="coMULTI">/*
+     * The uri to use for the io request
+     */</span>
+    uri <span class="sy0">:</span> <span class="br0">&#123;</span>
+        value<span class="sy0">:</span><span class="kw2">null</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="coMULTI">/*
+     * The io configuration object, to pass to io when initiating 
+     * a transaction
+     */</span>
+    cfg <span class="sy0">:</span> <span class="br0">&#123;</span>
+        value<span class="sy0">:</span><span class="kw2">null</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="coMULTI">/*
+     * The default formatter to use when formatting response data. The default
+     * implementation simply passes back the response data passed in. 
+     */</span>
+    formatter <span class="sy0">:</span> <span class="br0">&#123;</span>
+        valueFn<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">return</span> <span class="kw1">this</span>._defFormatter<span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="coMULTI">/*
+     * The default loading indicator to use, when an io transaction is in progress.
+     */</span>
+    loading<span class="sy0">:</span> <span class="br0">&#123;</span>
+        value<span class="sy0">:</span> <span class="st0">'&lt;img class=&quot;yui3-loading&quot; width=&quot;32px&quot; <span class="es0">\ </span>
+                    height=&quot;32px&quot; src=&quot;assets/img/ajax-loader.gif&quot;&gt;'</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span></pre></div><textarea id="syntax-a6e7713376777bf35e3e71ad1de693eb-plain">/* Setup local variable for Y.WidgetStdMod, since we use it 
+   multiple times to reference static properties */
+var WidgetIO = Y.WidgetIO;
+
+...
+
+/* Attribute definition */
+WidgetIO.ATTRS = {
+    /*
+     * The node that will contain the IO content 
+     */
+    contentNode: {
+        value: '.yui3-widget-content',
+        setter: '_defContentNodeSetter'
+    },
+
+    /*
+     * The uri to use for the io request
+     */
+    uri : {
+        value:null
+    },
+
+    /*
+     * The io configuration object, to pass to io when initiating 
+     * a transaction
+     */
+    cfg : {
+        value:null
+    },
+
+    /*
+     * The default formatter to use when formatting response data. The default
+     * implementation simply passes back the response data passed in. 
+     */
+    formatter : {
+        valueFn: function() {
+            return this._defFormatter;
+        }
+    },
+
+    /*
+     * The default loading indicator to use, when an io transaction is in progress.
+     */
+    loading: {
+        value: '<img class="yui3-loading" width="32px" \ 
+                    height="32px" src="assets/img/ajax-loader.gif">'
+    }
+};</textarea></div>
+<p>The <code>formatter</code> attribute uses <code>valueFn</code> to define an instance based default value; pointing to the <code>_defFormatter</code> method on the <code>WidgetIO</code> instance.</p>
+
+<h4>Lifecycle Methods: initializer, destructor</h4>
+
+<p>Since no special initialization is required, there is no need to implement an <code>initializer</code> method.</p>
+
+<p>The <code>destructor</code> terminates any existing transaction, if active when the plugin is destroyed (unplugged).</p>
+
+<div id="syntax-8434cd9fdd1ad5e9b2afad4d745b0f35" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">initializer<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;* Destruction code. Terminates the activeIO transaction if it exists</span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;*/</span></div></li><li class="li1"><div class="de1">destructor <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>._activeIO<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">io</span>.<span class="me1">abort</span><span class="br0">&#40;</span><span class="kw1">this</span>._activeIO<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>._activeIO <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">initializer<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><span class="br0">&#125;</span>
+&nbsp;
+<span class="coMULTI">/*
+ * Destruction code. Terminates the activeIO transaction if it exists
+ */</span>
+destructor <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>._activeIO<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">io</span>.<span class="me1">abort</span><span class="br0">&#40;</span><span class="kw1">this</span>._activeIO<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="kw1">this</span>._activeIO <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span></pre></div><textarea id="syntax-8434cd9fdd1ad5e9b2afad4d745b0f35-plain">initializer: function() {}
+
+/*
+ * Destruction code. Terminates the activeIO transaction if it exists
+ */
+destructor : function() {
+    if (this._activeIO) {
+        Y.io.abort(this._activeIO);
+        this._activeIO = null;
+    }
+},</textarea></div>
+<h4>The refresh Method</h4>
+
+<p>The <code>refresh</code> method is the main public method which the plugin provides. It's responsible for dispatching the IO request, using the current state of the attributes defined of the plugin. Users will end up invoking the method from the plugin instance attached to the Widget (<code>widget.io.refresh()</code>).</p>
+
+<div id="syntax-b9ede52f9eef7de92af5d191c3b4a258" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">refresh <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span><span class="kw1">this</span>._activeIO<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> uri <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;uri&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="kw1">if</span> <span class="br0">&#40;</span>uri<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            cfg <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;cfg&quot;</span><span class="br0">&#41;</span> <span class="sy0">||</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            cfg.<span class="me1">on</span> <span class="sy0">=</span> cfg.<span class="me1">on</span> <span class="sy0">||</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            cfg.<span class="me1">on</span>.<span class="me1">start</span> <span class="sy0">=</span> cfg.<span class="me1">on</span>.<span class="me1">start</span> <span class="sy0">||</span> Y.<span class="me1">bind</span><span class="br0">&#40;</span><span class="kw1">this</span>._defStartHandler<span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">            cfg.<span class="me1">on</span>.<span class="me1">complete</span> <span class="sy0">=</span> cfg.<span class="me1">on</span>.<span class="me1">complete</span> <span class="sy0">||</span> Y.<span class="me1">bind</span><span class="br0">&#40;</span><span class="kw1">this</span>._defCompleteHandler<span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            cfg.<span class="me1">on</span>.<span class="me1">success</span> <span class="sy0">=</span> cfg.<span class="me1">on</span>.<span class="me1">success</span> <span class="sy0">||</span> Y.<span class="me1">bind</span><span class="br0">&#40;</span><span class="kw1">this</span>._defSuccessHandler<span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            cfg.<span class="me1">on</span>.<span class="me1">failure</span> <span class="sy0">=</span> cfg.<span class="me1">on</span>.<span class="me1">failure</span> <span class="sy0">||</span> Y.<span class="me1">bind</span><span class="br0">&#40;</span><span class="kw1">this</span>._defFailureHandler<span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">            cfg.<span class="me1">method</span> <span class="sy0">=</span> cfg.<span class="me1">method</span><span class="sy0">;</span> <span class="co1">// io defaults to &quot;GET&quot; if not defined</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            Y.<span class="me1">io</span><span class="br0">&#40;</span>uri<span class="sy0">,</span> cfg<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">refresh <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span><span class="kw1">this</span>._activeIO<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw2">var</span> uri <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;uri&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span>uri<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            cfg <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;cfg&quot;</span><span class="br0">&#41;</span> <span class="sy0">||</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">;</span>
+            cfg.<span class="me1">on</span> <span class="sy0">=</span> cfg.<span class="me1">on</span> <span class="sy0">||</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+            cfg.<span class="me1">on</span>.<span class="me1">start</span> <span class="sy0">=</span> cfg.<span class="me1">on</span>.<span class="me1">start</span> <span class="sy0">||</span> Y.<span class="me1">bind</span><span class="br0">&#40;</span><span class="kw1">this</span>._defStartHandler<span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            cfg.<span class="me1">on</span>.<span class="me1">complete</span> <span class="sy0">=</span> cfg.<span class="me1">on</span>.<span class="me1">complete</span> <span class="sy0">||</span> Y.<span class="me1">bind</span><span class="br0">&#40;</span><span class="kw1">this</span>._defCompleteHandler<span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            cfg.<span class="me1">on</span>.<span class="me1">success</span> <span class="sy0">=</span> cfg.<span class="me1">on</span>.<span class="me1">success</span> <span class="sy0">||</span> Y.<span class="me1">bind</span><span class="br0">&#40;</span><span class="kw1">this</span>._defSuccessHandler<span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            cfg.<span class="me1">on</span>.<span class="me1">failure</span> <span class="sy0">=</span> cfg.<span class="me1">on</span>.<span class="me1">failure</span> <span class="sy0">||</span> Y.<span class="me1">bind</span><span class="br0">&#40;</span><span class="kw1">this</span>._defFailureHandler<span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            cfg.<span class="me1">method</span> <span class="sy0">=</span> cfg.<span class="me1">method</span><span class="sy0">;</span> <span class="co1">// io defaults to &quot;GET&quot; if not defined</span>
+&nbsp;
+            Y.<span class="me1">io</span><span class="br0">&#40;</span>uri<span class="sy0">,</span> cfg<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-b9ede52f9eef7de92af5d191c3b4a258-plain">refresh : function() {
+    if (!this._activeIO) {
+        var uri = this.get("uri");
+
+        if (uri) {
+            cfg = this.get("cfg") || {};
+            cfg.on = cfg.on || {};
+
+            cfg.on.start = cfg.on.start || Y.bind(this._defStartHandler, this);
+            cfg.on.complete = cfg.on.complete || Y.bind(this._defCompleteHandler, this);
+
+            cfg.on.success = cfg.on.success || Y.bind(this._defSuccessHandler, this);
+            cfg.on.failure = cfg.on.failure || Y.bind(this._defFailureHandler, this);
+
+            cfg.method = cfg.method; // io defaults to "GET" if not defined
+
+            Y.io(uri, cfg);
+        }
+    }
+}</textarea></div>
+<p>The <code>refresh</code> method, as implemented for the scope of this example, sets up the io configuration object for the transaction it is about to dispatch, filling in the default handlers for io's <code>start</code>, <code>complete</code>, <code>success</code> and <code>failure</code> events, if the user does not provide custom implementations.</p>
+
+<h4>Node Content Helper Method</h4>
+
+<p>To simplify implementation and extension, a <code>setContent</code> method is used to
+wrap the content setter, which by default updates the <code>contentBox</code> of the widget.</p>
+
+<div id="syntax-a4aeb94327522a2204c9f8dda829e093" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;* Helper method for setting host content </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;*/</span></div></li><li class="li1"><div class="de1">setContent<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>content<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'contentNode'</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span>content<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="coMULTI">/*
+ * Helper method for setting host content 
+ */</span>
+setContent<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>content<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'contentNode'</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span>content<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-a4aeb94327522a2204c9f8dda829e093-plain">/*
+ * Helper method for setting host content 
+ */
+setContent: function(content) {
+    this.get('contentNode').setContent(content);
+}</textarea></div><h4>The Default IO Event Handlers</h4>
+
+<p>The default success listener, pulls the response data from the response object, and uses it to update the content
+defined by the <code>contentNode</code> attribute, which, by default, is the <code>contentBox</code>. The response data is passed through the <code>formatter</code> configured for the plugin, converting it to the desired output format:</p>
+
+<div id="syntax-b66fed4564f6c30e602a5a3605781042" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">_defSuccessHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> response <span class="sy0">=</span> o.<span class="me1">responseXML</span> <span class="sy0">||</span> o.<span class="me1">responseText</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> formatter <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'formatter'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="kw1">this</span>.<span class="me1">setContent</span><span class="br0">&#40;</span>formatter<span class="br0">&#40;</span>response<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">_defSuccessHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> response <span class="sy0">=</span> o.<span class="me1">responseXML</span> <span class="sy0">||</span> o.<span class="me1">responseText</span><span class="sy0">;</span>
+    <span class="kw2">var</span> formatter <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'formatter'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">this</span>.<span class="me1">setContent</span><span class="br0">&#40;</span>formatter<span class="br0">&#40;</span>response<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-b66fed4564f6c30e602a5a3605781042-plain">_defSuccessHandler : function(id, o) {
+    var response = o.responseXML || o.responseText;
+    var formatter = this.get('formatter');
+
+    this.setContent(formatter(response));
+}</textarea></div>
+<p>The default failure listener, displays an error message in the currently configured <code>section</code>, when io communication fails:</p>
+
+<div id="syntax-2efcf460150d336712d5d14cc0207465" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">_defFailureHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">setContent</span><span class="br0">&#40;</span><span class="st0">'Failed to retrieve content'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">_defFailureHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>.<span class="me1">setContent</span><span class="br0">&#40;</span><span class="st0">'Failed to retrieve content'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-2efcf460150d336712d5d14cc0207465-plain">_defFailureHandler : function(id, o) {
+    this.setContent('Failed to retrieve content');
+}</textarea></div>
+<p>The default start event listener renders the <code>loading</code> content, which remains in place while the transaction is in process, and also stores a reference to the "inprogress" io transaction:</p>
+
+<div id="syntax-fd7da0e8c894e54e502aae87ecc946eb" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">_defStartHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._activeIO <span class="sy0">=</span> o<span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">setContent</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'loading'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">_defStartHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>._activeIO <span class="sy0">=</span> o<span class="sy0">;</span>
+    <span class="kw1">this</span>.<span class="me1">setContent</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'loading'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span></pre></div><textarea id="syntax-fd7da0e8c894e54e502aae87ecc946eb-plain">_defStartHandler : function(id, o) {
+    this._activeIO = o;
+    this.setContent(this.get('loading'));
+},</textarea></div>
+<p>The default complete event listener clears out the "inprogress" io transaction object:</p>
+
+<div id="syntax-ef4631ed72da1d9bb6ebd088dd1bbc65" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">_defCompleteHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._activeIO <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">_defCompleteHandler <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>._activeIO <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-ef4631ed72da1d9bb6ebd088dd1bbc65-plain">_defCompleteHandler : function(id, o) {
+    this._activeIO = null;
+}</textarea></div>
+<h4>Using the Plugin</h4>
+
+<p>All objects derived from <a href="../../api/Base.html">Base</a> are <a href="../../api/Plugin.Host.html">Plugin Hosts</a>. They provide <a href="../../api/Plugin.Host.html#method_plug"><code>plug</code></a> and <a href="../../api/Plugin.Host.html#method_unplug"><code>unplug</code></a> methods to allow users to add/remove plugins to/from existing instances. 
+They also allow the user to specify the set of plugins to be applied to a new instance, along with their configurations, as part of the constructor arguments.</p>
+
+<p>In this example, we'll create a new instance of a Widget:</p>
+
+<div id="syntax-5061e2d6ae3c3f3423bb3fdbbf074711" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="coMULTI">/* Create a new Widget instance, with content generated from script */</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> widget <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Widget</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="coMULTI">/* Create a new Widget instance, with content generated from script */</span>
+<span class="kw2">var</span> widget <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Widget</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-5061e2d6ae3c3f3423bb3fdbbf074711-plain">/* Create a new Widget instance, with content generated from script */
+var widget = new Y.Widget();</textarea></div>
+<p>And then use the <code>plug</code> method to add the <code>WidgetIO</code>,
+providing it with a configuration to use when sending out io transactions
+(The <a href="overlay-anim-plugin.html">Animation Plugin</a> example shows how
+you could do the same thing during construction), render the widget, and refresh
+the plugin to fetch the content.</p>
+
+<div id="syntax-314030122d73726d8d2ab2cbb9f20925" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;* Add the Plugin, and configure it to use a news feed uri </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;*/</span></div></li><li class="li1"><div class="de1">widget.<span class="me1">plug</span><span class="br0">&#40;</span>WidgetIO<span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    uri <span class="sy0">:</span> <span class="st0">'assets/news.php?query=web+browser'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    loading<span class="sy0">:</span> <span class="st0">'&lt;img class=&quot;yui3-loading&quot; width=&quot;32px&quot; height=&quot;32px&quot; src=&quot;assets/img/ajax-loader.gif&quot;&gt;'</span>    </div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">widget.<span class="me1">render</span><span class="br0">&#40;</span><span class="st0">'#demo'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co2">/* fetch the content */</span></div></li><li class="li1"><div class="de1">widget.<span class="me1">io</span>.<span class="me1">refresh</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="coMULTI">/*
+ * Add the Plugin, and configure it to use a news feed uri 
+ */</span>
+widget.<span class="me1">plug</span><span class="br0">&#40;</span>WidgetIO<span class="sy0">,</span> <span class="br0">&#123;</span>
+    uri <span class="sy0">:</span> <span class="st0">'assets/news.php?query=web+browser'</span><span class="sy0">,</span>
+    loading<span class="sy0">:</span> <span class="st0">'&lt;img class=&quot;yui3-loading&quot; width=&quot;32px&quot; height=&quot;32px&quot; src=&quot;assets/img/ajax-loader.gif&quot;&gt;'</span>    
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+widget.<span class="me1">render</span><span class="br0">&#40;</span><span class="st0">'#demo'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co2">/* fetch the content */</span>
+widget.<span class="me1">io</span>.<span class="me1">refresh</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-314030122d73726d8d2ab2cbb9f20925-plain">/*
+ * Add the Plugin, and configure it to use a news feed uri 
+ */
+widget.plug(WidgetIO, {
+    uri : 'assets/news.php?query=web+browser',
+    loading: '<img class="yui3-loading" width="32px" height="32px" src="assets/img/ajax-loader.gif">'    
+});
+
+widget.render('#demo');
+
+/* fetch the content */
+widget.io.refresh();</textarea></div>
+<p>The plugin class structure described above is captured in this <a href="assets/myplugin.js.txt">"MyPlugin" Template File</a>, which you can use as a starting point to create your own plugins derived from <code>Plugin.Base</code>.</p>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Widget Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../widget/widget-extend.html'>Extending the base widget class</a></li><li><a href='../widget/widget-build.html'>Creating custom widget classes</a></li><li class='selected'><a href='../widget/widget-plugin.html'>Creating a widget plugin</a></li><li><a href='../widget/widget-tooltip.html'>Creating a simple Tooltip widget</a></li><li><a href='../widget/widget-parentchild-listbox.html'>Creating a hierarchical ListBox widget</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Widget Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/widget/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_widget.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="selected "><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

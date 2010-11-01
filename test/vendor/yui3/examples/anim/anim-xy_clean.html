@@ -1,0 +1,67 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Animating XY Position</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<link href="assets//anim.css" rel="stylesheet" type="text/css">
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Animating XY Position</h1>
+
+<div class="exampleIntro">
+	<p>This demonstrates how to animate the <code>xy</code> position of an element.</p>
+<p> Click anywhere to move the element to your click position.</p>
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<span id="demo"></span>
+
+<script type="text/javascript">
+YUI().use("anim", function(Y) {
+    var anim = new Y.Anim({
+        node: '#demo',
+        duration: 0.5,
+        easing: Y.Easing.elasticOut
+    });
+
+    var onClick = function(e) {
+        anim.set('to', { xy: [e.pageX, e.pageY] });
+        anim.run();
+    };
+    
+    Y.one('document').on('click', onClick);
+
+});
+
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

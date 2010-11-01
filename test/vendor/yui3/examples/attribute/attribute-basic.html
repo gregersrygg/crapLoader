@@ -1,0 +1,462 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Attribute: Basic Attribute Configuration</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+    .example-out .myclass-attrs {
+        font-family:courier;
+        margin-top:2px;
+    }
+
+    .example-out .myclass-title {
+        font-weight:bold;
+        font-family:arial;
+        color:#8dd5e7;
+        margin-top:5px;
+        margin-bottom:3px;
+    }
+
+    .example-out {
+        overflow:auto;
+        border:1px solid #000;
+        color:#ffffff;
+        background-color:#004C6D;
+        margin:5px;
+        height:8em;
+        padding:2px 2px 2px 5px;
+    }
+</style>
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Attribute: Basic Attribute Configuration</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Attribute: Basic Attribute Configuration</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example provides an introduction to the Attribute utility, showing how you can use it to add attribute support to your own custom classes.</p>
+
+<p>
+It is geared towards users who want to create their own classes from scratch and add Attribute support. In most cases you should consider extending the <a href="http://developer.yahoo.com/yui/3/base/index.html"><code>Base</code></a> class when you need managed attribute support, 
+instead of augmenting Attribute directly, especially if you expect your class to be extended. <a href="http://developer.yahoo.com/yui/3/base/index.html"><code>Base</code></a> does the work described in this example for you, in addition to making it easier for users to extend you class.
+</p>	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="attribute-basic_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div id="createo1">
+    <button type="button" class="do">Create First Instance</button> Construct o1, with default attribute values
+    <div class="example-out"></div>
+</div>
+<div id="updateo1">
+    <button type="button" class="do">Update First Instance</button> Update the first instance, using set
+    <div class="example-out"></div>
+</div>
+<div id="createo2">
+    <button type="button" class="do">Create Second Instance</button> Create the second instance, passing initial values to the constructor
+    <div class="example-out"></div>
+</div>
+
+<script type="text/javascript">
+
+// Get a new instance of YUI and 
+// load it with the required set of modules
+
+YUI().use("node", "attribute", function(Y) {
+
+    // Setup custom class which we want to 
+    // add managed attribute support to
+
+    function MyClass(cfg) {
+
+        // When constructed, setup the initial attributes for the instance, by calling the addAttrs method.
+        var attrs = {
+            // Add 3 attributes, foo, bar and foobar
+            "foo" : {
+                value:5
+            },
+     
+            "bar" : {
+                value:"Hello World!"
+            },
+    
+            "foobar" : {
+                value:true
+            }
+        };
+
+        this.addAttrs(attrs, cfg);
+    }
+
+    // Augment custom class with Attribute
+    Y.augment(MyClass, Y.Attribute);
+
+    function displayValues(o, title, node) {
+        var str = 
+            '<div class="myclass"><div class="myclass-title">' 
+            + title + 
+            '</div><ul class="myclass-attrs"><li>foo: ' 
+            + o.get("foo") 
+            + '</li><li>bar: '
+            + o.get("bar")
+            + '</li><li>foobar: '
+            + o.get("foobar")
+            + '</li></ul></div>';
+
+        Y.one(node).set("innerHTML", str);
+    }
+
+    Y.on("click", function() {
+
+        // Create a new instance, but don't provide any initial attribute values.
+        var o1 = new MyClass();
+
+        // Display current values
+        displayValues(o1, "o1 with default values, set during construction", "#createo1 .example-out");
+
+        Y.on("click", function() {
+
+            // Update values, using the "set" method
+            o1.set("foo", 10);
+            o1.set("bar", "Hello New World!");
+            o1.set("foobar", false);
+
+            displayValues(o1, "o1 values updated using set, after construction", "#updateo1 .example-out");
+
+        }, "#updateo1 .do");
+
+    }, "#createo1 .do");
+
+    Y.on("click", function() {
+
+        var o2 = new MyClass({
+            foo: 7,
+            bar: "Aloha World!",
+            foobar: false
+        });
+
+        displayValues(o2, "o2 values set during construction", "#createo2 .example-out");
+
+    }, "#createo2 .do");
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Setting Up Your Own Class To Use Attribute</h3>
+
+<p>In this example, we'll show how you can use the Attribute utility to add managed attributes to your own object classes. Later examples will show how you can configure more advanced attribute properties, and work with attribute change events.</p>
+
+<h4>Creating A YUI Instance</h4>
+
+<p>Before we get into attribute, a quick note on how we set up the instance of YUI we'll use for the examples. For all of the attribute examples, we'll setup our own instance of the YUI object and download the files we require on demand using the code pattern shown below:</p>
+
+<div id="syntax-cf59141cd6ef656b5a352e3b3d5395a3" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sy0">&lt;</span>script type<span class="sy0">=</span><span class="st0">&quot;text/javascript&quot;</span><span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Create our local YUI instance, to avoid</span></div></li><li class="li1"><div class="de1">    <span class="co1">// modifying the global YUI object</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;attribute&quot;</span><span class="sy0">,</span> <span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Example code is written inside this function,</span></div></li><li class="li1"><div class="de1">        <span class="co1">// which gets passed our own YUI instance, Y, loaded</span></div></li><li class="li2"><div class="de2">        <span class="co1">// with the modules we asked for - &quot;attribute&quot; and &quot;node&quot;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="sy0">&lt;/</span>script<span class="sy0">&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="sy0">&lt;</span>script type<span class="sy0">=</span><span class="st0">&quot;text/javascript&quot;</span><span class="sy0">&gt;</span>
+&nbsp;
+    <span class="co1">// Create our local YUI instance, to avoid</span>
+    <span class="co1">// modifying the global YUI object</span>
+&nbsp;
+    YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;attribute&quot;</span><span class="sy0">,</span> <span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="co1">// Example code is written inside this function,</span>
+        <span class="co1">// which gets passed our own YUI instance, Y, loaded</span>
+        <span class="co1">// with the modules we asked for - &quot;attribute&quot; and &quot;node&quot;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="sy0">&lt;/</span>script<span class="sy0">&gt;</span></pre></div><textarea id="syntax-cf59141cd6ef656b5a352e3b3d5395a3-plain"><script type="text/javascript">
+
+    // Create our local YUI instance, to avoid
+    // modifying the global YUI object
+
+    YUI({...}).use("attribute", "node", function(Y) {
+
+        // Example code is written inside this function,
+        // which gets passed our own YUI instance, Y, loaded
+        // with the modules we asked for - "attribute" and "node"
+
+    });
+</script></textarea></div>
+<p>The call to <code>YUI()</code> will create and return a new instance of the global YUI object for us to use. However this instance does not yet have all the modules we need for the examples.</p>
+
+<p>To load the modules, we invoke <code>use()</code> and pass it the list of modules we'd like populated on our new YUI instance - in this case, <code>attribute</code> and <code>node</code>.
+
+The YUI instance will pull down the source files for modules if they don't already exist on the page, plus any or their dependencies.
+When the source files are done downloading, the callback function which we pass in as the 3rd argument to <code>use()</code>, is invoked. Our custom YUI instance, <code>Y</code>, is passed to the callback, populated with the classes which make up the requested modules.</p>
+
+<p>This callback function is where we'll write all our example code. By working inside the callback function, we don't pollute the global namespace and we're also able to download the files we need on demand, rather than have them be on the page up front.</p>
+
+<p>The configuration object passed to <code>YUI()</code> when creating the instance is used to specify how (<em>combined, separate, debug, min etc.</em>) we want the files downloaded, and from where. The API documentation for the <a href="../../api/YUI.html">YUI object</a>, provides more information about the configuration options available.</p>
+
+<h4>Defining Your Custom Class</h4>
+
+<p>The first step in the example is to create the constructor function for our new class, to which we want to add attribute support. In our example, this class is called <code>MyClass</code>.
+
+We then augment <code>MyClass</code> with <code>Y.Attribute</code>, so that it receives all of <code>Attribute's</code> methods:</p>
+
+<div id="syntax-f257ed24c316337c7de7c012aed906eb" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">function</span> MyClass<span class="br0">&#40;</span>cfg<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    ...</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">Y.<span class="me1">augment</span><span class="br0">&#40;</span>MyClass<span class="sy0">,</span> Y.<span class="me1">Attribute</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">function</span> MyClass<span class="br0">&#40;</span>cfg<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    ...
+<span class="br0">&#125;</span>
+&nbsp;
+Y.<span class="me1">augment</span><span class="br0">&#40;</span>MyClass<span class="sy0">,</span> Y.<span class="me1">Attribute</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-f257ed24c316337c7de7c012aed906eb-plain">function MyClass(cfg) {
+    ...
+}
+
+Y.augment(MyClass, Y.Attribute);</textarea></div>
+<h4>Adding Attributes</h4>
+
+<p>We can now set up any attributes we need for <code>MyClass</code> using the <code>addAttrs</code> method. For the basic example we add 3 attributes - <code>foo</code>,<code>bar</code>, and <code>foobar</code>, and provide an initial <code>value</code> for each. 
+
+The same object literal we use to provide the initial value for the attribute will also be used in the other examples to configure attribute properties such as <code>readOnly</code> or <code>writeOnce</code>, and define <code>getter</code>, <code>setter</code> and <code>validator</code> methods for the attribute.</p>
+
+<p>In this example, the default set of attributes which <code>MyClass</code> will support gets passed to <code>addAttrs</code> to set up the attributes for each instance during construction.</p>
+
+The complete definition for <code>MyClass</code> is shown below:</p>
+
+<div id="syntax-47bd4ac280e94f1ba8d5d7ccc42b62d8" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">// Setup custom class which we want to add managed attribute support to</span></div></li><li class="li1"><div class="de1"><span class="kw2">function</span> MyClass<span class="br0">&#40;</span>cfg<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// When constructed, setup the initial attributes for the </span></div></li><li class="li2"><div class="de2">    <span class="co1">// instance, by calling the addAttrs method.</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> attrs <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// Add 3 attributes, foo, bar and foobar</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;foo&quot;</span> <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            value<span class="sy0">:</span><span class="nu0">5</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="st0">&quot;bar&quot;</span> <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            value<span class="sy0">:</span><span class="st0">&quot;Hello World!&quot;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="st0">&quot;foobar&quot;</span> <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            value<span class="sy0">:</span><span class="kw2">true</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">addAttrs</span><span class="br0">&#40;</span>attrs<span class="sy0">,</span> cfg<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// Augment custom class with Attribute </span></div></li><li class="li2"><div class="de2">Y.<span class="me1">augment</span><span class="br0">&#40;</span>MyClass<span class="sy0">,</span> Y.<span class="me1">Attribute</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">// Setup custom class which we want to add managed attribute support to</span>
+<span class="kw2">function</span> MyClass<span class="br0">&#40;</span>cfg<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">// When constructed, setup the initial attributes for the </span>
+    <span class="co1">// instance, by calling the addAttrs method.</span>
+    <span class="kw2">var</span> attrs <span class="sy0">=</span> <span class="br0">&#123;</span>
+        <span class="co1">// Add 3 attributes, foo, bar and foobar</span>
+        <span class="st0">&quot;foo&quot;</span> <span class="sy0">:</span> <span class="br0">&#123;</span>
+            value<span class="sy0">:</span><span class="nu0">5</span>
+        <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+        <span class="st0">&quot;bar&quot;</span> <span class="sy0">:</span> <span class="br0">&#123;</span>
+            value<span class="sy0">:</span><span class="st0">&quot;Hello World!&quot;</span>
+        <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+        <span class="st0">&quot;foobar&quot;</span> <span class="sy0">:</span> <span class="br0">&#123;</span>
+            value<span class="sy0">:</span><span class="kw2">true</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">this</span>.<span class="me1">addAttrs</span><span class="br0">&#40;</span>attrs<span class="sy0">,</span> cfg<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="co1">// Augment custom class with Attribute </span>
+Y.<span class="me1">augment</span><span class="br0">&#40;</span>MyClass<span class="sy0">,</span> Y.<span class="me1">Attribute</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-47bd4ac280e94f1ba8d5d7ccc42b62d8-plain">// Setup custom class which we want to add managed attribute support to
+function MyClass(cfg) {
+
+    // When constructed, setup the initial attributes for the 
+    // instance, by calling the addAttrs method.
+    var attrs = {
+        // Add 3 attributes, foo, bar and foobar
+        "foo" : {
+            value:5
+        },
+ 
+        "bar" : {
+            value:"Hello World!"
+        },
+
+        "foobar" : {
+            value:true
+        }
+    };
+
+    this.addAttrs(attrs, cfg);
+}
+
+// Augment custom class with Attribute 
+Y.augment(MyClass, Y.Attribute);</textarea></div>
+<p>The <code>addAttrs</code> method, in addition to the default attribute configuration, also accepts an object literal (associative array) of name/value pairs which can be used to over-ride the default initial values of the attributes. This is useful for classes which wish to allow the user to set the value of attributes as part of object construction, as shown by the use of the <code>cfg</code> argument above.</p>
+
+<p>
+As mentioned previously, if you expect your class to be extended, <a href="http://developer.yahoo.com/yui/3/base/index.html">Base</a> provides a more convenient way for you to define the same attribute configuration statically for your class, so that it can be easily modified by extended classes. Base will take care of isolating the static configuration, so that it isn't modified across instances. 
+</p>
+
+<h4>Using Attributes</h4>
+
+<p>Now that we have <code>MyClass</code> defined with a set of attributes it supports, users can get and set attribute values on instances of <code>MyClass</code>:</p>
+
+<p>We construct the first instance, <code>o1</code>, without setting any initial attribute values in the constructor, but use Attribute's <code>set()</code> method to set values after construction:</p>
+
+<div id="syntax-6fb779ca7d200b40e5f015c53de12ec1" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">// Create a new instance, but don't provide any initial attribute values.</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> o1 <span class="sy0">=</span> <span class="kw2">new</span> MyClass<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// Display current values</span></div></li><li class="li2"><div class="de2">displayValues<span class="br0">&#40;</span>o1<span class="sy0">,</span> <span class="st0">&quot;o1 with default values, set during construction&quot;</span><span class="sy0">,</span> </div></li><li class="li1"><div class="de1">                <span class="st0">&quot;#createo1 .example-out&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">...</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="co1">// Update values, using the &quot;set&quot; method</span></div></li><li class="li1"><div class="de1">o1.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;foo&quot;</span><span class="sy0">,</span> <span class="nu0">10</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">o1.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;bar&quot;</span><span class="sy0">,</span> <span class="st0">&quot;Hello New World!&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">o1.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;foobar&quot;</span><span class="sy0">,</span> <span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">displayValues<span class="br0">&#40;</span>o1<span class="sy0">,</span> <span class="st0">&quot;o1 values updated using set, after construction&quot;</span><span class="sy0">,</span> </div></li><li class="li1"><div class="de1">                <span class="st0">&quot;#updateo1 .example-out&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">// Create a new instance, but don't provide any initial attribute values.</span>
+<span class="kw2">var</span> o1 <span class="sy0">=</span> <span class="kw2">new</span> MyClass<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Display current values</span>
+displayValues<span class="br0">&#40;</span>o1<span class="sy0">,</span> <span class="st0">&quot;o1 with default values, set during construction&quot;</span><span class="sy0">,</span> 
+                <span class="st0">&quot;#createo1 .example-out&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+...
+&nbsp;
+<span class="co1">// Update values, using the &quot;set&quot; method</span>
+o1.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;foo&quot;</span><span class="sy0">,</span> <span class="nu0">10</span><span class="br0">&#41;</span><span class="sy0">;</span>
+o1.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;bar&quot;</span><span class="sy0">,</span> <span class="st0">&quot;Hello New World!&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+o1.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;foobar&quot;</span><span class="sy0">,</span> <span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+displayValues<span class="br0">&#40;</span>o1<span class="sy0">,</span> <span class="st0">&quot;o1 values updated using set, after construction&quot;</span><span class="sy0">,</span> 
+                <span class="st0">&quot;#updateo1 .example-out&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-6fb779ca7d200b40e5f015c53de12ec1-plain">// Create a new instance, but don't provide any initial attribute values.
+var o1 = new MyClass();
+
+// Display current values
+displayValues(o1, "o1 with default values, set during construction", 
+                "#createo1 .example-out");
+
+...
+
+// Update values, using the "set" method
+o1.set("foo", 10);
+o1.set("bar", "Hello New World!");
+o1.set("foobar", false);
+
+displayValues(o1, "o1 values updated using set, after construction", 
+                "#updateo1 .example-out");</textarea></div>
+<p>For the second instance that, <code>o2</code> we set the initial values of the attributes, using the constructor configuration argument:</p>
+
+<div id="syntax-e9161598c8e73a8bdd1827a8ab241c06" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> o2 <span class="sy0">=</span> <span class="kw2">new</span> MyClass<span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    foo<span class="sy0">:</span> <span class="nu0">7</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    bar<span class="sy0">:</span> <span class="st0">&quot;Aloha World!&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    foobar<span class="sy0">:</span> <span class="kw2">false</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> o2 <span class="sy0">=</span> <span class="kw2">new</span> MyClass<span class="br0">&#40;</span><span class="br0">&#123;</span>
+    foo<span class="sy0">:</span> <span class="nu0">7</span><span class="sy0">,</span>
+    bar<span class="sy0">:</span> <span class="st0">&quot;Aloha World!&quot;</span><span class="sy0">,</span>
+    foobar<span class="sy0">:</span> <span class="kw2">false</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-e9161598c8e73a8bdd1827a8ab241c06-plain">var o2 = new MyClass({
+    foo: 7,
+    bar: "Aloha World!",
+    foobar: false
+});</textarea></div>
+<p>The <code>displayValues()</code> method uses Attribute's <code>get()</code> method to retrieve the current values of the attributes, to display:</p>
+
+<div id="syntax-abfcdcc4c7c2b222d2e626f78c7912d6" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">function</span> displayValues<span class="br0">&#40;</span>o<span class="sy0">,</span> title<span class="sy0">,</span> node<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> str <span class="sy0">=</span> </div></li><li class="li1"><div class="de1">        <span class="st0">'&lt;div class=&quot;myclass&quot;&gt;&lt;div class=&quot;myclass-title&quot;&gt;'</span> </div></li><li class="li1"><div class="de1">        <span class="sy0">+</span> title <span class="sy0">+</span> </div></li><li class="li2"><div class="de2">        <span class="st0">':&lt;/div&gt;&lt;ul class=&quot;myclass-attrs&quot;&gt;&lt;li&gt;foo:'</span> </div></li><li class="li1"><div class="de1">        <span class="sy0">+</span> o.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;foo&quot;</span><span class="br0">&#41;</span> </div></li><li class="li1"><div class="de1">        <span class="sy0">+</span> <span class="st0">'&lt;/li&gt;&lt;li&gt;bar:'</span></div></li><li class="li1"><div class="de1">        <span class="sy0">+</span> o.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;bar&quot;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">        <span class="sy0">+</span> <span class="st0">'&lt;/li&gt;&lt;li&gt;foobar:'</span></div></li><li class="li2"><div class="de2">        <span class="sy0">+</span> o.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;foobar&quot;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">        <span class="sy0">+</span> <span class="st0">'&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;'</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Use the Y.one() method to get the first element which </span></div></li><li class="li1"><div class="de1">    <span class="co1">// matches the selector passed in, to output the string to...       </span></div></li><li class="li2"><div class="de2">    Y.<span class="me1">one</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> str<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">function</span> displayValues<span class="br0">&#40;</span>o<span class="sy0">,</span> title<span class="sy0">,</span> node<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> str <span class="sy0">=</span> 
+        <span class="st0">'&lt;div class=&quot;myclass&quot;&gt;&lt;div class=&quot;myclass-title&quot;&gt;'</span> 
+        <span class="sy0">+</span> title <span class="sy0">+</span> 
+        <span class="st0">':&lt;/div&gt;&lt;ul class=&quot;myclass-attrs&quot;&gt;&lt;li&gt;foo:'</span> 
+        <span class="sy0">+</span> o.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;foo&quot;</span><span class="br0">&#41;</span> 
+        <span class="sy0">+</span> <span class="st0">'&lt;/li&gt;&lt;li&gt;bar:'</span>
+        <span class="sy0">+</span> o.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;bar&quot;</span><span class="br0">&#41;</span>
+        <span class="sy0">+</span> <span class="st0">'&lt;/li&gt;&lt;li&gt;foobar:'</span>
+        <span class="sy0">+</span> o.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;foobar&quot;</span><span class="br0">&#41;</span>
+        <span class="sy0">+</span> <span class="st0">'&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;'</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Use the Y.one() method to get the first element which </span>
+    <span class="co1">// matches the selector passed in, to output the string to...       </span>
+    Y.<span class="me1">one</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> str<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-abfcdcc4c7c2b222d2e626f78c7912d6-plain">function displayValues(o, title, node) {
+    var str = 
+        '<div class="myclass"><div class="myclass-title">' 
+        + title + 
+        ':</div><ul class="myclass-attrs"><li>foo:' 
+        + o.get("foo") 
+        + '</li><li>bar:'
+        + o.get("bar")
+        + '</li><li>foobar:'
+        + o.get("foobar")
+        + '</li></ul></div>';
+
+    // Use the Y.one() method to get the first element which 
+    // matches the selector passed in, to output the string to...       
+    Y.one(node).set("innerHTML", str);
+}</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Attribute Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li class='selected'><a href='../attribute/attribute-basic.html'>Basic Attribute Configuration</a></li><li><a href='../attribute/attribute-rw.html'>Read-Only and Write-Once Attributes</a></li><li><a href='../attribute/attribute-event.html'>Attribute Change Events</a></li><li><a href='../attribute/attribute-basic-speeddate.html'>Attribute Based Speed Dating</a></li><li><a href='../attribute/attribute-event-speeddate.html'>Attribute Event Based Speed Dating</a></li><li><a href='../attribute/attribute-getset.html'>Attribute Getters, Setters and Validators</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Attribute Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/attribute/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_attribute.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="selected "><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

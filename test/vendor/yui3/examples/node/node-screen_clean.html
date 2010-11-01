@@ -1,0 +1,76 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Measuring the Window and Document</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<link href="assets//node.css" rel="stylesheet" type="text/css">
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Measuring the Window and Document</h1>
+
+<div class="exampleIntro">
+	<p>This example shows how to measure the size of the window and document.</p>
+
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<dl id="demo">
+    <dt>Window size</dt>
+    <dd class="yui3-data-win">Click me to find out</dd>
+    <dt>Document size</dt>
+    <dd class="yui3-data-doc">Click me to find out</dd>
+</dl>
+
+<script type="text/javascript">
+YUI().use("node", function(Y) {
+    var onClick = function(e) {
+        var target = e.target,
+            h, w;
+
+        if (target.test('dd')) {
+            if (target.test('.yui3-data-win')) {
+                h = target.get('winHeight');
+                w = target.get('winWidth');
+            } else if (target.test('.yui3-data-doc')) {
+                h = target.get('docHeight');
+                w = target.get('docWidth');
+
+            }
+            target.set('innerHTML', 'width: ' + w + ' height: ' + h);
+        }
+    };
+
+    Y.one('#demo').on('click', onClick);
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

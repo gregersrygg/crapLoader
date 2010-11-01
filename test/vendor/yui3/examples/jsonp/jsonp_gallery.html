@@ -1,0 +1,603 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: JSONP: Reusing a JSONPRequest instance to poll a remote server</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+    #out {
+        margin-top: 2em;
+    }
+    #out h4 {
+        border-right: 100px solid #ccc;
+    }
+</style>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: JSONP: Reusing a JSONPRequest instance to poll a remote server</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>JSONP: Reusing a JSONPRequest instance to poll a remote server</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example shows how to create a reusable JSONPRequest for polling as well as how to configure success and failure callbacks.  See the API docs and user guide for a full listing of available configurations.</p>
+
+<p>For this example, we will use a JSONP service hosted on <a href="http://yuilibrary.com">YUILibrary</a> to fetch information about a random Gallery module and render some of the information on the page.</p>
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="jsonp_gallery_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div id="demo">
+    <input type="button" id="start" value="Start polling">
+    <input type="button" id="stop" value="Stop polling">
+    <div id="out">
+    </div>
+</div>
+<script>
+YUI().use("jsonp", "substitute", "transition",function (Y) {
+
+    var url = "http://yuilibrary.com/gallery/api/random?callback={callback}",
+        outputDiv = Y.one("#out"),
+        gallery;
+        
+    // Using the configuration object syntax
+    gallery = new Y.JSONPRequest(url, {
+        on: {
+            success: function (response) {
+                var module = response.modules[0],
+                    author = module.owner;
+
+                // Some users don't have a rank
+                if (!author.rank) {
+                    author.rank = "user";
+                }
+
+                // Format the author info and store as a property of the
+                // module object for use by Y.substitute
+                // ('this' refers to the JSONPRequest object by default)
+                module.authorHTML = Y.substitute(this.authorTemplate, author);
+
+                outputDiv.setContent(Y.substitute(this.moduleTemplate, module));
+
+                // Add some flare to the poll interval by showing a "time left"
+                // indicator via the header's border
+                Y.one("#out h4")
+                    .setStyle("borderRightWidth", "100px")
+                    .transition({
+                        borderRightWidth: 0,
+                        duration: 7
+                    }, function () {
+                        if (gallery.polling) {
+                            gallery.send();
+                        }
+                    });
+            },
+
+            failure: function () {
+                gallery.polling = false;
+                outputDiv.setContent(this.failureTemplate);
+
+                // Wire up the Try again button
+                outputDiv.one("button").on("click", function () {
+                    gallery.send();
+                });
+            }
+        }
+    });
+
+
+    gallery.moduleTemplate =
+        '<h4><a href="{url}">{title}</a></h4>' +
+        '<p class="author">{authorHTML}</p>' +
+        '<div>{summary}</div>';
+
+    gallery.authorTemplate =
+        '<img src="{icon}" height="30" width="30">' +
+        ' {fullname} <span class="rank">({rank})</span>';
+
+    gallery.failureTemplate =
+        '<p class="error">Ack, I couldn\'t reach the Gallery web service!</p>' +
+        '<button>Try again</button>';
+
+    gallery.polling = false;
+
+
+    // Click the button to send the JSONP request
+    Y.one("#start").on("click", function (e) {
+        if (!gallery.polling) {
+            gallery.polling = true;
+            gallery.send();
+        }
+    });
+
+    Y.one("#stop").on("click", function (e) {
+        gallery.polling = false;
+    });
+
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>The data</h3>
+<p>The structure of the JavaScript object returned from YUILibrary's JSONP service will look like this:</p>
+
+<div id="syntax-9d328c1ea11cc71aea0f355930e2f48c" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    modules<span class="sy0">:</span> <span class="br0">&#91;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            url<span class="sy0">:</span> <span class="br0">&#40;</span>the url to the module<span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            title<span class="sy0">:</span> <span class="br0">&#40;</span>the title of the module<span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            summary<span class="sy0">:</span> <span class="br0">&#40;</span>short description of the module<span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            ...<span class="sy0">,</span></div></li><li class="li1"><div class="de1">            owner<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                icon<span class="sy0">:</span> <span class="br0">&#40;</span>url to the author<span class="st0">'s thumb image),</span></div></li><li class="li2"><div class="de2"><span class="st0">                fullname: (the author'</span>s full <span class="kw3">name</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                rank<span class="sy0">:</span> <span class="br0">&#40;</span>YUI Team member<span class="sy0">?,</span> Contributor<span class="sy0">?</span> etc<span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                ...</div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#93;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    ...</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="br0">&#123;</span>
+    modules<span class="sy0">:</span> <span class="br0">&#91;</span>
+        <span class="br0">&#123;</span>
+            url<span class="sy0">:</span> <span class="br0">&#40;</span>the url to the module<span class="br0">&#41;</span><span class="sy0">,</span>
+            title<span class="sy0">:</span> <span class="br0">&#40;</span>the title of the module<span class="br0">&#41;</span><span class="sy0">,</span>
+            summary<span class="sy0">:</span> <span class="br0">&#40;</span>short description of the module<span class="br0">&#41;</span><span class="sy0">,</span>
+            ...<span class="sy0">,</span>
+            owner<span class="sy0">:</span> <span class="br0">&#123;</span>
+                icon<span class="sy0">:</span> <span class="br0">&#40;</span>url to the author<span class="st0">'s thumb image),
+                fullname: (the author'</span>s full <span class="kw3">name</span><span class="br0">&#41;</span><span class="sy0">,</span>
+                rank<span class="sy0">:</span> <span class="br0">&#40;</span>YUI Team member<span class="sy0">?,</span> Contributor<span class="sy0">?</span> etc<span class="br0">&#41;</span><span class="sy0">,</span>
+                ...
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#93;</span><span class="sy0">,</span>
+    ...
+<span class="br0">&#125;</span>
+&nbsp;</pre></div><textarea id="syntax-9d328c1ea11cc71aea0f355930e2f48c-plain">{
+    modules: [
+        {
+            url: (the url to the module),
+            title: (the title of the module),
+            summary: (short description of the module),
+            ...,
+            owner: {
+                icon: (url to the author's thumb image),
+                fullname: (the author's full name),
+                rank: (YUI Team member?, Contributor? etc),
+                ...
+            }
+        }
+    ],
+    ...
+}
+</textarea></div>
+<p>We'll use these objects to populate an HTML template with data <em>{placeholder}</em>s using <code>Y.substitute( template, object )</code>.</p>
+
+
+<h3>Start simple</h3>
+<p>To make a single call to the YUILibrary Gallery API, we can just use</p>
+
+<div id="syntax-8b2b283325d191e320093e60bc7ec0b4" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">Y.<span class="me1">jsonp</span><span class="br0">&#40;</span><span class="st0">&quot;http://yuilibrary.com/gallery/api/random?callback={callback}&quot;</span><span class="sy0">,</span> handleJSONP<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">Y.<span class="me1">jsonp</span><span class="br0">&#40;</span><span class="st0">&quot;http://yuilibrary.com/gallery/api/random?callback={callback}&quot;</span><span class="sy0">,</span> handleJSONP<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;</pre></div><textarea id="syntax-8b2b283325d191e320093e60bc7ec0b4-plain">Y.jsonp("http://yuilibrary.com/gallery/api/random?callback={callback}", handleJSONP);
+</textarea></div>
+<p>But since each call to <code>Y.jsonp()</code> creates a new instance of <code>Y.JSONPRequest</code>, we may as well store the instance and reuse it.</p>
+
+<div id="syntax-859b260daa9aa690ce55d3b6cc4d34ec" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> gallery <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">JSONPRequest</span><span class="br0">&#40;</span><span class="st0">&quot;http://yuilibrary.com/gallery/api/random?callback={callback}&quot;</span><span class="sy0">,</span> handleJSONP<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> gallery <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">JSONPRequest</span><span class="br0">&#40;</span><span class="st0">&quot;http://yuilibrary.com/gallery/api/random?callback={callback}&quot;</span><span class="sy0">,</span> handleJSONP<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;</pre></div><textarea id="syntax-859b260daa9aa690ce55d3b6cc4d34ec-plain">var gallery = new Y.JSONPRequest("http://yuilibrary.com/gallery/api/random?callback={callback}", handleJSONP);
+
+gallery.send();
+</textarea></div>
+<h3>Add polling</h3>
+<p>JSONPRequest doesn't have any built-in polling mechanism, but <code>Y.later()</code> can handle this for us.</p>
+
+<div id="syntax-7096b0622622c295c40f966162780d00" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> url <span class="sy0">=</span> <span class="st0">&quot;http://yuilibrary.com/gallery/api/random?callback={callback}&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">function</span> handleJSONP<span class="br0">&#40;</span>response<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">// populate template from the response object and add to the output div</span></div></li><li class="li2"><div class="de2">    ...</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="me1">Y</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span> Y.<span class="me1">substitute</span><span class="br0">&#40;</span>template<span class="sy0">,</span> module<span class="br0">&#41;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// After 7 seconds, call the API for a new module</span></div></li><li class="li2"><div class="de2">    Y.<span class="me1">later</span><span class="br0">&#40;</span><span class="nu0">7000</span><span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw1">this</span>.<span class="me1">send</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">var</span> gallery <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">JSONPRequest</span><span class="br0">&#40;</span>url<span class="sy0">,</span> handleJSONP<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> url <span class="sy0">=</span> <span class="st0">&quot;http://yuilibrary.com/gallery/api/random?callback={callback}&quot;</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw2">function</span> handleJSONP<span class="br0">&#40;</span>response<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">// populate template from the response object and add to the output div</span>
+    ...
+&nbsp;
+    <span class="me1">Y</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span> Y.<span class="me1">substitute</span><span class="br0">&#40;</span>template<span class="sy0">,</span> module<span class="br0">&#41;</span> <span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// After 7 seconds, call the API for a new module</span>
+    Y.<span class="me1">later</span><span class="br0">&#40;</span><span class="nu0">7000</span><span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw1">this</span>.<span class="me1">send</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw2">var</span> gallery <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">JSONPRequest</span><span class="br0">&#40;</span>url<span class="sy0">,</span> handleJSONP<span class="br0">&#41;</span><span class="sy0">;</span>
+gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;</pre></div><textarea id="syntax-7096b0622622c295c40f966162780d00-plain">var url = "http://yuilibrary.com/gallery/api/random?callback={callback}";
+
+function handleJSONP(response) {
+    // populate template from the response object and add to the output div
+    ...
+
+    Y.one("#out").setContent( Y.substitute(template, module) );
+
+    // After 7 seconds, call the API for a new module
+    Y.later(7000, this, this.send);
+};
+
+var gallery = new Y.JSONPRequest(url, handleJSONP);
+gallery.send();
+</textarea></div>
+<h3>Add failure protection</h3>
+<p>In case the Gallery API is busy or some other problem arises, we'll also want to handle this case and display an error.  We can do this by passing a configuration object as the second parameter rather than a simple success callback.</p>
+
+<div id="syntax-8645001440d03ed57ea76d42059c10bb" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> gallery <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">JSONPRequest</span><span class="br0">&#40;</span>url<span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        on<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            success<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>response<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="co1">// populate output div from the template and response object</span></div></li><li class="li2"><div class="de2">                ...</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="me1">Y</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span> Y.<span class="me1">substitute</span><span class="br0">&#40;</span>template<span class="sy0">,</span> module<span class="br0">&#41;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="co1">// After 7 seconds, call the API for a new module</span></div></li><li class="li2"><div class="de2">                Y.<span class="me1">later</span><span class="br0">&#40;</span><span class="nu0">7000</span><span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw1">this</span>.<span class="me1">send</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            failure<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span> failureTemplate <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> gallery <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">JSONPRequest</span><span class="br0">&#40;</span>url<span class="sy0">,</span> <span class="br0">&#123;</span>
+        on<span class="sy0">:</span> <span class="br0">&#123;</span>
+            success<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>response<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="co1">// populate output div from the template and response object</span>
+                ...
+&nbsp;
+                <span class="me1">Y</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span> Y.<span class="me1">substitute</span><span class="br0">&#40;</span>template<span class="sy0">,</span> module<span class="br0">&#41;</span> <span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+                <span class="co1">// After 7 seconds, call the API for a new module</span>
+                Y.<span class="me1">later</span><span class="br0">&#40;</span><span class="nu0">7000</span><span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw1">this</span>.<span class="me1">send</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+            failure<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span> failureTemplate <span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;</pre></div><textarea id="syntax-8645001440d03ed57ea76d42059c10bb-plain">var gallery = new Y.JSONPRequest(url, {
+        on: {
+            success: function (response) {
+                // populate output div from the template and response object
+                ...
+
+                Y.one("#out").setContent( Y.substitute(template, module) );
+
+                // After 7 seconds, call the API for a new module
+                Y.later(7000, this, this.send);
+            },
+
+            failure: function () {
+                Y.one("#out").setContent( failureTemplate );
+            }
+        }
+    });
+
+gallery.send();
+</textarea></div>
+<h3>Add flare</h3>
+<p>Now we'll add a bit of flourish, by adding a visual indicator of how long until the next module is requested.  We'll replace the call to <code>Y.later()</code> with a call to <code>node.transition()</code> using a shrinking border to show the remaining time.  Then when the transition is complete, we call <code>send()</code> again.
+
+<div id="syntax-c31e1f58e5ce90d97bc6a0de1fd1e39b" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> gallery <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">JSONPRequest</span><span class="br0">&#40;</span>url<span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        on<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            success<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>response<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="co1">// populate output div from the template and response object</span></div></li><li class="li2"><div class="de2">                ...</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="me1">Y</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span> Y.<span class="me1">substitute</span><span class="br0">&#40;</span>template<span class="sy0">,</span> module<span class="br0">&#41;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="co1">// Add some flare to the poll interval by showing a &quot;time left&quot;</span></div></li><li class="li2"><div class="de2">                <span class="co1">// indicator via the header's border</span></div></li><li class="li1"><div class="de1">                Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out h4&quot;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">                    .<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;borderRightWidth&quot;</span><span class="sy0">,</span> <span class="st0">&quot;100px&quot;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">                    .<span class="me1">transition</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                        borderRightWidth<span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                        duration<span class="sy0">:</span> <span class="nu0">7</span></div></li><li class="li1"><div class="de1">                    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                        gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            failure<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span> failureTemplate <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> gallery <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">JSONPRequest</span><span class="br0">&#40;</span>url<span class="sy0">,</span> <span class="br0">&#123;</span>
+        on<span class="sy0">:</span> <span class="br0">&#123;</span>
+            success<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>response<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="co1">// populate output div from the template and response object</span>
+                ...
+&nbsp;
+                <span class="me1">Y</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span> Y.<span class="me1">substitute</span><span class="br0">&#40;</span>template<span class="sy0">,</span> module<span class="br0">&#41;</span> <span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+                <span class="co1">// Add some flare to the poll interval by showing a &quot;time left&quot;</span>
+                <span class="co1">// indicator via the header's border</span>
+                Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out h4&quot;</span><span class="br0">&#41;</span>
+                    .<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;borderRightWidth&quot;</span><span class="sy0">,</span> <span class="st0">&quot;100px&quot;</span><span class="br0">&#41;</span>
+                    .<span class="me1">transition</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+                        borderRightWidth<span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+                        duration<span class="sy0">:</span> <span class="nu0">7</span>
+                    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                        gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+            failure<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span> failureTemplate <span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;</pre></div><textarea id="syntax-c31e1f58e5ce90d97bc6a0de1fd1e39b-plain">var gallery = new Y.JSONPRequest(url, {
+        on: {
+            success: function (response) {
+                // populate output div from the template and response object
+                ...
+
+                Y.one("#out").setContent( Y.substitute(template, module) );
+
+                // Add some flare to the poll interval by showing a "time left"
+                // indicator via the header's border
+                Y.one("#out h4")
+                    .setStyle("borderRightWidth", "100px")
+                    .transition({
+                        borderRightWidth: 0,
+                        duration: 7
+                    }, function () {
+                        gallery.send();
+                    });
+            },
+
+            failure: function () {
+                Y.one("#out").setContent( failureTemplate );
+            }
+        }
+    });
+
+gallery.send();
+</textarea></div>
+<h3>Stop the poll</h3>
+<p>The final step is to add the ability to start and stop the polling.  We'll manage this by adding a property to the <code>gallery</code> JSONPRequest instance named <code>gallery.polling</code>.  See the full code listing below for the implementation.
+
+<h3 id="fullcode">Full Code Listing</h3>
+<h4>HTML</h4>
+<div id="syntax-b58ab8442ba11893a0da45c273ccb49f" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;demo&quot;</span><span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sy0">&lt;</span>input type<span class="sy0">=</span><span class="st0">&quot;button&quot;</span> id<span class="sy0">=</span><span class="st0">&quot;start&quot;</span> value<span class="sy0">=</span><span class="st0">&quot;Start polling&quot;</span><span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sy0">&lt;</span>input type<span class="sy0">=</span><span class="st0">&quot;button&quot;</span> id<span class="sy0">=</span><span class="st0">&quot;stop&quot;</span> value<span class="sy0">=</span><span class="st0">&quot;Stop polling&quot;</span><span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;out&quot;</span><span class="sy0">&gt;</span></div></li><li class="li2"><div class="de2">    <span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1"><span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;demo&quot;</span><span class="sy0">&gt;</span>
+    <span class="sy0">&lt;</span>input type<span class="sy0">=</span><span class="st0">&quot;button&quot;</span> id<span class="sy0">=</span><span class="st0">&quot;start&quot;</span> value<span class="sy0">=</span><span class="st0">&quot;Start polling&quot;</span><span class="sy0">&gt;</span>
+    <span class="sy0">&lt;</span>input type<span class="sy0">=</span><span class="st0">&quot;button&quot;</span> id<span class="sy0">=</span><span class="st0">&quot;stop&quot;</span> value<span class="sy0">=</span><span class="st0">&quot;Stop polling&quot;</span><span class="sy0">&gt;</span>
+    <span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;out&quot;</span><span class="sy0">&gt;</span>
+    <span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span>
+<span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span>
+&nbsp;</pre></div><textarea id="syntax-b58ab8442ba11893a0da45c273ccb49f-plain"><div id="demo">
+    <input type="button" id="start" value="Start polling">
+    <input type="button" id="stop" value="Stop polling">
+    <div id="out">
+    </div>
+</div>
+</textarea></div>
+<h4>JavaScript</h4>
+<div id="syntax-bb9e7cee965cb98f70324a4dbcc9056c" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;jsonp&quot;</span><span class="sy0">,</span> <span class="st0">&quot;substitute&quot;</span><span class="sy0">,</span> <span class="st0">&quot;transition&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> url <span class="sy0">=</span> <span class="st0">&quot;http://yuilibrary.com/gallery/api/random?callback={callback}&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        outputDiv <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        gallery<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Using the configuration object syntax</span></div></li><li class="li1"><div class="de1">    gallery <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">JSONPRequest</span><span class="br0">&#40;</span>url<span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        on<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            success<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>response<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw2">var</span> module <span class="sy0">=</span> response.<span class="me1">modules</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                    author <span class="sy0">=</span> module.<span class="me1">owner</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="co1">// Some users don't have a rank</span></div></li><li class="li2"><div class="de2">                <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>author.<span class="me1">rank</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    author.<span class="me1">rank</span> <span class="sy0">=</span> <span class="st0">&quot;user&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="co1">// Format the author info and store as a property of the</span></div></li><li class="li2"><div class="de2">                <span class="co1">// module object for use by Y.substitute</span></div></li><li class="li1"><div class="de1">                <span class="co1">// ('this' refers to the JSONPRequest object by default)</span></div></li><li class="li1"><div class="de1">                module.<span class="me1">authorHTML</span> <span class="sy0">=</span> Y.<span class="me1">substitute</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">authorTemplate</span><span class="sy0">,</span> author<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                outputDiv.<span class="me1">setContent</span><span class="br0">&#40;</span>Y.<span class="me1">substitute</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">moduleTemplate</span><span class="sy0">,</span> module<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="co1">// Add some flare to the poll interval by showing a &quot;time left&quot;</span></div></li><li class="li1"><div class="de1">                <span class="co1">// indicator via the header's border</span></div></li><li class="li1"><div class="de1">                Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out h4&quot;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">                    .<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;borderRightWidth&quot;</span><span class="sy0">,</span> <span class="st0">&quot;100px&quot;</span><span class="br0">&#41;</span></div></li><li class="li2"><div class="de2">                    .<span class="me1">transition</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                        borderRightWidth<span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                        duration<span class="sy0">:</span> <span class="nu0">7</span></div></li><li class="li1"><div class="de1">                    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                        <span class="kw1">if</span> <span class="br0">&#40;</span>gallery.<span class="me1">polling</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                            gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">                    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">            failure<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                gallery.<span class="me1">polling</span> <span class="sy0">=</span> <span class="kw2">false</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                outputDiv.<span class="me1">setContent</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">failureTemplate</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="co1">// Wire up the Try again button</span></div></li><li class="li2"><div class="de2">                outputDiv.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;button&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    gallery.<span class="me1">moduleTemplate</span> <span class="sy0">=</span></div></li><li class="li1"><div class="de1">        <span class="st0">'&lt;h4&gt;&lt;a href=&quot;{url}&quot;&gt;{title}&lt;/a&gt;&lt;/h4&gt;'</span> <span class="sy0">+</span></div></li><li class="li2"><div class="de2">        <span class="st0">'&lt;p class=&quot;author&quot;&gt;{authorHTML}&lt;/p&gt;'</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">'&lt;div&gt;{summary}&lt;/div&gt;'</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    gallery.<span class="me1">authorTemplate</span> <span class="sy0">=</span></div></li><li class="li1"><div class="de1">        <span class="st0">'&lt;img src=&quot;{icon}&quot; height=&quot;30&quot; width=&quot;30&quot;&gt;'</span> <span class="sy0">+</span></div></li><li class="li2"><div class="de2">        <span class="st0">' {fullname} &lt;span class=&quot;rank&quot;&gt;({rank})&lt;/span&gt;'</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    gallery.<span class="me1">failureTemplate</span> <span class="sy0">=</span></div></li><li class="li1"><div class="de1">        <span class="st0">'&lt;p class=&quot;error&quot;&gt;Ack, I couldn<span class="es0">\'</span>t reach the Gallery web service!&lt;/p&gt;'</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">'&lt;button&gt;Try again&lt;/button&gt;'</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    gallery.<span class="me1">polling</span> <span class="sy0">=</span> <span class="kw2">false</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Click the button to send the JSONP request</span></div></li><li class="li2"><div class="de2">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#start&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>gallery.<span class="me1">polling</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            gallery.<span class="me1">polling</span> <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#stop&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        gallery.<span class="me1">polling</span> <span class="sy0">=</span> <span class="kw2">false</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;jsonp&quot;</span><span class="sy0">,</span> <span class="st0">&quot;substitute&quot;</span><span class="sy0">,</span> <span class="st0">&quot;transition&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="kw2">var</span> url <span class="sy0">=</span> <span class="st0">&quot;http://yuilibrary.com/gallery/api/random?callback={callback}&quot;</span><span class="sy0">,</span>
+        outputDiv <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        gallery<span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Using the configuration object syntax</span>
+    gallery <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">JSONPRequest</span><span class="br0">&#40;</span>url<span class="sy0">,</span> <span class="br0">&#123;</span>
+        on<span class="sy0">:</span> <span class="br0">&#123;</span>
+            success<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>response<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="kw2">var</span> module <span class="sy0">=</span> response.<span class="me1">modules</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="sy0">,</span>
+                    author <span class="sy0">=</span> module.<span class="me1">owner</span><span class="sy0">;</span>
+&nbsp;
+                <span class="co1">// Some users don't have a rank</span>
+                <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>author.<span class="me1">rank</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    author.<span class="me1">rank</span> <span class="sy0">=</span> <span class="st0">&quot;user&quot;</span><span class="sy0">;</span>
+                <span class="br0">&#125;</span>
+&nbsp;
+                <span class="co1">// Format the author info and store as a property of the</span>
+                <span class="co1">// module object for use by Y.substitute</span>
+                <span class="co1">// ('this' refers to the JSONPRequest object by default)</span>
+                module.<span class="me1">authorHTML</span> <span class="sy0">=</span> Y.<span class="me1">substitute</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">authorTemplate</span><span class="sy0">,</span> author<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+                outputDiv.<span class="me1">setContent</span><span class="br0">&#40;</span>Y.<span class="me1">substitute</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">moduleTemplate</span><span class="sy0">,</span> module<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+                <span class="co1">// Add some flare to the poll interval by showing a &quot;time left&quot;</span>
+                <span class="co1">// indicator via the header's border</span>
+                Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#out h4&quot;</span><span class="br0">&#41;</span>
+                    .<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;borderRightWidth&quot;</span><span class="sy0">,</span> <span class="st0">&quot;100px&quot;</span><span class="br0">&#41;</span>
+                    .<span class="me1">transition</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+                        borderRightWidth<span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+                        duration<span class="sy0">:</span> <span class="nu0">7</span>
+                    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                        <span class="kw1">if</span> <span class="br0">&#40;</span>gallery.<span class="me1">polling</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                            gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                        <span class="br0">&#125;</span>
+                    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+            failure<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                gallery.<span class="me1">polling</span> <span class="sy0">=</span> <span class="kw2">false</span><span class="sy0">;</span>
+                outputDiv.<span class="me1">setContent</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">failureTemplate</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+                <span class="co1">// Wire up the Try again button</span>
+                outputDiv.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;button&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    gallery.<span class="me1">moduleTemplate</span> <span class="sy0">=</span>
+        <span class="st0">'&lt;h4&gt;&lt;a href=&quot;{url}&quot;&gt;{title}&lt;/a&gt;&lt;/h4&gt;'</span> <span class="sy0">+</span>
+        <span class="st0">'&lt;p class=&quot;author&quot;&gt;{authorHTML}&lt;/p&gt;'</span> <span class="sy0">+</span>
+        <span class="st0">'&lt;div&gt;{summary}&lt;/div&gt;'</span><span class="sy0">;</span>
+&nbsp;
+    gallery.<span class="me1">authorTemplate</span> <span class="sy0">=</span>
+        <span class="st0">'&lt;img src=&quot;{icon}&quot; height=&quot;30&quot; width=&quot;30&quot;&gt;'</span> <span class="sy0">+</span>
+        <span class="st0">' {fullname} &lt;span class=&quot;rank&quot;&gt;({rank})&lt;/span&gt;'</span><span class="sy0">;</span>
+&nbsp;
+    gallery.<span class="me1">failureTemplate</span> <span class="sy0">=</span>
+        <span class="st0">'&lt;p class=&quot;error&quot;&gt;Ack, I couldn<span class="es0">\'</span>t reach the Gallery web service!&lt;/p&gt;'</span> <span class="sy0">+</span>
+        <span class="st0">'&lt;button&gt;Try again&lt;/button&gt;'</span><span class="sy0">;</span>
+&nbsp;
+    gallery.<span class="me1">polling</span> <span class="sy0">=</span> <span class="kw2">false</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="co1">// Click the button to send the JSONP request</span>
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#start&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>gallery.<span class="me1">polling</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            gallery.<span class="me1">polling</span> <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span>
+            gallery.<span class="me1">send</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#stop&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        gallery.<span class="me1">polling</span> <span class="sy0">=</span> <span class="kw2">false</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;</pre></div><textarea id="syntax-bb9e7cee965cb98f70324a4dbcc9056c-plain">YUI().use("jsonp", "substitute", "transition", function (Y) {
+
+    var url = "http://yuilibrary.com/gallery/api/random?callback={callback}",
+        outputDiv = Y.one("#out"),
+        gallery;
+        
+    // Using the configuration object syntax
+    gallery = new Y.JSONPRequest(url, {
+        on: {
+            success: function (response) {
+                var module = response.modules[0],
+                    author = module.owner;
+
+                // Some users don't have a rank
+                if (!author.rank) {
+                    author.rank = "user";
+                }
+
+                // Format the author info and store as a property of the
+                // module object for use by Y.substitute
+                // ('this' refers to the JSONPRequest object by default)
+                module.authorHTML = Y.substitute(this.authorTemplate, author);
+
+                outputDiv.setContent(Y.substitute(this.moduleTemplate, module));
+
+                // Add some flare to the poll interval by showing a "time left"
+                // indicator via the header's border
+                Y.one("#out h4")
+                    .setStyle("borderRightWidth", "100px")
+                    .transition({
+                        borderRightWidth: 0,
+                        duration: 7
+                    }, function () {
+                        if (gallery.polling) {
+                            gallery.send();
+                        }
+                    });
+            },
+
+            failure: function () {
+                gallery.polling = false;
+                outputDiv.setContent(this.failureTemplate);
+
+                // Wire up the Try again button
+                outputDiv.one("button").on("click", function () {
+                    gallery.send();
+                });
+            }
+        }
+    });
+
+
+    gallery.moduleTemplate =
+        '<h4><a href="{url}">{title}</a></h4>' +
+        '<p class="author">{authorHTML}</p>' +
+        '<div>{summary}</div>';
+
+    gallery.authorTemplate =
+        '<img src="{icon}" height="30" width="30">' +
+        ' {fullname} <span class="rank">({rank})</span>';
+
+    gallery.failureTemplate =
+        '<p class="error">Ack, I couldn\'t reach the Gallery web service!</p>' +
+        '<button>Try again</button>';
+
+    gallery.polling = false;
+
+
+    // Click the button to send the JSONP request
+    Y.one("#start").on("click", function (e) {
+        if (!gallery.polling) {
+            gallery.polling = true;
+            gallery.send();
+        }
+    });
+
+    Y.one("#stop").on("click", function (e) {
+        gallery.polling = false;
+    });
+
+});
+</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    JSONP Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../jsonp/jsonp_github.html'>Getting cross domain JSON data using Y.jsonp()</a></li><li class='selected'><a href='../jsonp/jsonp_gallery.html'>Reusing a JSONPRequest instance to poll a remote server</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More JSONP Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/jsonp/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_jsonp.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="selected "><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

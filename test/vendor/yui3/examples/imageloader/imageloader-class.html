@@ -1,0 +1,236 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: ImageLoader: Using ImageLoader with CSS Class Names</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+
+<!--there is no custom header content for this example-->
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-debug.js"></script>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: ImageLoader: Using ImageLoader with CSS Class Names</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>ImageLoader: Using ImageLoader with CSS Class Names</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>The <a href="http://developer.yahoo.com/yui/imageloader/">ImageLoader Utility</a> allows you an alternate method of using CSS class names to load images.</p>
+
+<p>Hover over each image to show its triggers and limit. Try tripping the triggers to see the load reactions. Refresh the page to reset the images.</p>
+
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="imageloader-class_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<style>
+
+.everything { position:relative; height:420px; }
+.everything div { border:1px solid #888; }
+.topmain { position:absolute; top:10px; left:120px; height:75px; width:100px; }
+.duo1 { position:absolute; top:130px; left:20px; height:67px; width:100px; }
+.duo2 { position:absolute; top:130px; left:220px; height:53px; width:100px; }
+.scroll { position:absolute; top:320px; left:120px; height:72px; width:100px; }
+
+.yui3-imgload-maingroup,
+.yui3-imgload-duogroup,
+.yui3-imgload-scrollgroup
+	{ background:none !important; }
+
+</style>
+
+
+<div class='everything' id='everything'>
+	<div class='topmain yui3-imgload-maingroup' id='topmain' style='background-image:url("http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/museum.jpg");' title='group 1; mouseover image; 2 sec limit'></div>
+	<div class='duo1 yui3-imgload-duogroup' id='duo1' style='background-image:url("http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/uluru.jpg");' title='group 2; mouseover left image, or click on right image; 4 sec limit'></div>
+	<div class='duo2 yui3-imgload-duogroup' id='duo2' style='background-image:url("http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/katatjuta.jpg");' title='group 2; mouseover left image, or click on right image; 4 sec limit'></div>
+	<div class='scroll' title='group 3; scroll; no time limit'>
+		<img id='scrollImg' class='yui3-imgload-scrollgroup' style='background-image:url("http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/morraine.jpg");' src='http://l.yimg.com/a/i/us/tr/b/1px_trans.gif' width='100' height='72' />
+	</div>
+</div>
+
+
+<script>
+
+YUI({filter:"debug", logInclude: {imageloader:true, example:true}}).use("imageloader", function(Y) {
+
+	var mainGroup = new Y.ImgLoadGroup({ name: 'group 1', timeLimit: 2, className: 'yui3-imgload-maingroup' });
+	mainGroup.addTrigger('#topmain', 'mouseover');
+
+	var duoGroup = new Y.ImgLoadGroup({ name: 'group 2', timeLimit: 4, className: 'yui3-imgload-duogroup' });
+	duoGroup.addTrigger('#duo1', 'mouseover').addTrigger('#duo2', 'click');
+
+	var scrollGroup = new Y.ImgLoadGroup({ name: 'group 3', className: 'yui3-imgload-scrollgroup' });
+	scrollGroup.addTrigger(window, 'scroll');
+
+});
+
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h2 class='first'>Using CSS Class Names to Load Images</h2>
+
+<p>Look familiar? These are the same images and triggers as the Basic Features example (with the weather image omitted). The only difference is the manner in which we're loading the images on the back end.</p>
+
+<p>Insead of registering specific image ids/URLs with a group, you can simply tag the group with a CSS class. The group will later use this class name to identify which DOM elements belong to the group. Each group should have one corresponding class. Each class must have a <code>background:none</code> CSS definition at the top of the page, as in this example:</p>
+
+<div id="syntax-e1abaedeb95823477da981db9e094f77" class="yui-syntax-highlight"><div class="numbers"><pre class="css" style="font-family:monospace;"><ol><li class="li1"><div class="de1">.yui3-imgload-maingroup<span class="sy0">,</span></div></li><li class="li1"><div class="de1">.yui3-imgload-duogroup<span class="sy0">,</span></div></li><li class="li1"><div class="de1"><span class="re1">.yui3-imgload-scrollgroup</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#123;</span> <span class="kw1">background</span><span class="sy0">:</span><span class="kw2">none</span> !important<span class="sy0">;</span> <span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="css" style="font-family:monospace;">.yui3-imgload-maingroup<span class="sy0">,</span>
+.yui3-imgload-duogroup<span class="sy0">,</span>
+<span class="re1">.yui3-imgload-scrollgroup</span>
+	<span class="br0">&#123;</span> <span class="kw1">background</span><span class="sy0">:</span><span class="kw2">none</span> !important<span class="sy0">;</span> <span class="br0">&#125;</span></pre></div><textarea id="syntax-e1abaedeb95823477da981db9e094f77-plain">.yui3-imgload-maingroup,
+.yui3-imgload-duogroup,
+.yui3-imgload-scrollgroup
+	{ background:none !important; }</textarea></div>
+<p>Here is the HTML for the images:</p>
+
+<div id="syntax-a6be24bac53ab51ec5ac1f04c3bce6a8" class="yui-syntax-highlight"><div class="numbers"><pre class="html4strict" style="font-family:monospace;"><ol><li class="li1"><div class="de1">	<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">'topmain yui-imgload-maingroup'</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">'topmain'</span> <span class="kw3">style</span><span class="sy0">=</span><span class="st0">'background-image:url(&quot;http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/museum.jpg&quot;);'</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">	<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">'duo1 yui-imgload-duogroup'</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">'duo1'</span> <span class="kw3">style</span><span class="sy0">=</span><span class="st0">'background-image:url(&quot;http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/uluru.jpg&quot;);'</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">	<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">'duo2 yui-imgload-duogroup'</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">'duo2'</span> <span class="kw3">style</span><span class="sy0">=</span><span class="st0">'background-image:url(&quot;http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/katatjuta.jpg&quot;);'</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">	<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">'scroll'</span>&gt;</span></div></li><li class="li2"><div class="de2">		<span class="sc2">&lt;<span class="kw2">img</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">'scrollImg'</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">'yui-imgload-scrollgroup'</span> <span class="kw3">style</span><span class="sy0">=</span><span class="st0">'background-image:url(&quot;http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/morraine.jpg&quot;);'</span> <span class="kw3">src</span><span class="sy0">=</span><span class="st0">'http://l.yimg.com/a/i/us/tr/b/1px_trans.gif'</span> <span class="kw3">width</span><span class="sy0">=</span><span class="st0">'100'</span> <span class="kw3">height</span><span class="sy0">=</span><span class="st0">'72'</span> <span class="sy0">/</span>&gt;</span></div></li><li class="li1"><div class="de1">	<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="html4strict" style="font-family:monospace;">	<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">'topmain yui-imgload-maingroup'</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">'topmain'</span> <span class="kw3">style</span><span class="sy0">=</span><span class="st0">'background-image:url(&quot;http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/museum.jpg&quot;);'</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+	<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">'duo1 yui-imgload-duogroup'</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">'duo1'</span> <span class="kw3">style</span><span class="sy0">=</span><span class="st0">'background-image:url(&quot;http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/uluru.jpg&quot;);'</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+	<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">'duo2 yui-imgload-duogroup'</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">'duo2'</span> <span class="kw3">style</span><span class="sy0">=</span><span class="st0">'background-image:url(&quot;http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/katatjuta.jpg&quot;);'</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+	<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">'scroll'</span>&gt;</span>
+		<span class="sc2">&lt;<span class="kw2">img</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">'scrollImg'</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">'yui-imgload-scrollgroup'</span> <span class="kw3">style</span><span class="sy0">=</span><span class="st0">'background-image:url(&quot;http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/morraine.jpg&quot;);'</span> <span class="kw3">src</span><span class="sy0">=</span><span class="st0">'http://l.yimg.com/a/i/us/tr/b/1px_trans.gif'</span> <span class="kw3">width</span><span class="sy0">=</span><span class="st0">'100'</span> <span class="kw3">height</span><span class="sy0">=</span><span class="st0">'72'</span> <span class="sy0">/</span>&gt;</span>
+	<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></pre></div><textarea id="syntax-a6be24bac53ab51ec5ac1f04c3bce6a8-plain">	<div class='topmain yui-imgload-maingroup' id='topmain' style='background-image:url("http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/museum.jpg");'></div>
+	<div class='duo1 yui-imgload-duogroup' id='duo1' style='background-image:url("http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/uluru.jpg");'></div>
+	<div class='duo2 yui-imgload-duogroup' id='duo2' style='background-image:url("http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/katatjuta.jpg");'></div>
+	<div class='scroll'>
+		<img id='scrollImg' class='yui-imgload-scrollgroup' style='background-image:url("http://developer.yahoo.com/yui/docs/assets/examples/exampleimages/small/morraine.jpg");' src='http://l.yimg.com/a/i/us/tr/b/1px_trans.gif' width='100' height='72' />
+	</div></textarea></div>
+<p>A few things to note. First, the images have class names matching those in the style definitions above.</p>
+
+<p>Second, the image URL is set in the <code>background-image</code> of the elements. The <code>background:none</code> defined earlier in the CSS will be removed by the ImageLoader Utility JavaScript when the images are eventually loaded.</p>
+
+<p>Third, since the <code>&lt;img&gt;</code> element displays its images through the <code>background-image</code>, its size won't change when the image is loaded. Therefore the <code>width</code>/<code>height</code> needs to be set in the HTML. And since that gives the image a substantial size, the browsers would show a missing-image icon if the <code>src</code> attribute were not specified. Therefore we need to set one; a transparent one so that the background image will show through.</p>
+
+<p>This brings up an important limitation with this approach: you cannot alter the natural size of the image. Because the image is displayed as a background image, the browser will not resize the image according to the <code>width</code>/<code>height</code> of the <code>&lt;img&gt;</code> element.</p>
+
+<p>Now let's turn to the JavaScript. Since the image URLs are already specified in the HTML, we don't need them in the JS. All each group needs to know is the CSS class name that will identify the images.</p>
+
+<div id="syntax-61885b5b8d4d1b241f37b8bcb0b794b1" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> mainGroup <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">ImgLoadGroup</span><span class="br0">&#40;</span><span class="br0">&#123;</span> <span class="kw3">name</span><span class="sy0">:</span> <span class="st0">'group 1'</span><span class="sy0">,</span> timeLimit<span class="sy0">:</span> <span class="nu0">2</span><span class="sy0">,</span> className<span class="sy0">:</span> <span class="st0">'yui-imgload-maingroup'</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">mainGroup.<span class="me1">addTrigger</span><span class="br0">&#40;</span><span class="st0">'#topmain'</span><span class="sy0">,</span> <span class="st0">'mouseover'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">var</span> duoGroup <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">ImgLoadGroup</span><span class="br0">&#40;</span><span class="br0">&#123;</span> <span class="kw3">name</span><span class="sy0">:</span> <span class="st0">'group 2'</span><span class="sy0">,</span> timeLimit<span class="sy0">:</span> <span class="nu0">4</span><span class="sy0">,</span> className<span class="sy0">:</span> <span class="st0">'yui-imgload-duogroup'</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">duoGroup.<span class="me1">addTrigger</span><span class="br0">&#40;</span><span class="st0">'#duo1'</span><span class="sy0">,</span> <span class="st0">'mouseover'</span><span class="br0">&#41;</span>.<span class="me1">addTrigger</span><span class="br0">&#40;</span><span class="st0">'#duo2'</span><span class="sy0">,</span> <span class="st0">'click'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">var</span> scrollGroup <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">ImgLoadGroup</span><span class="br0">&#40;</span><span class="br0">&#123;</span> <span class="kw3">name</span><span class="sy0">:</span> <span class="st0">'group 3'</span><span class="sy0">,</span> className<span class="sy0">:</span> <span class="st0">'yui-imgload-scrollgroup'</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">scrollGroup.<span class="me1">addTrigger</span><span class="br0">&#40;</span>window<span class="sy0">,</span> <span class="st0">'scroll'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> mainGroup <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">ImgLoadGroup</span><span class="br0">&#40;</span><span class="br0">&#123;</span> <span class="kw3">name</span><span class="sy0">:</span> <span class="st0">'group 1'</span><span class="sy0">,</span> timeLimit<span class="sy0">:</span> <span class="nu0">2</span><span class="sy0">,</span> className<span class="sy0">:</span> <span class="st0">'yui-imgload-maingroup'</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+mainGroup.<span class="me1">addTrigger</span><span class="br0">&#40;</span><span class="st0">'#topmain'</span><span class="sy0">,</span> <span class="st0">'mouseover'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw2">var</span> duoGroup <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">ImgLoadGroup</span><span class="br0">&#40;</span><span class="br0">&#123;</span> <span class="kw3">name</span><span class="sy0">:</span> <span class="st0">'group 2'</span><span class="sy0">,</span> timeLimit<span class="sy0">:</span> <span class="nu0">4</span><span class="sy0">,</span> className<span class="sy0">:</span> <span class="st0">'yui-imgload-duogroup'</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+duoGroup.<span class="me1">addTrigger</span><span class="br0">&#40;</span><span class="st0">'#duo1'</span><span class="sy0">,</span> <span class="st0">'mouseover'</span><span class="br0">&#41;</span>.<span class="me1">addTrigger</span><span class="br0">&#40;</span><span class="st0">'#duo2'</span><span class="sy0">,</span> <span class="st0">'click'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw2">var</span> scrollGroup <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">ImgLoadGroup</span><span class="br0">&#40;</span><span class="br0">&#123;</span> <span class="kw3">name</span><span class="sy0">:</span> <span class="st0">'group 3'</span><span class="sy0">,</span> className<span class="sy0">:</span> <span class="st0">'yui-imgload-scrollgroup'</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+scrollGroup.<span class="me1">addTrigger</span><span class="br0">&#40;</span>window<span class="sy0">,</span> <span class="st0">'scroll'</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-61885b5b8d4d1b241f37b8bcb0b794b1-plain">var mainGroup = new Y.ImgLoadGroup({ name: 'group 1', timeLimit: 2, className: 'yui-imgload-maingroup' });
+mainGroup.addTrigger('#topmain', 'mouseover');
+
+var duoGroup = new Y.ImgLoadGroup({ name: 'group 2', timeLimit: 4, className: 'yui-imgload-duogroup' });
+duoGroup.addTrigger('#duo1', 'mouseover').addTrigger('#duo2', 'click');
+
+var scrollGroup = new Y.ImgLoadGroup({ name: 'group 3', className: 'yui-imgload-scrollgroup' });
+scrollGroup.addTrigger(window, 'scroll');</textarea></div>
+<p>Note that you are free to combine this class-name approach with the other. The same group can have some images identified by class name and others by registering ids/URLs.</p>
+				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    ImageLoader Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../imageloader/imageloader-basics.html'>Basic Features of the ImageLoader Utility</a></li><li><a href='../imageloader/imageloader-fold.html'>Loading Images Below the Fold</a></li><li class='selected'><a href='../imageloader/imageloader-class.html'>Using ImageLoader with CSS Class Names</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More ImageLoader Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/imageloader/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_imageloader.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="selected "><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {filter:"debug", logInclude: {imageloader:true, example:true}};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

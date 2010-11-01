@@ -1,0 +1,1229 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Widget: Creating a simple Tooltip widget</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+    .yui3-tooltip {
+        position:absolute;
+    }
+
+    .yui3-tooltip-content {
+        color: #000;
+        padding: 2px 5px;
+        border-color: #D4C237 #A6982B #A6982B #A6982B;
+        border-width: 1px;
+        border-style: solid;
+        background-color: #FFEE69;
+    }
+
+    .yui3-tooltip-hidden {
+        visibility:hidden;
+    }
+
+    div.yui3-hastooltip {
+        border:1px solid #243356;
+        background-color:#406ED9;
+        color:#ffffff;
+        width:25em;
+        margin:20px 0px;
+        padding:5px;
+        cursor:default;
+    }
+
+    div.yui3-hastooltip span {
+        font-style:italic;
+        font-weight:bold;
+        color:#ABCEFF;
+    }
+
+    .yui3-tooltip-content strong {
+        font-weight:bold;
+    }
+</style>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Widget: Creating a simple Tooltip widget</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Widget: Creating a simple Tooltip widget</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	This is an advanced example, in which we create a Tooltip widget, by extending the base <code>Widget</code> class, and adding <code>WidgetStack</code> and <code>WidgetPosition</code> extensions, through <code>Base.build</code>.	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="widget-tooltip_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div id="delegate">
+    <div class="yui3-hastooltip" title="Tooltip 1" id="tt1">Tooltip One <span>(content from title)</span></div>
+    <div class="yui3-hastooltip" title="Tooltip 2" id="tt2">Tooltip Two <span>(content set in event listener)</span></div>
+    <div class="yui3-hastooltip" title="Tooltip 3" id="tt3">Tooltip Three <span>(content from lookup)</span></div>
+    <div class="yui3-hastooltip" title="Tooltip 4" id="tt4">Tooltip Four <span>(content from title)</span></div>
+    <label><input type="checkbox" id="prevent" /> Prevent Tooltip Four</label>
+</div>
+
+<script type="text/javascript">
+YUI().use("event-mouseenter", "widget", "widget-position", "widget-stack", function(Y) {
+    var Lang = Y.Lang,
+        Node = Y.Node,
+        OX = -10000,
+        OY = -10000;
+
+    var Tooltip = Y.Base.create("tooltip", Y.Widget, [Y.WidgetPosition, Y.WidgetStack], {
+
+        // PROTOTYPE METHODS/PROPERTIES
+
+        /*
+         * Initialization Code: Sets up privately used state
+         * properties, and publishes the events Tooltip introduces
+         */
+        initializer : function(config) {
+
+            this._triggerClassName = this.getClassName("trigger");
+
+            // Currently bound trigger node information
+            this._currTrigger = {
+                node: null,
+                title: null,
+                mouseX: Tooltip.OFFSCREEN_X,
+                mouseY: Tooltip.OFFSCREEN_Y
+            };
+
+            // Event handles - mouse over is set on the delegate
+            // element, mousemove and mouseleave are set on the trigger node
+            this._eventHandles = {
+                delegate: null,
+                trigger: {
+                    mouseMove : null,
+                    mouseOut: null
+                }
+            };
+
+            // Show/hide timers
+            this._timers = {
+                show: null,
+                hide: null
+            };
+
+            // Publish events introduced by Tooltip. Note the triggerEnter event is preventable,
+            // with the default behavior defined in the _defTriggerEnterFn method 
+            this.publish("triggerEnter", {defaultFn: this._defTriggerEnterFn, preventable:true});
+            this.publish("triggerLeave", {preventable:false});
+        },
+
+        /*
+         * Destruction Code: Clears event handles, timers,
+         * and current trigger information
+         */
+        destructor : function() {
+            this._clearCurrentTrigger();
+            this._clearTimers();
+            this._clearHandles();
+        },
+
+        /*
+         * bindUI is used to bind attribute change and dom event
+         * listeners
+         */
+        bindUI : function() {
+            this.after("delegateChange", this._afterSetDelegate);
+            this.after("nodesChange", this._afterSetNodes);
+
+            this._bindDelegate();
+        },
+
+        /*
+         * syncUI is used to update the rendered DOM, based on the current
+         * Tooltip state
+         */
+        syncUI : function() {
+            this._uiSetNodes(this.get("triggerNodes"));
+        },
+
+        /*
+         * Public method, which can be used by triggerEvent event listeners
+         * to set the content of the tooltip for the current trigger node
+         */
+        setTriggerContent : function(content) {
+            var contentBox = this.get("contentBox");
+            contentBox.set("innerHTML", "");
+
+            if (content) {
+                if (content instanceof Node) {
+                    for (var i = 0, l = content.size(); i < l; ++i) {
+                        contentBox.appendChild(content.item(i));
+                    }
+                } else if (Lang.isString(content)) {
+                    contentBox.set("innerHTML", content);
+                }
+            }
+        },
+
+        /*
+         * Default attribute change listener for 
+         * the triggerNodes attribute
+         */
+        _afterSetNodes : function(e) {
+            this._uiSetNodes(e.newVal);
+        },
+
+        /*
+         * Default attribute change listener for 
+         * the delegate attribute
+         */
+        _afterSetDelegate : function(e) {
+            this._bindDelegate(e.newVal);
+        },
+
+        /*
+         * Updates the rendered DOM to reflect the
+         * set of trigger nodes passed in
+         */
+        _uiSetNodes : function(nodes) {
+            if (this._triggerNodes) {
+                this._triggerNodes.removeClass(this._triggerClassName);
+            }
+
+            if (nodes) {
+                this._triggerNodes = nodes;
+                this._triggerNodes.addClass(this._triggerClassName);
+            }
+        },
+
+        /*
+         * Attaches the default mouseover DOM listener to the 
+         * current delegate node
+         */
+        _bindDelegate : function() {
+            var eventHandles = this._eventHandles;
+
+            if (eventHandles.delegate) {
+                eventHandles.delegate.detach();
+                eventHandles.delegate = null;
+            }
+            eventHandles.delegate = Y.delegate("mouseenter", Y.bind(this._onNodeMouseEnter, this), this.get("delegate"), "." + this._triggerClassName);
+        },
+
+        /*
+         * Default mouse enter DOM event listener.
+         * 
+         * Delegates to the _enterTrigger method,
+         * if the mouseover enters a trigger node.
+         */
+        _onNodeMouseEnter : function(e) {
+            var node = e.currentTarget;
+            if (node && (!this._currTrigger.node || !node.compareTo(this._currTrigger.node))) {
+                this._enterTrigger(node, e.pageX, e.pageY);
+            }
+        },
+
+        /*
+         * Default mouse leave DOM event listener
+         * 
+         * Delegates to _leaveTrigger if the mouse
+         * leaves the current trigger node
+         */
+        _onNodeMouseLeave : function(e) {
+            this._leaveTrigger(e.currentTarget);
+        },
+
+        /*
+         * Default mouse move DOM event listener
+         */
+        _onNodeMouseMove : function(e) {
+            this._overTrigger(e.pageX, e.pageY);
+        },
+
+        /*
+         * Default handler invoked when the mouse enters
+         * a trigger node. Fires the triggerEnter
+         * event which can be prevented by listeners to 
+         * show the tooltip from being displayed.
+         */
+        _enterTrigger : function(node, x, y) {
+            this._setCurrentTrigger(node, x, y);
+            this.fire("triggerEnter", {node:node, pageX:x, pageY:y});
+        },
+
+        /*
+         * Default handler for the triggerEvent event,
+         * which will setup the timer to display the tooltip,
+         * if the default handler has not been prevented.
+         */
+        _defTriggerEnterFn : function(e) {
+            var node = e.node;
+            if (!this.get("disabled")) {
+                this._clearTimers();
+                var delay = (this.get("visible")) ? 0 : this.get("showDelay");
+                this._timers.show = Y.later(delay, this, this._showTooltip, [node]);
+            }
+        },
+
+        /*
+         * Default handler invoked when the mouse leaves
+         * the current trigger node. Fires the triggerLeave
+         * event and sets up the hide timer
+         */
+        _leaveTrigger : function(node) {
+            this.fire("triggerLeave");
+
+            this._clearCurrentTrigger();
+            this._clearTimers();
+
+            this._timers.hide = Y.later(this.get("hideDelay"), this, this._hideTooltip);
+        },
+
+        /*
+         * Default handler invoked for mousemove events
+         * on the trigger node. Stores the current mouse 
+         * x, y positions
+         */
+        _overTrigger : function(x, y) {
+            this._currTrigger.mouseX = x;
+            this._currTrigger.mouseY = y;
+        },
+
+        /*
+         * Shows the tooltip, after moving it to the current mouse
+         * position.
+         */
+        _showTooltip : function(node) {
+            var x = this._currTrigger.mouseX;
+            var y = this._currTrigger.mouseY;
+
+            this.move(x + Tooltip.OFFSET_X, y + Tooltip.OFFSET_Y);
+
+            this.show();
+            this._clearTimers();
+
+            this._timers.hide = Y.later(this.get("autoHideDelay"), this, this._hideTooltip);
+        },
+
+        /*
+         * Hides the tooltip, after clearing existing timers.
+         */
+        _hideTooltip : function() {
+            this._clearTimers();
+            this.hide();
+        },
+
+        /*
+         * Set the rendered content of the tooltip for the current
+         * trigger, based on (in order of precedence):
+         * 
+         * a). The string/node content attribute value
+         * b). From the content lookup map if it is set, or 
+         * c). From the title attribute if set.
+         */
+        _setTriggerContent : function(node) {
+            var content = this.get("content");
+            if (content && !(content instanceof Node || Lang.isString(content))) {
+                content = content[node.get("id")] || node.getAttribute("title");
+            }
+            this.setTriggerContent(content);
+        },
+
+        /*
+         * Set the currently bound trigger node information, clearing 
+         * out the title attribute if set and setting up mousemove/out 
+         * listeners.
+         */
+        _setCurrentTrigger : function(node, x, y) {
+
+            var currTrigger = this._currTrigger,
+                triggerHandles = this._eventHandles.trigger;
+
+            this._setTriggerContent(node);
+
+            triggerHandles.mouseMove = Y.on("mousemove", Y.bind(this._onNodeMouseMove, this), node);
+            triggerHandles.mouseOut = Y.on("mouseleave", Y.bind(this._onNodeMouseLeave, this), node);
+
+            var title = node.getAttribute("title");
+            node.setAttribute("title", "");
+
+            currTrigger.mouseX = x;
+            currTrigger.mouseY = y;
+            currTrigger.node = node;
+            currTrigger.title = title;
+        },
+
+        /*
+         * Clear out the current trigger state, restoring
+         * the title attribute on the trigger node, 
+         * if it was originally set.
+         */
+        _clearCurrentTrigger : function() {
+
+            var currTrigger = this._currTrigger,
+                triggerHandles = this._eventHandles.trigger;
+
+            if (currTrigger.node) {
+                var node = currTrigger.node;
+                var title = currTrigger.title || "";
+
+                currTrigger.node = null;
+                currTrigger.title = "";
+
+                triggerHandles.mouseMove.detach();
+                triggerHandles.mouseOut.detach();
+                triggerHandles.mouseMove = null;
+                triggerHandles.mouseOut = null;
+
+                node.setAttribute("title", title);
+            }
+        },
+
+        /*
+         * Cancel any existing show/hide timers
+         */
+        _clearTimers : function() {
+            var timers = this._timers;
+            if (timers.hide) {
+                timers.hide.cancel();
+                timers.hide = null;
+            }
+            if (timers.show) {
+              timers.show.cancel();
+              timers.show = null;
+            }
+        },
+
+        /*
+         * Detach any stored event handles
+         */
+        _clearHandles : function() {
+            var eventHandles = this._eventHandles;
+
+            if (eventHandles.delegate) {
+                this._eventHandles.delegate.detach();
+            }
+            if (eventHandles.trigger.mouseOut) {
+                eventHandles.trigger.mouseOut.detach();
+            }
+            if (eventHandles.trigger.mouseMove) {
+                eventHandles.trigger.mouseMove.detach();
+            }
+        }
+    }, {
+    
+        // STATIC METHODS/PROPERTIES
+       
+        OFFSET_X : 15,
+        OFFSET_Y : 15,
+        OFFSCREEN_X : OX,
+        OFFSCREEN_Y : OY,
+
+        ATTRS : {
+    
+            /* 
+             * The tooltip content. This can either be a fixed content value, 
+             * or a map of id-to-values, designed to be used when a single
+             * tooltip is mapped to multiple trigger elements.
+             */
+            content : {
+                value: null
+            },
+    
+            /* 
+             * The set of nodes to bind to the tooltip instance. Can be a string, 
+             * or a node instance.
+             */
+            triggerNodes : {
+                value: null,
+                setter: function(val) {
+                    if (val && Lang.isString(val)) {
+                        val = Node.all(val);
+                    }
+                    return val;
+                }
+            },
+    
+            /*
+             * The delegate node to which event listeners should be attached.
+             * This node should be an ancestor of all trigger nodes bound
+             * to the instance. By default the document is used.
+             */
+            delegate : {
+                value: null,
+                setter: function(val) {
+                    return Y.one(val) || Y.one("document");
+                }
+            },
+    
+            /*
+             * The time to wait, after the mouse enters the trigger node,
+             * to display the tooltip
+             */
+            showDelay : {
+                value:250
+            },
+    
+            /*
+             * The time to wait, after the mouse leaves the trigger node,
+             * to hide the tooltip
+             */
+            hideDelay : {
+                value:10
+            },
+    
+            /*
+             * The time to wait, after the tooltip is first displayed for 
+             * a trigger node, to hide it, if the mouse has not left the 
+             * trigger node
+             */
+            autoHideDelay : {
+                value:2000
+            },
+    
+            /*
+             * Override the default visibility set by the widget base class
+             */
+            visible : {
+                value:false
+            },
+    
+            /*
+             * Override the default XY value set by the widget base class,
+             * to position the tooltip offscreen
+             */
+            xy: {
+                value:[OX, OY]
+            }
+        }
+    });
+
+    var tt = new Tooltip({
+        triggerNodes:".yui3-hastooltip",
+        delegate: "#delegate",
+        content: {
+            tt3: "Tooltip 3 (from lookup)"
+        },
+        shim:false,
+        zIndex:2
+    });
+    tt.render();
+
+    tt.on("triggerEnter", function(e) {
+        var node = e.node;
+        if (node && node.get("id") == "tt2") {
+            this.setTriggerContent("Tooltip 2 (from triggerEvent)");
+        }
+    });
+
+    var prevent = Y.one("#prevent");
+    tt.on("triggerEnter", function(e) {
+        var node = e.node;
+        if (prevent.get("checked")) {
+            if (node && node.get("id") == "tt4") {
+                e.preventDefault();
+            }
+        }
+    });
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Creating A Tooltip Widget Class</h3>
+
+<h4>Basic Class Structure</h4>
+
+<p>As with the basic <a href="widget-extend.html">"Extending Widget"</a> example, the <code>Tooltip</code> class will extend the <code>Widget</code> base class and follows the same pattern we use for other classes which extend Base.</p>
+
+<p>Namely:</p>
+
+<ul>
+    <li>Set up the constructor to invoke the superclass constructor</li>
+    <li>Define a <code>NAME</code> property, to identify the class</li>
+    <li>Define the default attribute configuration, using the <code>ATTRS</code> property</li>
+    <li>Implement prototype methods</li>
+</ul>
+
+<p>This basic structure is shown below:</p>
+
+<div id="syntax-eb254cc335ab8859897b29f33f52f273" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="coMULTI">/* </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;*  Required NAME static field, used to identify the Widget class and </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;*  used as an event prefix, to generate class names etc. (set to the </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;*  class name in camel case). </span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;*/</span></div></li><li class="li1"><div class="de1">Tooltip.<span class="kw3">NAME</span> <span class="sy0">=</span> <span class="st0">&quot;tooltip&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co2">/* Default Tooltip Attributes */</span></div></li><li class="li1"><div class="de1">Tooltip.<span class="me1">ATTRS</span> <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="coMULTI">/* </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * The tooltip content. This can either be a fixed content value, </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * or a map of id-to-values, designed to be used when a single</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * tooltip is mapped to multiple trigger elements.</span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li1"><div class="de1">    content <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        value<span class="sy0">:</span> <span class="kw2">null</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="coMULTI">/* </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * The set of nodes to bind to the tooltip instance. Can be a string, </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * or a node instance.</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li1"><div class="de1">    triggerNodes <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        value<span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        setter<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">if</span> <span class="br0">&#40;</span>val <span class="sy0">&amp;&amp;</span> Lang.<span class="me1">isString</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                val <span class="sy0">=</span> Node.<span class="me1">all</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">            <span class="kw1">return</span> val<span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="coMULTI">/*</span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;    * The delegate node to which event listeners should be attached.</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * This node should be an ancestor of all trigger nodes bound</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * to the instance. By default the document is used.</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li1"><div class="de1">    delegate <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        value<span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        setter<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">return</span> Y.<span class="me1">one</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="sy0">||</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;document&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * The time to wait, after the mouse enters the trigger node,</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * to display the tooltip</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li2"><div class="de2">    showDelay <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        value<span class="sy0">:</span><span class="nu0">250</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="coMULTI">/*</span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;    * The time to wait, after the mouse leaves the trigger node,</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * to hide the tooltip</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li1"><div class="de1">    hideDelay <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        value<span class="sy0">:</span><span class="nu0">10</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * The time to wait, after the tooltip is first displayed for </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * a trigger node, to hide it, if the mouse has not left the </span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;    * trigger node</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li1"><div class="de1">    autoHideDelay <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        value<span class="sy0">:</span><span class="nu0">2000</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * Override the default visibility set by the widget base class</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li1"><div class="de1">    visible <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        value<span class="sy0">:</span><span class="kw2">false</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * Override the default XY value set by the widget base class,</span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;    * to position the tooltip offscreen</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li1"><div class="de1">    xy<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        value<span class="sy0">:</span><span class="br0">&#91;</span>Tooltip.<span class="me1">OFFSCREEN_X</span><span class="sy0">,</span> Tooltip.<span class="me1">OFFSCREEN_Y</span><span class="br0">&#93;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">Y.<span class="me1">extend</span><span class="br0">&#40;</span>Tooltip<span class="sy0">,</span> Y.<span class="me1">Widget</span><span class="sy0">,</span> <span class="br0">&#123;</span> </div></li><li class="li1"><div class="de1">    <span class="co1">// Prototype methods/properties</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="coMULTI">/* 
+ *  Required NAME static field, used to identify the Widget class and 
+ *  used as an event prefix, to generate class names etc. (set to the 
+ *  class name in camel case). 
+ */</span>
+Tooltip.<span class="kw3">NAME</span> <span class="sy0">=</span> <span class="st0">&quot;tooltip&quot;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co2">/* Default Tooltip Attributes */</span>
+Tooltip.<span class="me1">ATTRS</span> <span class="sy0">=</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="coMULTI">/* 
+     * The tooltip content. This can either be a fixed content value, 
+     * or a map of id-to-values, designed to be used when a single
+     * tooltip is mapped to multiple trigger elements.
+     */</span>
+    content <span class="sy0">:</span> <span class="br0">&#123;</span>
+        value<span class="sy0">:</span> <span class="kw2">null</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="coMULTI">/* 
+     * The set of nodes to bind to the tooltip instance. Can be a string, 
+     * or a node instance.
+     */</span>
+    triggerNodes <span class="sy0">:</span> <span class="br0">&#123;</span>
+        value<span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+        setter<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">if</span> <span class="br0">&#40;</span>val <span class="sy0">&amp;&amp;</span> Lang.<span class="me1">isString</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                val <span class="sy0">=</span> Node.<span class="me1">all</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+            <span class="kw1">return</span> val<span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="coMULTI">/*
+     * The delegate node to which event listeners should be attached.
+     * This node should be an ancestor of all trigger nodes bound
+     * to the instance. By default the document is used.
+     */</span>
+    delegate <span class="sy0">:</span> <span class="br0">&#123;</span>
+        value<span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+        setter<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">return</span> Y.<span class="me1">one</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="sy0">||</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;document&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="coMULTI">/*
+     * The time to wait, after the mouse enters the trigger node,
+     * to display the tooltip
+     */</span>
+    showDelay <span class="sy0">:</span> <span class="br0">&#123;</span>
+        value<span class="sy0">:</span><span class="nu0">250</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="coMULTI">/*
+     * The time to wait, after the mouse leaves the trigger node,
+     * to hide the tooltip
+     */</span>
+    hideDelay <span class="sy0">:</span> <span class="br0">&#123;</span>
+        value<span class="sy0">:</span><span class="nu0">10</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="coMULTI">/*
+     * The time to wait, after the tooltip is first displayed for 
+     * a trigger node, to hide it, if the mouse has not left the 
+     * trigger node
+     */</span>
+    autoHideDelay <span class="sy0">:</span> <span class="br0">&#123;</span>
+        value<span class="sy0">:</span><span class="nu0">2000</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="coMULTI">/*
+     * Override the default visibility set by the widget base class
+     */</span>
+    visible <span class="sy0">:</span> <span class="br0">&#123;</span>
+        value<span class="sy0">:</span><span class="kw2">false</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="coMULTI">/*
+     * Override the default XY value set by the widget base class,
+     * to position the tooltip offscreen
+     */</span>
+    xy<span class="sy0">:</span> <span class="br0">&#123;</span>
+        value<span class="sy0">:</span><span class="br0">&#91;</span>Tooltip.<span class="me1">OFFSCREEN_X</span><span class="sy0">,</span> Tooltip.<span class="me1">OFFSCREEN_Y</span><span class="br0">&#93;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+Y.<span class="me1">extend</span><span class="br0">&#40;</span>Tooltip<span class="sy0">,</span> Y.<span class="me1">Widget</span><span class="sy0">,</span> <span class="br0">&#123;</span> 
+    <span class="co1">// Prototype methods/properties</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-eb254cc335ab8859897b29f33f52f273-plain">/* 
+ *  Required NAME static field, used to identify the Widget class and 
+ *  used as an event prefix, to generate class names etc. (set to the 
+ *  class name in camel case). 
+ */
+Tooltip.NAME = "tooltip";
+
+/* Default Tooltip Attributes */
+Tooltip.ATTRS = {
+
+    /* 
+     * The tooltip content. This can either be a fixed content value, 
+     * or a map of id-to-values, designed to be used when a single
+     * tooltip is mapped to multiple trigger elements.
+     */
+    content : {
+        value: null
+    },
+
+    /* 
+     * The set of nodes to bind to the tooltip instance. Can be a string, 
+     * or a node instance.
+     */
+    triggerNodes : {
+        value: null,
+        setter: function(val) {
+            if (val && Lang.isString(val)) {
+                val = Node.all(val);
+            }
+            return val;
+        }
+    },
+
+    /*
+     * The delegate node to which event listeners should be attached.
+     * This node should be an ancestor of all trigger nodes bound
+     * to the instance. By default the document is used.
+     */
+    delegate : {
+        value: null,
+        setter: function(val) {
+            return Y.one(val) || Y.one("document");
+        }
+    },
+
+    /*
+     * The time to wait, after the mouse enters the trigger node,
+     * to display the tooltip
+     */
+    showDelay : {
+        value:250
+    },
+
+    /*
+     * The time to wait, after the mouse leaves the trigger node,
+     * to hide the tooltip
+     */
+    hideDelay : {
+        value:10
+    },
+
+    /*
+     * The time to wait, after the tooltip is first displayed for 
+     * a trigger node, to hide it, if the mouse has not left the 
+     * trigger node
+     */
+    autoHideDelay : {
+        value:2000
+    },
+
+    /*
+     * Override the default visibility set by the widget base class
+     */
+    visible : {
+        value:false
+    },
+
+    /*
+     * Override the default XY value set by the widget base class,
+     * to position the tooltip offscreen
+     */
+    xy: {
+        value:[Tooltip.OFFSCREEN_X, Tooltip.OFFSCREEN_Y]
+    }
+};
+
+Y.extend(Tooltip, Y.Widget, { 
+    // Prototype methods/properties
+});</textarea></div>
+<h4>Adding WidgetPosition and WidgetStack Extension Support</h4>
+
+<p>The Tooltip class also needs basic positioning and stacking (z-index, shimming) support. As with the <a href="widget-build.html">Custom Widget Classes</a> example, we use
+<code>Base.create</code> to create a new <code>Tooltip</code> class with this support:</p>
+
+<div id="syntax-07dcbeea3f70fa2fd29fd076b394bc62" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">   <span class="kw2">var</span> Tooltip <span class="sy0">=</span> Y.<span class="me1">Base</span>.<span class="me1">create</span><span class="br0">&#40;</span><span class="st0">&quot;tooltip&quot;</span><span class="sy0">,</span> Y.<span class="me1">Widget</span><span class="sy0">,</span> <span class="br0">&#91;</span>Y.<span class="me1">WidgetPosition</span><span class="sy0">,</span> Y.<span class="me1">WidgetStack</span><span class="br0">&#93;</span><span class="sy0">,</span> </div></li><li class="li1"><div class="de1">                                     <span class="br0">&#123;</span> ... <span class="me1">prototype</span> properties ... <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                                     <span class="br0">&#123;</span> ... <span class="me1">static</span> properties ... <span class="br0">&#125;</span><span class="sy0">,</span>  </div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">   <span class="kw2">var</span> Tooltip <span class="sy0">=</span> Y.<span class="me1">Base</span>.<span class="me1">create</span><span class="br0">&#40;</span><span class="st0">&quot;tooltip&quot;</span><span class="sy0">,</span> Y.<span class="me1">Widget</span><span class="sy0">,</span> <span class="br0">&#91;</span>Y.<span class="me1">WidgetPosition</span><span class="sy0">,</span> Y.<span class="me1">WidgetStack</span><span class="br0">&#93;</span><span class="sy0">,</span> 
+                                     <span class="br0">&#123;</span> ... <span class="me1">prototype</span> properties ... <span class="br0">&#125;</span><span class="sy0">,</span>
+                                     <span class="br0">&#123;</span> ... <span class="me1">static</span> properties ... <span class="br0">&#125;</span><span class="sy0">,</span>  </pre></div><textarea id="syntax-07dcbeea3f70fa2fd29fd076b394bc62-plain">   var Tooltip = Y.Base.create("tooltip", Y.Widget, [Y.WidgetPosition, Y.WidgetStack], 
+                                     { ... prototype properties ... },
+                                     { ... static properties ... },  </textarea></div>
+<h4>Lifecycle Methods: initializer, destructor</h4>
+
+<p>The <code>initializer</code> method is invoked during the <code>init</code> lifecycle phase, after the attributes are configured for each class. <code>Tooltip</code> uses it 
+to setup the private state variables it will use to store the trigger node currently being serviced by the tooltip instance, event handles and show/hide timers.</p>
+
+<div id="syntax-ccf50a080cbe79bba8421868bcebd42e" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">initializer <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>config<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._triggerClassName <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">getClassName</span><span class="br0">&#40;</span><span class="st0">&quot;trigger&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="co1">// Currently bound trigger node information</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._currTrigger <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        node<span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        title<span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        mouseX<span class="sy0">:</span> Tooltip.<span class="me1">OFFSCREEN_X</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        mouseY<span class="sy0">:</span> Tooltip.<span class="me1">OFFSCREEN_Y</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Event handles - mouse over is set on the delegate</span></div></li><li class="li1"><div class="de1">    <span class="co1">// element, mousemove and mouseleave are set on the trigger node</span></div></li><li class="li2"><div class="de2">    <span class="kw1">this</span>._eventHandles <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        delegate<span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        trigger<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            mouseMove <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            mouseOut<span class="sy0">:</span> <span class="kw2">null</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Show/hide timers</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._timers <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        show<span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        hide<span class="sy0">:</span> <span class="kw2">null</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Publish events introduced by Tooltip. Note the triggerEnter event is preventable,</span></div></li><li class="li2"><div class="de2">    <span class="co1">// with the default behavior defined in the _defTriggerEnterFn method </span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">publish</span><span class="br0">&#40;</span><span class="st0">&quot;triggerEnter&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span>defaultFn<span class="sy0">:</span> <span class="kw1">this</span>._defTriggerEnterFn<span class="sy0">,</span> preventable<span class="sy0">:</span><span class="kw2">true</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">publish</span><span class="br0">&#40;</span><span class="st0">&quot;triggerLeave&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span>preventable<span class="sy0">:</span><span class="kw2">false</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">initializer <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>config<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="kw1">this</span>._triggerClassName <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">getClassName</span><span class="br0">&#40;</span><span class="st0">&quot;trigger&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Currently bound trigger node information</span>
+    <span class="kw1">this</span>._currTrigger <span class="sy0">=</span> <span class="br0">&#123;</span>
+        node<span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+        title<span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+        mouseX<span class="sy0">:</span> Tooltip.<span class="me1">OFFSCREEN_X</span><span class="sy0">,</span>
+        mouseY<span class="sy0">:</span> Tooltip.<span class="me1">OFFSCREEN_Y</span>
+    <span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Event handles - mouse over is set on the delegate</span>
+    <span class="co1">// element, mousemove and mouseleave are set on the trigger node</span>
+    <span class="kw1">this</span>._eventHandles <span class="sy0">=</span> <span class="br0">&#123;</span>
+        delegate<span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+        trigger<span class="sy0">:</span> <span class="br0">&#123;</span>
+            mouseMove <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+            mouseOut<span class="sy0">:</span> <span class="kw2">null</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Show/hide timers</span>
+    <span class="kw1">this</span>._timers <span class="sy0">=</span> <span class="br0">&#123;</span>
+        show<span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+        hide<span class="sy0">:</span> <span class="kw2">null</span>
+    <span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Publish events introduced by Tooltip. Note the triggerEnter event is preventable,</span>
+    <span class="co1">// with the default behavior defined in the _defTriggerEnterFn method </span>
+    <span class="kw1">this</span>.<span class="me1">publish</span><span class="br0">&#40;</span><span class="st0">&quot;triggerEnter&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span>defaultFn<span class="sy0">:</span> <span class="kw1">this</span>._defTriggerEnterFn<span class="sy0">,</span> preventable<span class="sy0">:</span><span class="kw2">true</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw1">this</span>.<span class="me1">publish</span><span class="br0">&#40;</span><span class="st0">&quot;triggerLeave&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span>preventable<span class="sy0">:</span><span class="kw2">false</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-ccf50a080cbe79bba8421868bcebd42e-plain">initializer : function(config) {
+
+    this._triggerClassName = this.getClassName("trigger");
+
+    // Currently bound trigger node information
+    this._currTrigger = {
+        node: null,
+        title: null,
+        mouseX: Tooltip.OFFSCREEN_X,
+        mouseY: Tooltip.OFFSCREEN_Y
+    };
+
+    // Event handles - mouse over is set on the delegate
+    // element, mousemove and mouseleave are set on the trigger node
+    this._eventHandles = {
+        delegate: null,
+        trigger: {
+            mouseMove : null,
+            mouseOut: null
+        }
+    };
+
+    // Show/hide timers
+    this._timers = {
+        show: null,
+        hide: null
+    };
+
+    // Publish events introduced by Tooltip. Note the triggerEnter event is preventable,
+    // with the default behavior defined in the _defTriggerEnterFn method 
+    this.publish("triggerEnter", {defaultFn: this._defTriggerEnterFn, preventable:true});
+    this.publish("triggerLeave", {preventable:false});
+}</textarea></div>
+<p>The <code>destructor</code> is used to clear out stored state, detach any event handles and clear out the show/hide timers:</p>
+
+<div id="syntax-3cee8e3c63b5f987ddc3477755e8584c" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">destructor <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._clearCurrentTrigger<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._clearTimers<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._clearHandles<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">destructor <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>._clearCurrentTrigger<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw1">this</span>._clearTimers<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw1">this</span>._clearHandles<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-3cee8e3c63b5f987ddc3477755e8584c-plain">destructor : function() {
+    this._clearCurrentTrigger();
+    this._clearTimers();
+    this._clearHandles();
+}</textarea></div>
+<h4>Lifecycle Methods: bindUI, syncUI</h4>
+
+<p>The <code>bindUI</code> and <code>syncUI</code> are invoked by the base Widget class' <code>renderer</code> method.</p>
+
+<p><code>bindUI</code> is used to bind the attribute change listeners used to update the rendered UI from the current state of the widget and also to bind
+the DOM listeners required to enable the UI for interaction.</p>
+
+<p><code>syncUI</code> is used to sync the UI state from the current widget state, when initially rendered.</p>
+
+<p><em>NOTE:</em> Widget's <code>renderer</code> method also invokes the <code>renderUI</code> method, which is responsible for laying down any additional content elements a widget requires. However
+tooltip does not have any additional elements in needs to add to the DOM, outside of the default Widget boundingBox and contentBox.</p>
+
+<div id="syntax-bfaabe6b9832ceb1b22ff53ab64732e7" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">bindUI <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;delegateChange&quot;</span><span class="sy0">,</span> <span class="kw1">this</span>._afterSetDelegate<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;nodesChange&quot;</span><span class="sy0">,</span> <span class="kw1">this</span>._afterSetNodes<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="kw1">this</span>._bindDelegate<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">syncUI <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._uiSetNodes<span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;triggerNodes&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">bindUI <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;delegateChange&quot;</span><span class="sy0">,</span> <span class="kw1">this</span>._afterSetDelegate<span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw1">this</span>.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;nodesChange&quot;</span><span class="sy0">,</span> <span class="kw1">this</span>._afterSetNodes<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">this</span>._bindDelegate<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+syncUI <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>._uiSetNodes<span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;triggerNodes&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-bfaabe6b9832ceb1b22ff53ab64732e7-plain">bindUI : function() {
+    this.after("delegateChange", this._afterSetDelegate);
+    this.after("nodesChange", this._afterSetNodes);
+
+    this._bindDelegate();
+},
+
+syncUI : function() {
+    this._uiSetNodes(this.get("triggerNodes"));
+}</textarea></div>
+<h4>Attribute Supporting Methods</h4>
+
+<p>Tooltip's <code>triggerNodes</code>, which defines the set of nodes which should trigger this tooltip instance,
+has a couple of supporting methods associated with it.</p>
+
+<p>The <code>_afterSetNodes</code> method is the default attribute change event handler for the <code>triggerNodes</code>
+attribute. It invokes the <code>_uiSetNodes</code> method, which marks all trigger nodes with a trigger class name (<code>yui-tooltip-trigger</code>) when set.</p>
+
+<div id="syntax-2e0c9eb7c4f6391ce369e6241bebbb07" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">_afterSetNodes <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._uiSetNodes<span class="br0">&#40;</span>e.<span class="me1">newVal</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">_uiSetNodes <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>nodes<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>._triggerNodes<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>._triggerNodes.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="kw1">this</span>._triggerClassName<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="kw1">if</span> <span class="br0">&#40;</span>nodes<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>._triggerNodes <span class="sy0">=</span> nodes<span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>._triggerNodes.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="kw1">this</span>._triggerClassName<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">_afterSetNodes <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>._uiSetNodes<span class="br0">&#40;</span>e.<span class="me1">newVal</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+_uiSetNodes <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>nodes<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>._triggerNodes<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">this</span>._triggerNodes.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="kw1">this</span>._triggerClassName<span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">&#40;</span>nodes<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">this</span>._triggerNodes <span class="sy0">=</span> nodes<span class="sy0">;</span>
+        <span class="kw1">this</span>._triggerNodes.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="kw1">this</span>._triggerClassName<span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span></pre></div><textarea id="syntax-2e0c9eb7c4f6391ce369e6241bebbb07-plain">_afterSetNodes : function(e) {
+    this._uiSetNodes(e.newVal);
+},
+
+_uiSetNodes : function(nodes) {
+    if (this._triggerNodes) {
+        this._triggerNodes.removeClass(this._triggerClassName);
+    }
+
+    if (nodes) {
+        this._triggerNodes = nodes;
+        this._triggerNodes.addClass(this._triggerClassName);
+    }
+},</textarea></div>
+<p>Similarly the <code>_afterSetDelegate</code> method is the default attribute change listener for the <code>delegate</code> attribute,
+and invokes <code>_bindDelegate</code> to set up the listeners when a new delegate node is set. We use <code>Y.delegate</code> support, along with Event's <code>mouseenter</code> support, 
+which means the only thing we need to do is tell delegate which node we want to act as the delegate, and which elements we want to target using the <code>"." + this._triggerClassName</code> selector.</p>
+
+<div id="syntax-1c8b953b90f64761689195954afcd554" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">_afterSetDelegate <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._bindDelegate<span class="br0">&#40;</span>e.<span class="me1">newVal</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">_bindDelegate <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> eventHandles <span class="sy0">=</span> <span class="kw1">this</span>._eventHandles<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>eventHandles.<span class="me1">delegate</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        eventHandles.<span class="me1">delegate</span>.<span class="me1">detach</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        eventHandles.<span class="me1">delegate</span> <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    eventHandles.<span class="me1">delegate</span> <span class="sy0">=</span> Y.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;mouseenter&quot;</span><span class="sy0">,</span> Y.<span class="me1">bind</span><span class="br0">&#40;</span><span class="kw1">this</span>._onNodeMouseEnter<span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="sy0">,</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;delegate&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span> <span class="st0">&quot;.&quot;</span> <span class="sy0">+</span> <span class="kw1">this</span>._triggerClassName<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">_afterSetDelegate <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>._bindDelegate<span class="br0">&#40;</span>e.<span class="me1">newVal</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+_bindDelegate <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> eventHandles <span class="sy0">=</span> <span class="kw1">this</span>._eventHandles<span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">&#40;</span>eventHandles.<span class="me1">delegate</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        eventHandles.<span class="me1">delegate</span>.<span class="me1">detach</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        eventHandles.<span class="me1">delegate</span> <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+    eventHandles.<span class="me1">delegate</span> <span class="sy0">=</span> Y.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;mouseenter&quot;</span><span class="sy0">,</span> Y.<span class="me1">bind</span><span class="br0">&#40;</span><span class="kw1">this</span>._onNodeMouseEnter<span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="sy0">,</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;delegate&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span> <span class="st0">&quot;.&quot;</span> <span class="sy0">+</span> <span class="kw1">this</span>._triggerClassName<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span></pre></div><textarea id="syntax-1c8b953b90f64761689195954afcd554-plain">_afterSetDelegate : function(e) {
+    this._bindDelegate(e.newVal);
+},
+
+_bindDelegate : function() {
+    var eventHandles = this._eventHandles;
+
+    if (eventHandles.delegate) {
+        eventHandles.delegate.detach();
+        eventHandles.delegate = null;
+    }
+    eventHandles.delegate = Y.delegate("mouseenter", Y.bind(this._onNodeMouseEnter, this), this.get("delegate"), "." + this._triggerClassName);
+},</textarea></div>
+<h4>DOM Event Handlers</h4>
+
+<p>Tooltips interaction revolves around the <code>mouseenter</code>, <code>mousemove</code> and <code>mouseleave</code> DOM events. The mousenter listener is the only listener set up initially, on the <code>delegate</code> node:</p>
+
+<div id="syntax-d3764e1c199e5702e6d4174a02e63915" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">_onNodeMouseEnter <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> node <span class="sy0">=</span> e.<span class="me1">currentTarget</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>node <span class="sy0">&amp;&amp;</span> <span class="br0">&#40;</span><span class="sy0">!</span><span class="kw1">this</span>._currTrigger.<span class="me1">node</span> <span class="sy0">||</span> <span class="sy0">!</span>node.<span class="me1">compareTo</span><span class="br0">&#40;</span><span class="kw1">this</span>._currTrigger.<span class="me1">node</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>._enterTrigger<span class="br0">&#40;</span>node<span class="sy0">,</span> e.<span class="me1">pageX</span><span class="sy0">,</span> e.<span class="me1">pageY</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">_onNodeMouseEnter <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> node <span class="sy0">=</span> e.<span class="me1">currentTarget</span><span class="sy0">;</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span>node <span class="sy0">&amp;&amp;</span> <span class="br0">&#40;</span><span class="sy0">!</span><span class="kw1">this</span>._currTrigger.<span class="me1">node</span> <span class="sy0">||</span> <span class="sy0">!</span>node.<span class="me1">compareTo</span><span class="br0">&#40;</span><span class="kw1">this</span>._currTrigger.<span class="me1">node</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">this</span>._enterTrigger<span class="br0">&#40;</span>node<span class="sy0">,</span> e.<span class="me1">pageX</span><span class="sy0">,</span> e.<span class="me1">pageY</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-d3764e1c199e5702e6d4174a02e63915-plain">_onNodeMouseEnter : function(e) {
+    var node = e.currentTarget;
+    if (node && (!this._currTrigger.node || !node.compareTo(this._currTrigger.node))) {
+        this._enterTrigger(node, e.pageX, e.pageY);
+    }
+}</textarea></div>
+<p>Since the <code>mouseenter</code> implementation doesn't invoke it's listeners for <code>mouseover</code> events generated from elements nested 
+inside the targeted node (for example when mousing out of a child element of a trigger node), there are no additional checks we need to perform other than to see if the node is the current trigger, before handing off to 
+the <code>_enterTrigger</code> method to setup the current trigger state and attach mousemove and mouseleave listeners on the current trigger node.</p>
+
+<p>The mouseleave listener delegates to the <code>_leaveTrigger</code> method, and again, since the <code>mouseleave</code> implementation deals with nested elements, we don't need to perform any additional target checks:</p>
+
+<div id="syntax-8223b4c6a8281da9c6f06c3ba1ac1205" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">_onNodeMouseLeave <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._leaveTrigger<span class="br0">&#40;</span>e.<span class="me1">currentTarget</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">_onNodeMouseLeave <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>._leaveTrigger<span class="br0">&#40;</span>e.<span class="me1">currentTarget</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-8223b4c6a8281da9c6f06c3ba1ac1205-plain">_onNodeMouseLeave : function(e) {
+    this._leaveTrigger(e.currentTarget);
+}</textarea></div>
+<p>The mouse move listener delegates to the <code>_overTrigger</code> method to store the current mouse XY co-ordinates (used to position the Tooltip when it is displayed after the <code>showDelay</code>):</p>
+
+<div id="syntax-04a61d5ec9d6e29931a341663d944758" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">_onNodeMouseMove <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._overTrigger<span class="br0">&#40;</span>e.<span class="me1">pageX</span><span class="sy0">,</span> e.<span class="me1">pageY</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">_onNodeMouseMove <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>._overTrigger<span class="br0">&#40;</span>e.<span class="me1">pageX</span><span class="sy0">,</span> e.<span class="me1">pageY</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-04a61d5ec9d6e29931a341663d944758-plain">_onNodeMouseMove : function(e) {
+    this._overTrigger(e.pageX, e.pageY);
+}</textarea></div>
+<h4>Trigger Event Delegates: _enterTrigger, _leaveTrigger, _overTrigger</h4>
+
+<p>As seen above, the DOM event handlers delegate to the <code>_enterTrigger, _leaveTrigger and _overTrigger</code> methods to update the 
+Tooltip state based on the currently active trigger node.</p>
+
+<p>The <code>_enterTrigger</code> method sets the current trigger state (which node is the current tooltip trigger, 
+what the current mouse XY position is, etc.). The method also fires the <code>triggerEnter</code> event, whose default function actually handles 
+showing the tooltip after the configured <code>showDelay</code> period. The <code>triggerEnter</code> event can be prevented by listeners, allowing 
+users to prevent the tooltip from being shown if required. (<code>triggerEnter</code> listeners are passed the current trigger node and pageX, pageY mouse co-ordinates as event facade properties):</p>
+
+<div id="syntax-8ac5239b2594d93057424c7baf8f7353" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">_enterTrigger <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>node<span class="sy0">,</span> x<span class="sy0">,</span> y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._setCurrentTrigger<span class="br0">&#40;</span>node<span class="sy0">,</span> x<span class="sy0">,</span> y<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">fire</span><span class="br0">&#40;</span><span class="st0">&quot;triggerEnter&quot;</span><span class="sy0">,</span> <span class="kw2">null</span><span class="sy0">,</span> node<span class="sy0">,</span> x<span class="sy0">,</span> y<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">_defTriggerEnterFn <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> node <span class="sy0">=</span> e.<span class="me1">node</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;disabled&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>._clearTimers<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="kw2">var</span> delay <span class="sy0">=</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;visible&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="sy0">?</span> <span class="nu0">0</span> <span class="sy0">:</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;showDelay&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>._timers.<span class="me1">show</span> <span class="sy0">=</span> Y.<span class="me1">later</span><span class="br0">&#40;</span>delay<span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw1">this</span>._showTooltip<span class="sy0">,</span> <span class="br0">&#91;</span>node<span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">_enterTrigger <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>node<span class="sy0">,</span> x<span class="sy0">,</span> y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>._setCurrentTrigger<span class="br0">&#40;</span>node<span class="sy0">,</span> x<span class="sy0">,</span> y<span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw1">this</span>.<span class="me1">fire</span><span class="br0">&#40;</span><span class="st0">&quot;triggerEnter&quot;</span><span class="sy0">,</span> <span class="kw2">null</span><span class="sy0">,</span> node<span class="sy0">,</span> x<span class="sy0">,</span> y<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+_defTriggerEnterFn <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> node <span class="sy0">=</span> e.<span class="me1">node</span><span class="sy0">;</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;disabled&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">this</span>._clearTimers<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="kw2">var</span> delay <span class="sy0">=</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;visible&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="sy0">?</span> <span class="nu0">0</span> <span class="sy0">:</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;showDelay&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="kw1">this</span>._timers.<span class="me1">show</span> <span class="sy0">=</span> Y.<span class="me1">later</span><span class="br0">&#40;</span>delay<span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw1">this</span>._showTooltip<span class="sy0">,</span> <span class="br0">&#91;</span>node<span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span></pre></div><textarea id="syntax-8ac5239b2594d93057424c7baf8f7353-plain">_enterTrigger : function(node, x, y) {
+    this._setCurrentTrigger(node, x, y);
+    this.fire("triggerEnter", null, node, x, y);
+},
+
+_defTriggerEnterFn : function(e) {
+    var node = e.node;
+    if (!this.get("disabled")) {
+        this._clearTimers();
+        var delay = (this.get("visible")) ? 0 : this.get("showDelay");
+        this._timers.show = Y.later(delay, this, this._showTooltip, [node]);
+    }
+},</textarea></div>
+<p>Similarly the <code>_leaveTrigger</code> method is invoked when the mouse leaves a trigger node, and clears any stored state, timers and listeners before setting up
+the <code>hideDelay</code> timer. It fires a <code>triggerLeave</code> event, but cannot be prevented, and has no default behavior to prevent:</p>
+
+<div id="syntax-5fb996eab4401398172692dd2f866905" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">_leaveTrigger <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">fire</span><span class="br0">&#40;</span><span class="st0">&quot;triggerLeave&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._clearCurrentTrigger<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">this</span>._clearTimers<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._timers.<span class="me1">hide</span> <span class="sy0">=</span> Y.<span class="me1">later</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;hideDelay&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw1">this</span>._hideTooltip<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">_leaveTrigger <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>.<span class="me1">fire</span><span class="br0">&#40;</span><span class="st0">&quot;triggerLeave&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">this</span>._clearCurrentTrigger<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw1">this</span>._clearTimers<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">this</span>._timers.<span class="me1">hide</span> <span class="sy0">=</span> Y.<span class="me1">later</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;hideDelay&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw1">this</span>._hideTooltip<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span></pre></div><textarea id="syntax-5fb996eab4401398172692dd2f866905-plain">_leaveTrigger : function(node) {
+    this.fire("triggerLeave");
+
+    this._clearCurrentTrigger();
+    this._clearTimers();
+
+    this._timers.hide = Y.later(this.get("hideDelay"), this, this._hideTooltip);
+},</textarea></div>
+<p>As mentioned previously, the <code>_overTrigger</code> method simply stores the current mouse XY co-ordinates for use when the tooltip is shown:</p>
+
+<div id="syntax-c71b55e386b10069e057833d809917ef" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">_overTrigger <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>x<span class="sy0">,</span> y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._currTrigger.<span class="me1">mouseX</span> <span class="sy0">=</span> x<span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._currTrigger.<span class="me1">mouseY</span> <span class="sy0">=</span> y<span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">_overTrigger <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>x<span class="sy0">,</span> y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>._currTrigger.<span class="me1">mouseX</span> <span class="sy0">=</span> x<span class="sy0">;</span>
+    <span class="kw1">this</span>._currTrigger.<span class="me1">mouseY</span> <span class="sy0">=</span> y<span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-c71b55e386b10069e057833d809917ef-plain">_overTrigger : function(x, y) {
+    this._currTrigger.mouseX = x;
+    this._currTrigger.mouseY = y;
+}</textarea></div>
+<h4>Setting Tooltip Content</h4>
+
+<p>Since the content for a tooltip is usually a function of the trigger node and not constant, <code>Tooltip</code> provides a number of ways to set the content.</p>
+
+<ol>
+    <li>Setting the <code>content</code> attribute to a string or node. In this case, the value of the <code>content</code> attribute is used
+    for all triggerNodes</li>
+    <li>Setting the <code>content</code> attribute to an object literal, containing a map of triggerNode id to content. The content for a trigger node
+    will be set using the map, when the tooltip is triggered for the node.</li>
+    <li>Setting the title attribute on the trigger node. The value of the title attribute is used to set the tooltip content,
+    when triggered for the node.</li>
+    <li>By calling the <code>setTriggerContent</code> method to set content for a specific trigger node, in a <code>triggerEnter</code> event listener.</li>
+</ol>
+
+<p>The precedence of these methods is handled in the <code>_setTriggerContent</code> method, invoked when the mouse enters a trigger:</p>
+
+<div id="syntax-101427403c6c1150688515a57fffdbbf" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">_setTriggerContent <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> content <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;content&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>content <span class="sy0">&amp;&amp;</span> <span class="sy0">!</span><span class="br0">&#40;</span>content <span class="kw1">instanceof</span> Node <span class="sy0">||</span> Lang.<span class="me1">isString</span><span class="br0">&#40;</span>content<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        content <span class="sy0">=</span> content<span class="br0">&#91;</span>node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span><span class="br0">&#93;</span> <span class="sy0">||</span> node.<span class="me1">getAttribute</span><span class="br0">&#40;</span><span class="st0">&quot;title&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">setTriggerContent</span><span class="br0">&#40;</span>content<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">setTriggerContent <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>content<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    <span class="kw2">var</span> contentBox <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;contentBox&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    contentBox.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>content<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>content <span class="kw1">instanceof</span> Node<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            <span class="kw1">for</span> <span class="br0">&#40;</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">,</span> l <span class="sy0">=</span> content.<span class="me1">size</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> l<span class="sy0">;</span> <span class="sy0">++</span>i<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                contentBox.<span class="me1">appendChild</span><span class="br0">&#40;</span>content.<span class="kw1">item</span><span class="br0">&#40;</span>i<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="kw1">if</span> <span class="br0">&#40;</span>Lang.<span class="me1">isString</span><span class="br0">&#40;</span>content<span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            contentBox.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> content<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">_setTriggerContent <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> content <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;content&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span>content <span class="sy0">&amp;&amp;</span> <span class="sy0">!</span><span class="br0">&#40;</span>content <span class="kw1">instanceof</span> Node <span class="sy0">||</span> Lang.<span class="me1">isString</span><span class="br0">&#40;</span>content<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        content <span class="sy0">=</span> content<span class="br0">&#91;</span>node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span><span class="br0">&#93;</span> <span class="sy0">||</span> node.<span class="me1">getAttribute</span><span class="br0">&#40;</span><span class="st0">&quot;title&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+    <span class="kw1">this</span>.<span class="me1">setTriggerContent</span><span class="br0">&#40;</span>content<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+setTriggerContent <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>content<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> contentBox <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;contentBox&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    contentBox.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">&#40;</span>content<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span>content <span class="kw1">instanceof</span> Node<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">for</span> <span class="br0">&#40;</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">,</span> l <span class="sy0">=</span> content.<span class="me1">size</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> l<span class="sy0">;</span> <span class="sy0">++</span>i<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                contentBox.<span class="me1">appendChild</span><span class="br0">&#40;</span>content.<span class="kw1">item</span><span class="br0">&#40;</span>i<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="kw1">if</span> <span class="br0">&#40;</span>Lang.<span class="me1">isString</span><span class="br0">&#40;</span>content<span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            contentBox.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> content<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-101427403c6c1150688515a57fffdbbf-plain">_setTriggerContent : function(node) {
+    var content = this.get("content");
+    if (content && !(content instanceof Node || Lang.isString(content))) {
+        content = content[node.get("id")] || node.getAttribute("title");
+    }
+    this.setTriggerContent(content);
+},
+
+setTriggerContent : function(content) {
+    var contentBox = this.get("contentBox");
+    contentBox.set("innerHTML", "");
+
+    if (content) {
+        if (content instanceof Node) {
+            for (var i = 0, l = content.size(); i < l; ++i) {
+                contentBox.appendChild(content.item(i));
+            }
+        } else if (Lang.isString(content)) {
+            contentBox.set("innerHTML", content);
+        }
+    }
+}</textarea></div>
+<p>Calling the public <code>setTriggerContent</code> in a <code>triggerEvent</code> listener will over-ride content set using the <code>content</code> attribute or the trigger node's title value.</p>
+
+<h4>Using Tooltip</h4>
+
+<p>For this example, we set up 4 DIV elements which will act as tooltip triggers. They are all marked using a <code>yui-hastooltip</code> class, so that they can be queried using a simple selector, passed as the value for the <code>triggerNodes</code> attribute in the tooltip's constructor Also all 4 trigger nodes are contained in a wrapper DIV with <code>id="delegate"</code> which will act as the <code>delegate</code> node.</p>
+
+<div id="syntax-de42b14b4b2aae6398d052a51a44706a" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> tt <span class="sy0">=</span> <span class="kw2">new</span> Tooltip<span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    triggerNodes<span class="sy0">:</span><span class="st0">&quot;.yui3-hastooltip&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    delegate<span class="sy0">:</span> <span class="st0">&quot;#delegate&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    content<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        tt3<span class="sy0">:</span> <span class="st0">&quot;Tooltip 3 (from lookup)&quot;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    shim<span class="sy0">:</span><span class="kw2">false</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    zIndex<span class="sy0">:</span><span class="nu0">2</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">tt.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> tt <span class="sy0">=</span> <span class="kw2">new</span> Tooltip<span class="br0">&#40;</span><span class="br0">&#123;</span>
+    triggerNodes<span class="sy0">:</span><span class="st0">&quot;.yui3-hastooltip&quot;</span><span class="sy0">,</span>
+    delegate<span class="sy0">:</span> <span class="st0">&quot;#delegate&quot;</span><span class="sy0">,</span>
+    content<span class="sy0">:</span> <span class="br0">&#123;</span>
+        tt3<span class="sy0">:</span> <span class="st0">&quot;Tooltip 3 (from lookup)&quot;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+    shim<span class="sy0">:</span><span class="kw2">false</span><span class="sy0">,</span>
+    zIndex<span class="sy0">:</span><span class="nu0">2</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+tt.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-de42b14b4b2aae6398d052a51a44706a-plain">var tt = new Tooltip({
+    triggerNodes:".yui3-hastooltip",
+    delegate: "#delegate",
+    content: {
+        tt3: "Tooltip 3 (from lookup)"
+    },
+    shim:false,
+    zIndex:2
+});
+tt.render();</textarea></div>
+<p>The tooltip content for each of the trigger nodes is setup differently. The first trigger node uses the title attribute to set it's content. The third trigger node's content is set using the content map set in the constructor above. The second trigger node's content is set using a <code>triggerEnter</code> event listener and the <code>setTriggerContent</code> method as shown below:</p>
+
+<div id="syntax-ae87bd671a6147d5da6f242e99c2c613" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">tt.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;triggerEnter&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> node <span class="sy0">=</span> e.<span class="me1">node</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>node <span class="sy0">&amp;&amp;</span> node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span> <span class="sy0">==</span> <span class="st0">&quot;tt2&quot;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>.<span class="me1">setTriggerContent</span><span class="br0">&#40;</span><span class="st0">&quot;Tooltip 2 (from triggerEvent)&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">tt.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;triggerEnter&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> node <span class="sy0">=</span> e.<span class="me1">node</span><span class="sy0">;</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span>node <span class="sy0">&amp;&amp;</span> node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span> <span class="sy0">==</span> <span class="st0">&quot;tt2&quot;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">this</span>.<span class="me1">setTriggerContent</span><span class="br0">&#40;</span><span class="st0">&quot;Tooltip 2 (from triggerEvent)&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-ae87bd671a6147d5da6f242e99c2c613-plain">tt.on("triggerEnter", function(e) {
+    var node = e.node;
+    if (node && node.get("id") == "tt2") {
+        this.setTriggerContent("Tooltip 2 (from triggerEvent)");
+    }
+});</textarea></div>
+<p>The fourth trigger node's content is set using it's title attribute, however it also has a <code>triggerEvent</code> listener which prevents the tooltip from being displayed for it, if the checkbox is checked.</p>
+
+<div id="syntax-385abd177a10d69a6ab6bcb4bf8dc6b3" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> prevent <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#prevent&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">tt.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;triggerEnter&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> node <span class="sy0">=</span> e.<span class="me1">node</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>prevent.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;checked&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="kw1">if</span> <span class="br0">&#40;</span>node <span class="sy0">&amp;&amp;</span> node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span> <span class="sy0">==</span> <span class="st0">&quot;tt4&quot;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> prevent <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#prevent&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+tt.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;triggerEnter&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> node <span class="sy0">=</span> e.<span class="me1">node</span><span class="sy0">;</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span>prevent.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;checked&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span>node <span class="sy0">&amp;&amp;</span> node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span> <span class="sy0">==</span> <span class="st0">&quot;tt4&quot;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-385abd177a10d69a6ab6bcb4bf8dc6b3-plain">var prevent = Y.one("#prevent");
+tt.on("triggerEnter", function(e) {
+    var node = e.node;
+    if (prevent.get("checked")) {
+        if (node && node.get("id") == "tt4") {
+            e.preventDefault();
+        }
+    }
+});</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Widget Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../widget/widget-extend.html'>Extending the base widget class</a></li><li><a href='../widget/widget-build.html'>Creating custom widget classes</a></li><li><a href='../widget/widget-plugin.html'>Creating a widget plugin</a></li><li class='selected'><a href='../widget/widget-tooltip.html'>Creating a simple Tooltip widget</a></li><li><a href='../widget/widget-parentchild-listbox.html'>Creating a hierarchical ListBox widget</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Widget Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/widget/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_widget.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="selected "><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

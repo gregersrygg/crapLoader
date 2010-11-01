@@ -1,0 +1,392 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Accessible TabView</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+
+	/*	The following style rules necessary to override style rules in the 
+		YUI CSS file. */
+
+	#example ul,
+	#example li {
+		list-style: none;
+		list-style: none;		
+	}
+	
+	#example em {
+		font-style: normal;
+	}
+
+	#example .yui3-tabpanel {
+
+		/*	Use the "zoom" property to set the the hasLayout property to true.
+			This ensures that the background color of the tab's panel will 
+			be rendered correctly when the example is running in the 
+			example chrome.
+		*/
+
+		_zoom: 1;
+
+	}
+
+	#example .yui3-tabpanel a {
+		text-decoration: underline;
+		color: blue;
+	}
+	
+	#example h3 {
+		color: #000;
+		font-size: 100%;
+		font-weight: bold;
+	}
+
+	#example .yui3-tabview {
+		margin: 0 .25em;
+	}
+	
+
+	/*	Hide the instructional text used to label the tabview offscreen.
+	 	This ensures it is still available to users of screen readers, but is 
+		not visible to sighted users.	*/
+
+	#tabview-heading em {
+		position: absolute;
+		left: -999em;
+	}
+
+
+	/*	Hide the list while it is being transformed into a tabview.	*/
+
+	.yui3-loading #tabview-1 {
+		display: none;
+	}
+
+</style>
+<script type="text/javascript">
+
+	//	Add a class to the documentElement to prevent the user from seeing 
+	//	the unstyled tabview while the necessary CSS and JavaScript 
+	//	dependancies are being fetched.
+
+	document.documentElement.className = "yui3-loading";
+
+</script>
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Accessible TabView</h1>
+
+<div class="exampleIntro">
+	<p>
+This example illustrates how to create an accessible tabview widget using the 
+Focus Manager Node Plugin, 
+<a href="../../api/YUI.html#event_delegate">Event's delegation support</a>, and 
+Node's support for the 
+<a href="http://www.w3.org/TR/wai-aria/">WAI-ARIA Roles and States</a>.
+</p>			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<h3 id="tabview-heading">Today's News</h3>
+<div id="tabview-1">
+    <ul>
+        <li class="yui3-tab yui3-tab-selected"><a href="#top-stories"><em>Top Stories</em></a></li>
+        <li class="yui3-tab"><a href="#world-news"><em>World</em></a></li>
+        <li class="yui3-tab"><a href="#entertainment-news"><em>Entertainment</em></a></li>
+        <li class="yui3-tab"><a href="#sports-news"><em>Sports</em></a></li>
+        <li class="yui3-tab"><a href="#technology-news"><em>Technology</em></a></li>		
+    </ul>            
+    <div>
+        <div class="yui3-tabpanel yui3-tabpanel-selected" id="top-stories">
+			<h3>Top Stories</h3>
+			<ul>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/quran_burning"><q>US church to go ahead with Sept. 11 Quran burning 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/us_house_stakes"><q>Grim outlook for Democrats puts House up for grabs 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/us_colorado_wildfires"><q>CO firefighters to step up attack on Boulder blaze 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/iran_stoning"><q>EU decries 'barbaric' plans to stone Iranian woman 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_la_am_ca/cb_cuba_fidel_castro"><q>Report: Castro blasts Ahmadinejad as anti-Semitic 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_mi_ea/ml_israel_palestinians"><q>Abbas asks US to step into settlement dispute 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_el_st_lo/us_chicago_mayor"><q>Chicago Mayor Daley won't run for re-election 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_en_ot/us_chapman_parole"><q>John Lennon killer Chapman denied parole in NY 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_he_me/us_med_smoking_rates"><q>US smoking rate still stuck at 1 in 5 adults 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_co_ap_po/fbc_t25_college_fb_poll"><q>Boise State gains ground in AP Top 25 
+    (AP)
+</q></a>
+				</li></ul>	        	
+        </div>
+        <div class="yui3-tabpanel" id="world-news">
+			<h3>World News</h3>
+			<ul>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_mi_ea/ml_iraq_us_casualties"><q>Iraqi soldier fires on US troops, kills 2 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_bi_ge/eu_europe_strikes"><q>Strikes in France, London foreshadow more protests 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/iran_stoning"><q>EU decries 'barbaric' plans to stone Iranian woman 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_as/as_pakistan"><q>Women, kids among 17 dead in NW Pakistani bombing 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_as/as_singapore_good_english"><q>Singapore prods locals to speak better English 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/time/20100907/wl_time/08599201635900"><q>Europe's Sets Up New Banking Police 
+    (Time.com)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/afp/20100907/wl_sthasia_afp/cricketengpakt20"><q>England cruise to T20 win after Pakistan collapse 
+    (AFP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_mi_ea/ml_israel_palestinians"><q>Abbas asks US to step into settlement dispute 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_la_am_ca/lt_colombia_farc_journalist"><q>Colombia orders arrest of reporter in rebel case 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/un_un_congo_rapes"><q>UN reports over 500 rapes in eastern Congo 
+    (AP)
+</q></a>
+				</li></ul>        </div>
+        <div class="yui3-tabpanel" id="entertainment-news">
+			<h3>Entertainment News</h3>
+			<ul>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_ot/us_anna_nicole_smith"><q>Nanny: Bloody syringes in Anna Nicole's bathroom 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_ot/us_tv_cnn_parker_spitzer"><q>CNN christens its new talk show 'Parker Spitzer' 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_ce/us_tv_letterman_view"><q>Walters, Letterman compare notes on heart surgery 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://us.rd.yahoo.com/dailynews/external/omg_rss/rss_omg_en/http___omg_yahoo_com_photos4190/37482215/*http://omg.yahoo.com/photos/la-toya-jackson-milks-it/4190"><q>La Toya Jackson Milks It 
+    (omg!)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_ot/us_white_house_dance"><q>Michelle Obama hosts first White House dance event 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_mu/us_chapman_parole"><q>John Lennon killer Chapman denied parole in NY 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_tv/us_anna_nicole_smith"><q>Nanny: Bloody syringes in Anna Nicole's bathroom 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/nm/20100907/film_nm/us_venice"><q>Venice film fest fights its corner as crisis bites 
+    (Reuters)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_mu/us_music_review_stone_sour"><q>Review: Stone Sour packs punch on `Audio Secrecy' 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/nm/20100907/media_nm/us_venice"><q>Venice film fest fights its corner as crisis bites 
+    (Reuters)
+</q></a>
+				</li></ul>	        	
+        </div>
+        <div class="yui3-tabpanel" id="sports-news">
+			<h3>Sports News</h3>
+			<ul>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_co_ap_po/fbc_t25_college_fb_poll"><q>Boise State gains ground in AP Top 25 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_go_ne/glf_ryder_cup"><q>US Ryder Cup picks: Woods, Johnson, Cink, Fowler 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_te_ga_su/ten_us_open"><q>Youzhny slows Spain's US Open reign, beats Robredo 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/afp/20100907/sp_soccer_afp/fbleuro2012gpbrussvk"><q>Slovakia down Advocaat's Russia 
+    (AFP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_fo_ne/fbn_nfl_umpires"><q>NFL again tweaks positioning of umpires 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_fo_ne/fbn_redskins_titans_haynesworth"><q>AP Sources: Redskins, Titans talking Haynesworth 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_fo_ne/fbn_dolphins_parcells"><q>Parcells turns over control of Dolphins to Ireland 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/nm/20100907/sp_nm/us_nfl_dolphins"><q>Parcells turns over control of Dolphins to GM Ireland 
+    (Reuters)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://us.rd.yahoo.com/dailynews/external/appolicious_rss/rss_appolicious_sp/http___www_appolicious_com_articles3032_playoff_baseball_is_around_the_corner_get_ready_with_these_iphone_apps/37479524/SIG=13o37jpm4/*http://www.appolicious.com/sports/articles/3032-playoff-baseball-is-around-the-corner-get-ready-with-these-iphone-apps"><q>Playoff baseball is around the corner, get ready with these iPhone apps 
+    (Appolicious)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100901/ap_on_sp_bk_ne/bkn_celtics_west"><q>Guard Delonte West returning to Celtics 
+    (AP)
+</q></a>
+				</li></ul>	        	
+        </div>
+        <div class="yui3-tabpanel" id="technology-news">
+			<h3>Technology News</h3>
+			<ul>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20100907/ap_on_hi_te/us_oracle_hurd"><q>HP sues ex-CEO Hurd over new job at rival Oracle 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20100906/ap_on_hi_te/as_apple_s_challenger"><q>Taiwan's HTC: iPhone's `quiet' challenger 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20100905/ap_on_bi_ge/us_craigslist_adult_services"><q>1 'censored' bar won't stop online prostitution 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ytech_gadg/20100830/tc_ytech_gadg/ytech_gadg_tc3511"><q>Able to unplug from work while you’re on vacation? 
+    (Ben Patterson)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ytech_gadg/20100830/tc_ytech_gadg/ytech_gadg_tc3509"><q>Mobile users still wary of being found, survey says 
+    (Ben Patterson)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/macworld/20100907/tc_macworld/macworldintroducesmacworldinsider"><q>Macworld introduces Macworld Insider 
+    (Macworld.com)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20100907/ap_on_hi_te/us_electronic_devices_searches"><q>NY lawsuit seeks to halt suspicionless searches 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/nf/20100907/tc_nf/75061"><q>Yikes! Coming to TV This Fall -- Google And Its Ads 
+    (NewsFactor)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20100907/ap_on_bi_ge/us_millicom_analyst_note"><q>Millicom downgraded at Stifel Nicolaus 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/afp/20100907/tc_afp/usitcompanypolicydiplomacyinternetgoogle"><q>Former State Department official to head 'Google Ideas' 
+    (AFP)
+</q></a>
+				</li></ul>	        	
+        </div>			
+    </div>
+</div>
+
+<script type="text/javascript">
+
+	YUI({ 
+
+			base: "../../build/",
+			modules: {
+				"tabviewcss": {
+					type: "css",
+					fullpath: "assets/tabview.css"
+				},
+				"tabviewjs": {
+					type: "js",
+					fullpath: "assets/tabview.js",
+					requires: ["node-focusmanager", "tabviewcss"]
+				}
+
+			},
+			timeout: 10000
+
+		}).use("tabviewjs", function(Y, result) {
+
+		    //	The callback supplied to use() will be executed regardless of
+		    //	whether the operation was successful or not.  The second parameter
+		    //	is a result object that has the status of the operation.  We can
+		    //	use this to try to recover from failures or timeouts.
+
+		    if (!result.success) {
+
+		        Y.log("Load failure: " + result.msg, "warn", "Example");
+
+				//	Show the tabview HTML if the loader failed that way the 
+				//	original unskinned tabview will be visible so that the 
+				//	user can interact with it either way.
+
+				document.documentElement.className = "";
+
+		    }
+
+	});
+
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

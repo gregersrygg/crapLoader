@@ -1,0 +1,574 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Drag &amp; Drop: Animated Drop Targets</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+
+<!--there is no custom header content for this example-->
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Drag &amp; Drop: Animated Drop Targets</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Drag &amp; Drop: Animated Drop Targets</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example will show you how to make an animated node a Drop target.</p>
+	</div>	
+
+	<div class="module example-container  newWindow">
+			<div id="example-canvas" class="bd">
+
+		<p class="newWindowButton yui-skin-sam">
+        <span id="newWindowLink">
+            <span class="first-child">
+                <a href="anim-drop_source.html" target="_blank">View example in new window.</a>
+            </span>
+        </span>	
+    </p>
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Setting up the HTML</h3>
+<p>First we will create our HTML.</p>
+<div id="syntax-f1b923b4b4275c6d41f8aff6a51d3bfc" class="yui-syntax-highlight"><div class="numbers"><pre class="html4strict" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;dock&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;drag&quot;</span>&gt;</span>Drag #1<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;anim1&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;anim&quot;</span>&gt;</span>Anim #1<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;anim2&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;anim&quot;</span>&gt;</span>Anim #2<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li2"><div class="de2"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;anim3&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;anim&quot;</span>&gt;</span>Anim #3<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;anim4&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;anim&quot;</span>&gt;</span>Anim #4<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;anim5&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;anim&quot;</span>&gt;</span>Anim #5<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="html4strict" style="font-family:monospace;"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;dock&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;drag&quot;</span>&gt;</span>Drag #1<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;anim1&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;anim&quot;</span>&gt;</span>Anim #1<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;anim2&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;anim&quot;</span>&gt;</span>Anim #2<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;anim3&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;anim&quot;</span>&gt;</span>Anim #3<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;anim4&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;anim&quot;</span>&gt;</span>Anim #4<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;anim5&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;anim&quot;</span>&gt;</span>Anim #5<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></pre></div><textarea id="syntax-f1b923b4b4275c6d41f8aff6a51d3bfc-plain"><div id="dock"></div>
+<div id="drag">Drag #1</div>
+<div id="anim1" class="anim">Anim #1</div>
+<div id="anim2" class="anim">Anim #2</div>
+<div id="anim3" class="anim">Anim #3</div>
+<div id="anim4" class="anim">Anim #4</div>
+<div id="anim5" class="anim">Anim #5</div></textarea></div><p>Now we give that HTML some CSS to make it visible.</p>
+<div id="syntax-f47a0a1415e7697946290bae3589f3ef" class="yui-syntax-highlight"><div class="numbers"><pre class="css" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="re1">.anim</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">relative</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">50px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">100px</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="kw1">black</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#00B8BF</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">top</span><span class="sy0">:</span> <span class="re3">100px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#drag</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">50px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">50px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="kw1">black</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#004C6D</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">color</span><span class="sy0">:</span> <span class="kw2">white</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">cursor</span><span class="sy0">:</span> move<span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">z-index</span><span class="sy0">:</span> <span class="nu0">5</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#dock</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">600px</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">75px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#D00050</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="kw1">black</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">absolute</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">top</span><span class="sy0">:</span> <span class="re3">5px</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">right</span><span class="sy0">:</span> <span class="re3">0px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re1">.anim</span><span class="re1">.yui3-dd-drop-over</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#EDFF9F</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li2"><div class="de2"><span class="re1">.anim</span><span class="re1">.done</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="kw2">white</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#drag1</span><span class="re1">.yui3-dd-drag-over</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    opacity<span class="sy0">:</span> .5<span class="sy0">;</span></div></li><li class="li2"><div class="de2">    filter<span class="sy0">:</span> alpha<span class="br0">&#40;</span>opacity<span class="sy0">=</span><span class="nu0">50</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="css" style="font-family:monospace;"><span class="re1">.anim</span> <span class="br0">&#123;</span>
+    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">relative</span><span class="sy0">;</span>
+    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">50px</span><span class="sy0">;</span>
+    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">100px</span><span class="sy0">;</span>
+    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="kw1">black</span><span class="sy0">;</span>
+    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#00B8BF</span><span class="sy0">;</span>
+    <span class="kw1">top</span><span class="sy0">:</span> <span class="re3">100px</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#drag</span> <span class="br0">&#123;</span>
+    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">50px</span><span class="sy0">;</span>
+    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">50px</span><span class="sy0">;</span>
+    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="kw1">black</span><span class="sy0">;</span>
+    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#004C6D</span><span class="sy0">;</span>
+    <span class="kw1">color</span><span class="sy0">:</span> <span class="kw2">white</span><span class="sy0">;</span>
+    <span class="kw1">cursor</span><span class="sy0">:</span> move<span class="sy0">;</span>
+    <span class="kw1">z-index</span><span class="sy0">:</span> <span class="nu0">5</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#dock</span> <span class="br0">&#123;</span>
+    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">600px</span><span class="sy0">;</span>
+    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">75px</span><span class="sy0">;</span>
+    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#D00050</span><span class="sy0">;</span>
+    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="kw1">black</span><span class="sy0">;</span>
+    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">absolute</span><span class="sy0">;</span>
+    <span class="kw1">top</span><span class="sy0">:</span> <span class="re3">5px</span><span class="sy0">;</span>
+    <span class="kw1">right</span><span class="sy0">:</span> <span class="re3">0px</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re1">.anim</span><span class="re1">.yui3-dd-drop-over</span> <span class="br0">&#123;</span>
+    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="re0">#EDFF9F</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re1">.anim</span><span class="re1">.done</span> <span class="br0">&#123;</span>
+    <span class="kw1">background-color</span><span class="sy0">:</span> <span class="kw2">white</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#drag1</span><span class="re1">.yui3-dd-drag-over</span> <span class="br0">&#123;</span>
+    opacity<span class="sy0">:</span> .5<span class="sy0">;</span>
+    filter<span class="sy0">:</span> alpha<span class="br0">&#40;</span>opacity<span class="sy0">=</span><span class="nu0">50</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-f47a0a1415e7697946290bae3589f3ef-plain">.anim {
+    position: relative;
+    height: 50px;
+    width: 100px;
+    border: 1px solid black;
+    background-color: #00B8BF;
+    top: 100px;
+}
+#drag {
+    height: 50px;
+    width: 50px;
+    border: 1px solid black;
+    background-color: #004C6D;
+    color: white;
+    cursor: move;
+    z-index: 5;
+}
+#dock {
+    height: 600px;
+    width: 75px;
+    background-color: #D00050;
+    border: 1px solid black;
+    position: absolute;
+    top: 5px;
+    right: 0px;
+}
+.anim.yui3-dd-drop-over {
+    background-color: #EDFF9F;
+}
+.anim.done {
+    background-color: white;
+}
+#drag1.yui3-dd-drag-over {
+    opacity: .5;
+    filter: alpha(opacity=50);
+}</textarea></div>
+<h3>Setting up the YUI Instance</h3>
+<p>Now we need to create our YUI instance and tell it to load the <code>dd-drop</code>, <code>dd-plugin</code>, <code>dd-drop-plugin</code> and <code>anim</code> modules.</p>
+<div id="syntax-57de47b5b67c8b44080450dce7b14a0c" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drop'</span><span class="sy0">,</span> <span class="st0">'anim'</span><span class="sy0">,</span> <span class="st0">'dd-plugin'</span><span class="sy0">,</span> <span class="st0">'dd-drop-plugin'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drop'</span><span class="sy0">,</span> <span class="st0">'anim'</span><span class="sy0">,</span> <span class="st0">'dd-plugin'</span><span class="sy0">,</span> <span class="st0">'dd-drop-plugin'</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-57de47b5b67c8b44080450dce7b14a0c-plain">YUI().use('dd-drop', 'anim', 'dd-plugin', 'dd-drop-plugin');</textarea></div>
+<h3>Making the Node draggable</h3>
+<p>Now that we have a YUI instance with the modules loaded, we need to instantiate the <code>Drag</code> instance on this Node.</p>
+<p>In this example we will be using Node plugins to accomplish our tasks.</p>
+<div id="syntax-8174d34a42088d61717b1fdb8457667a" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drop'</span><span class="sy0">,</span> <span class="st0">'anim'</span><span class="sy0">,</span> <span class="st0">'dd-plugin'</span><span class="sy0">,</span> <span class="st0">'dd-drop-plugin'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//Get the node #drag</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> d <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#drag'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    d.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">Drag</span><span class="sy0">,</span> <span class="br0">&#123;</span> dragMode<span class="sy0">:</span> <span class="st0">'intersect'</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drop'</span><span class="sy0">,</span> <span class="st0">'anim'</span><span class="sy0">,</span> <span class="st0">'dd-plugin'</span><span class="sy0">,</span> <span class="st0">'dd-drop-plugin'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">//Get the node #drag</span>
+    <span class="kw2">var</span> d <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#drag'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    d.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">Drag</span><span class="sy0">,</span> <span class="br0">&#123;</span> dragMode<span class="sy0">:</span> <span class="st0">'intersect'</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-8174d34a42088d61717b1fdb8457667a-plain">YUI().use('dd-drop', 'anim', 'dd-plugin', 'dd-drop-plugin', function(Y) {
+    //Get the node #drag
+    var d = Y.one('#drag');
+    d.plug(Y.Plugin.Drag, { dragMode: 'intersect' });
+});</textarea></div>
+<h3>Animating the Nodes</h3>
+<p>Now we will set up the Animation sequence that we want to run.</p>
+<div id="syntax-9f667e1302fde828677450b40c1995ef" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">    <span class="co1">//Get all the div's with the class anim</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> anims <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">'div.anim'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> counter <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    anims.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>v<span class="sy0">,</span> k<span class="sy0">,</span> items<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="co1">//Get a reference to the Node instance</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> a <span class="sy0">=</span> v<span class="sy0">;</span> </div></li><li class="li1"><div class="de1">        counter<span class="sy0">++;</span></div></li><li class="li1"><div class="de1">        <span class="co1">//Add the FX plugin</span></div></li><li class="li1"><div class="de1">        a.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFX</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="co1">//Add the Drop plugin</span></div></li><li class="li1"><div class="de1">        a.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">Drop</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//Set the attributes on the animation</span></div></li><li class="li1"><div class="de1">        a.<span class="me1">fx</span>.<span class="me1">setAttrs</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            from<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                left<span class="sy0">:</span> <span class="nu0">0</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            to<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                curve<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                    <span class="kw2">var</span> points <span class="sy0">=</span> <span class="br0">&#91;</span><span class="br0">&#93;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                        n <span class="sy0">=</span> <span class="nu0">10</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                    <span class="kw1">for</span> <span class="br0">&#40;</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> n<span class="sy0">;</span> <span class="sy0">++</span>i<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                        points.<span class="me1">push</span><span class="br0">&#40;</span><span class="br0">&#91;</span></div></li><li class="li2"><div class="de2">                            Math.<span class="me1">floor</span><span class="br0">&#40;</span>Math.<span class="me1">random</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">*</span>Y.<span class="me1">DOM</span>.<span class="me1">winWidth</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">-</span> <span class="nu0">60</span> <span class="sy0">-</span> a.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'offsetWidth'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                            Math.<span class="me1">floor</span><span class="br0">&#40;</span>Math.<span class="me1">random</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">*</span>Y.<span class="me1">DOM</span>.<span class="me1">winHeight</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">-</span> a.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'offsetHeight'</span><span class="br0">&#41;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">                        <span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">                    <span class="kw1">return</span> points<span class="sy0">;</span></div></li><li class="li2"><div class="de2">                <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            <span class="co1">//Do the animation 20 times</span></div></li><li class="li1"><div class="de1">            iterations<span class="sy0">:</span> <span class="nu0">20</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            <span class="co1">//Alternate it so it &quot;bounces&quot; across the screen</span></div></li><li class="li2"><div class="de2">            direction<span class="sy0">:</span> <span class="st0">'alternate'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            <span class="co1">//Give all of them a different duration so we get different speeds.</span></div></li><li class="li1"><div class="de1">            duration<span class="sy0">:</span> <span class="br0">&#40;</span><span class="br0">&#40;</span>counter <span class="sy0">*</span> <span class="nu0">1.75</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="nu0">1</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">    <span class="co1">//Get all the div's with the class anim</span>
+    <span class="kw2">var</span> anims <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">'div.anim'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw2">var</span> counter <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+    anims.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>v<span class="sy0">,</span> k<span class="sy0">,</span> items<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="co1">//Get a reference to the Node instance</span>
+        <span class="kw2">var</span> a <span class="sy0">=</span> v<span class="sy0">;</span> 
+        counter<span class="sy0">++;</span>
+        <span class="co1">//Add the FX plugin</span>
+        a.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFX</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="co1">//Add the Drop plugin</span>
+        a.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">Drop</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">//Set the attributes on the animation</span>
+        a.<span class="me1">fx</span>.<span class="me1">setAttrs</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+            from<span class="sy0">:</span> <span class="br0">&#123;</span>
+                left<span class="sy0">:</span> <span class="nu0">0</span>
+            <span class="br0">&#125;</span><span class="sy0">,</span>
+            to<span class="sy0">:</span> <span class="br0">&#123;</span>
+                curve<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    <span class="kw2">var</span> points <span class="sy0">=</span> <span class="br0">&#91;</span><span class="br0">&#93;</span><span class="sy0">,</span>
+                        n <span class="sy0">=</span> <span class="nu0">10</span><span class="sy0">;</span>
+&nbsp;
+                    <span class="kw1">for</span> <span class="br0">&#40;</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> n<span class="sy0">;</span> <span class="sy0">++</span>i<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                        points.<span class="me1">push</span><span class="br0">&#40;</span><span class="br0">&#91;</span>
+                            Math.<span class="me1">floor</span><span class="br0">&#40;</span>Math.<span class="me1">random</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">*</span>Y.<span class="me1">DOM</span>.<span class="me1">winWidth</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">-</span> <span class="nu0">60</span> <span class="sy0">-</span> a.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'offsetWidth'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+                            Math.<span class="me1">floor</span><span class="br0">&#40;</span>Math.<span class="me1">random</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">*</span>Y.<span class="me1">DOM</span>.<span class="me1">winHeight</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">-</span> a.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'offsetHeight'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>
+                        <span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                    <span class="br0">&#125;</span>
+                    <span class="kw1">return</span> points<span class="sy0">;</span>
+                <span class="br0">&#125;</span>
+            <span class="br0">&#125;</span><span class="sy0">,</span>
+            <span class="co1">//Do the animation 20 times</span>
+            iterations<span class="sy0">:</span> <span class="nu0">20</span><span class="sy0">,</span>
+            <span class="co1">//Alternate it so it &quot;bounces&quot; across the screen</span>
+            direction<span class="sy0">:</span> <span class="st0">'alternate'</span><span class="sy0">,</span>
+            <span class="co1">//Give all of them a different duration so we get different speeds.</span>
+            duration<span class="sy0">:</span> <span class="br0">&#40;</span><span class="br0">&#40;</span>counter <span class="sy0">*</span> <span class="nu0">1.75</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="nu0">1</span><span class="br0">&#41;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-9f667e1302fde828677450b40c1995ef-plain">    //Get all the div's with the class anim
+    var anims = Y.Node.all('div.anim');
+    var counter = 0;
+    anims.each(function(v, k, items) {
+        //Get a reference to the Node instance
+        var a = v; 
+        counter++;
+        //Add the FX plugin
+        a.plug(Y.Plugin.NodeFX);
+        //Add the Drop plugin
+        a.plug(Y.Plugin.Drop);
+
+        //Set the attributes on the animation
+        a.fx.setAttrs({
+            from: {
+                left: 0
+            },
+            to: {
+                curve: function() {
+                    var points = [],
+                        n = 10;
+
+                    for (var i = 0; i < n; ++i) {
+                        points.push([
+                            Math.floor(Math.random()*Y.DOM.winWidth() - 60 - a.get('offsetWidth')),
+                            Math.floor(Math.random()*Y.DOM.winHeight() - a.get('offsetHeight'))
+                        ]);
+                    }
+                    return points;
+                }
+            },
+            //Do the animation 20 times
+            iterations: 20,
+            //Alternate it so it "bounces" across the screen
+            direction: 'alternate',
+            //Give all of them a different duration so we get different speeds.
+            duration: ((counter * 1.75) + 1)
+        });
+    });</textarea></div>
+<h3>Making the Node a Target</h3>
+<p>Using the <code>dd-drop-plugin</code>, we now need to make this animated Node a Drop Target.</p>
+<p>To do that, we need to add the plugin after the fx plugin.</p>
+<div id="syntax-56256fb66fd1a20d8bbe17360f484861" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">//Add the FX plugin</span></div></li><li class="li1"><div class="de1">a.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFX</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="co1">//Add the Drop plugin</span></div></li><li class="li1"><div class="de1">a.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">Drop</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">//Add the FX plugin</span>
+a.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFX</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="co1">//Add the Drop plugin</span>
+a.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">Drop</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-56256fb66fd1a20d8bbe17360f484861-plain">//Add the FX plugin
+a.plug(Y.Plugin.NodeFX);
+//Add the Drop plugin
+a.plug(Y.Plugin.Drop);</textarea></div>
+<h3>Syncing the Target with the Animation</h3>
+<p>The Drop Target needs to be in sync with the animation, since we are changing the height, width, top and left style.</p>
+<p>We do this by adding a listener to the <code>tween</code> event on the animation instance.</p>
+<div id="syntax-3b103c16c4df8cf4f7ede0fdf2299e9c" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">//on tween of the original anim, we need to sync the drop's shim.</span></div></li><li class="li1"><div class="de1">a.<span class="me1">fx</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'tween'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//Do we have an active Drag?</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>Y.<span class="me1">DD</span>.<span class="me1">DDM</span>.<span class="me1">activeDrag</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="co1">//Size this shim</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>.<span class="me1">drop</span>.<span class="me1">sizeShim</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="co1">//Force an over target check since we might not be moving the mouse.</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">Lang</span>.<span class="me1">later</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="sy0">,</span> a<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">this</span>.<span class="me1">drop</span>._handleTargetOver<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> a<span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">//on tween of the original anim, we need to sync the drop's shim.</span>
+a.<span class="me1">fx</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'tween'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">//Do we have an active Drag?</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span>Y.<span class="me1">DD</span>.<span class="me1">DDM</span>.<span class="me1">activeDrag</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="co1">//Size this shim</span>
+        <span class="kw1">this</span>.<span class="me1">drop</span>.<span class="me1">sizeShim</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="co1">//Force an over target check since we might not be moving the mouse.</span>
+        Y.<span class="me1">Lang</span>.<span class="me1">later</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="sy0">,</span> a<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">this</span>.<span class="me1">drop</span>._handleTargetOver<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span> a<span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-3b103c16c4df8cf4f7ede0fdf2299e9c-plain">//on tween of the original anim, we need to sync the drop's shim.
+a.fx.on('tween', function() {
+    //Do we have an active Drag?
+    if (Y.DD.DDM.activeDrag) {
+        //Size this shim
+        this.drop.sizeShim();
+        //Force an over target check since we might not be moving the mouse.
+        Y.Lang.later(0, a, function() {
+            this.drop._handleTargetOver();
+        });
+    }
+}, a);</textarea></div>
+<h3>Full example source</h3>
+<div id="syntax-946a105b503fe6434b13e5451ca25b47" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drop'</span><span class="sy0">,</span> <span class="st0">'anim'</span><span class="sy0">,</span> <span class="st0">'dd-plugin'</span><span class="sy0">,</span> <span class="st0">'dd-drop-plugin'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//Get the node #drag</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> d <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#drag'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    d.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">plugin</span>.<span class="me1">Drag</span><span class="sy0">,</span> <span class="br0">&#123;</span> dragMode<span class="sy0">:</span> <span class="st0">'intersect'</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//Get all the div's with the class anim</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> anims <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">'div.anim'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> counter <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    anims.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>v<span class="sy0">,</span> k<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="co1">//Get a reference to the Node instance</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> a <span class="sy0">=</span> v<span class="sy0">;</span> </div></li><li class="li1"><div class="de1">        <span class="co1">//Add the FX plugin</span></div></li><li class="li1"><div class="de1">        a.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFX</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="co1">//Add the Drop plugin</span></div></li><li class="li2"><div class="de2">        a.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">Drop</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//Set the attributes on the animation</span></div></li><li class="li1"><div class="de1">        a.<span class="me1">fx</span>.<span class="me1">setAttrs</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            from<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                left<span class="sy0">:</span> <span class="nu0">0</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            to<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                curve<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    <span class="kw2">var</span> points <span class="sy0">=</span> <span class="br0">&#91;</span><span class="br0">&#93;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                        n <span class="sy0">=</span> <span class="nu0">10</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                    <span class="kw1">for</span> <span class="br0">&#40;</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> n<span class="sy0">;</span> <span class="sy0">++</span>i<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                        points.<span class="me1">push</span><span class="br0">&#40;</span><span class="br0">&#91;</span></div></li><li class="li1"><div class="de1">                            Math.<span class="me1">floor</span><span class="br0">&#40;</span>Math.<span class="me1">random</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">*</span>Y.<span class="me1">DOM</span>.<span class="me1">winWidth</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">-</span> <span class="nu0">60</span> <span class="sy0">-</span> a.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'offsetWidth'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                            Math.<span class="me1">floor</span><span class="br0">&#40;</span>Math.<span class="me1">random</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">*</span>Y.<span class="me1">DOM</span>.<span class="me1">winHeight</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">-</span> a.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'offsetHeight'</span><span class="br0">&#41;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">                        <span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">                    <span class="kw1">return</span> points<span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">            <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            <span class="co1">//Do the animation 20 times</span></div></li><li class="li1"><div class="de1">            iterations<span class="sy0">:</span> <span class="nu0">20</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            <span class="co1">//Alternate it so it &quot;bounces&quot; across the screen</span></div></li><li class="li1"><div class="de1">            direction<span class="sy0">:</span> <span class="st0">'alternate'</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            <span class="co1">//Give all of them a different duration so we get different speeds.</span></div></li><li class="li1"><div class="de1">            duration<span class="sy0">:</span> <span class="br0">&#40;</span><span class="br0">&#40;</span>counter <span class="sy0">*</span> <span class="nu0">1.75</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="nu0">1</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//When this drop is entered, pause the fx</span></div></li><li class="li2"><div class="de2">        a.<span class="me1">drop</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drop:enter'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">this</span>.<span class="me1">fx</span>.<span class="me1">pause</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span> a<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="co1">//When the drop is exited, run the fx again</span></div></li><li class="li1"><div class="de1">        a.<span class="me1">drop</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drop:exit'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            <span class="kw1">this</span>.<span class="me1">fx</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span> a<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="co1">//When a drop is on the node, do something special</span></div></li><li class="li1"><div class="de1">        a.<span class="me1">drop</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drop:hit'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="co1">//Stop the animation</span></div></li><li class="li2"><div class="de2">            <span class="kw1">this</span>.<span class="me1">fx</span>.<span class="kw3">stop</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="co1">//remove the tween listener</span></div></li><li class="li1"><div class="de1">            <span class="kw1">this</span>.<span class="me1">fx</span>.<span class="me1">unsubscribeAll</span><span class="br0">&#40;</span><span class="st0">'tween'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="co1">//move it to the dock</span></div></li><li class="li1"><div class="de1">            <span class="kw1">this</span>.<span class="me1">fx</span>.<span class="me1">setAttrs</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                from<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    opacity<span class="sy0">:</span> <span class="nu0">1</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                to<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    height<span class="sy0">:</span> <span class="nu0">50</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                    width<span class="sy0">:</span> <span class="nu0">50</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                    left<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                        <span class="kw2">var</span> dW <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'body'</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'viewportRegion'</span><span class="br0">&#41;</span>.<span class="me1">right</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                        <span class="kw1">return</span> <span class="br0">&#40;</span><span class="br0">&#40;</span>dW <span class="sy0">-</span> <span class="nu0">60</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">//Minus 60 for the dock</span></div></li><li class="li1"><div class="de1">                    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                    top<span class="sy0">:</span> <span class="nu0">15</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                    opacity<span class="sy0">:</span> .5</div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                direction<span class="sy0">:</span> <span class="st0">'normal'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                iterations<span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                duration<span class="sy0">:</span> .5<span class="sy0">,</span></div></li><li class="li1"><div class="de1">                <span class="co1">//We are using reverse above for the &quot;bouncing&quot;, reset it here.</span></div></li><li class="li1"><div class="de1">                reverse<span class="sy0">:</span> <span class="kw2">false</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">            <span class="co1">//On end, add a class and destroy the target</span></div></li><li class="li1"><div class="de1">            <span class="kw1">this</span>.<span class="me1">fx</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'end'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw1">this</span>.<span class="me1">drop</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span>.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">'done'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="kw1">this</span>.<span class="me1">drop</span>.<span class="me1">destroy</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">            <span class="co1">//Run this animation</span></div></li><li class="li1"><div class="de1">            <span class="kw1">this</span>.<span class="me1">fx</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="co1">//others that were dropped on.</span></div></li><li class="li1"><div class="de1">            Y.<span class="me1">each</span><span class="br0">&#40;</span>e.<span class="me1">others</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>v<span class="sy0">,</span> k<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                <span class="kw2">var</span> node <span class="sy0">=</span> v.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                node.<span class="me1">fx</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span> a<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//on tween of the original anim, we need to sync the drop's shim.</span></div></li><li class="li1"><div class="de1">        a.<span class="me1">fx</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'tween'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="co1">//Do we have an active Drag?</span></div></li><li class="li1"><div class="de1">            <span class="kw1">if</span> <span class="br0">&#40;</span>Y.<span class="me1">DD</span>.<span class="me1">DDM</span>.<span class="me1">activeDrag</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                <span class="co1">//Size this shim</span></div></li><li class="li1"><div class="de1">                <span class="kw1">this</span>.<span class="me1">drop</span>.<span class="me1">sizeShim</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="co1">//Force an over target check since we might not be moving the mouse.</span></div></li><li class="li1"><div class="de1">                Y.<span class="me1">Lang</span>.<span class="me1">later</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="sy0">,</span> a<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    <span class="kw1">this</span>.<span class="me1">drop</span>._handleTargetOver<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">                <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span> a<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        a.<span class="me1">fx</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-drop'</span><span class="sy0">,</span> <span class="st0">'anim'</span><span class="sy0">,</span> <span class="st0">'dd-plugin'</span><span class="sy0">,</span> <span class="st0">'dd-drop-plugin'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">//Get the node #drag</span>
+    <span class="kw2">var</span> d <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#drag'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    d.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">plugin</span>.<span class="me1">Drag</span><span class="sy0">,</span> <span class="br0">&#123;</span> dragMode<span class="sy0">:</span> <span class="st0">'intersect'</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//Get all the div's with the class anim</span>
+    <span class="kw2">var</span> anims <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">'div.anim'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw2">var</span> counter <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+    anims.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>v<span class="sy0">,</span> k<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="co1">//Get a reference to the Node instance</span>
+        <span class="kw2">var</span> a <span class="sy0">=</span> v<span class="sy0">;</span> 
+        <span class="co1">//Add the FX plugin</span>
+        a.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFX</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="co1">//Add the Drop plugin</span>
+        a.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">Drop</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">//Set the attributes on the animation</span>
+        a.<span class="me1">fx</span>.<span class="me1">setAttrs</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+            from<span class="sy0">:</span> <span class="br0">&#123;</span>
+                left<span class="sy0">:</span> <span class="nu0">0</span>
+            <span class="br0">&#125;</span><span class="sy0">,</span>
+            to<span class="sy0">:</span> <span class="br0">&#123;</span>
+                curve<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    <span class="kw2">var</span> points <span class="sy0">=</span> <span class="br0">&#91;</span><span class="br0">&#93;</span><span class="sy0">,</span>
+                        n <span class="sy0">=</span> <span class="nu0">10</span><span class="sy0">;</span>
+&nbsp;
+                    <span class="kw1">for</span> <span class="br0">&#40;</span><span class="kw2">var</span> i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> n<span class="sy0">;</span> <span class="sy0">++</span>i<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                        points.<span class="me1">push</span><span class="br0">&#40;</span><span class="br0">&#91;</span>
+                            Math.<span class="me1">floor</span><span class="br0">&#40;</span>Math.<span class="me1">random</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">*</span>Y.<span class="me1">DOM</span>.<span class="me1">winWidth</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">-</span> <span class="nu0">60</span> <span class="sy0">-</span> a.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'offsetWidth'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+                            Math.<span class="me1">floor</span><span class="br0">&#40;</span>Math.<span class="me1">random</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">*</span>Y.<span class="me1">DOM</span>.<span class="me1">winHeight</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">-</span> a.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'offsetHeight'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>
+                        <span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                    <span class="br0">&#125;</span>
+                    <span class="kw1">return</span> points<span class="sy0">;</span>
+                <span class="br0">&#125;</span>
+            <span class="br0">&#125;</span><span class="sy0">,</span>
+            <span class="co1">//Do the animation 20 times</span>
+            iterations<span class="sy0">:</span> <span class="nu0">20</span><span class="sy0">,</span>
+            <span class="co1">//Alternate it so it &quot;bounces&quot; across the screen</span>
+            direction<span class="sy0">:</span> <span class="st0">'alternate'</span><span class="sy0">,</span>
+            <span class="co1">//Give all of them a different duration so we get different speeds.</span>
+            duration<span class="sy0">:</span> <span class="br0">&#40;</span><span class="br0">&#40;</span>counter <span class="sy0">*</span> <span class="nu0">1.75</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="nu0">1</span><span class="br0">&#41;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">//When this drop is entered, pause the fx</span>
+        a.<span class="me1">drop</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drop:enter'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">this</span>.<span class="me1">fx</span>.<span class="me1">pause</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span><span class="sy0">,</span> a<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="co1">//When the drop is exited, run the fx again</span>
+        a.<span class="me1">drop</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drop:exit'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">this</span>.<span class="me1">fx</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span><span class="sy0">,</span> a<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="co1">//When a drop is on the node, do something special</span>
+        a.<span class="me1">drop</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'drop:hit'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="co1">//Stop the animation</span>
+            <span class="kw1">this</span>.<span class="me1">fx</span>.<span class="kw3">stop</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="co1">//remove the tween listener</span>
+            <span class="kw1">this</span>.<span class="me1">fx</span>.<span class="me1">unsubscribeAll</span><span class="br0">&#40;</span><span class="st0">'tween'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="co1">//move it to the dock</span>
+            <span class="kw1">this</span>.<span class="me1">fx</span>.<span class="me1">setAttrs</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+                from<span class="sy0">:</span> <span class="br0">&#123;</span>
+                    opacity<span class="sy0">:</span> <span class="nu0">1</span>
+                <span class="br0">&#125;</span><span class="sy0">,</span>
+                to<span class="sy0">:</span> <span class="br0">&#123;</span>
+                    height<span class="sy0">:</span> <span class="nu0">50</span><span class="sy0">,</span>
+                    width<span class="sy0">:</span> <span class="nu0">50</span><span class="sy0">,</span>
+                    left<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                        <span class="kw2">var</span> dW <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'body'</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'viewportRegion'</span><span class="br0">&#41;</span>.<span class="me1">right</span><span class="sy0">;</span>
+                        <span class="kw1">return</span> <span class="br0">&#40;</span><span class="br0">&#40;</span>dW <span class="sy0">-</span> <span class="nu0">60</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">//Minus 60 for the dock</span>
+                    <span class="br0">&#125;</span><span class="sy0">,</span>
+                    top<span class="sy0">:</span> <span class="nu0">15</span><span class="sy0">,</span>
+                    opacity<span class="sy0">:</span> .5
+                <span class="br0">&#125;</span><span class="sy0">,</span>
+                direction<span class="sy0">:</span> <span class="st0">'normal'</span><span class="sy0">,</span>
+                iterations<span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span>
+                duration<span class="sy0">:</span> .5<span class="sy0">,</span>
+                <span class="co1">//We are using reverse above for the &quot;bouncing&quot;, reset it here.</span>
+                reverse<span class="sy0">:</span> <span class="kw2">false</span>
+            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            <span class="co1">//On end, add a class and destroy the target</span>
+            <span class="kw1">this</span>.<span class="me1">fx</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'end'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="kw1">this</span>.<span class="me1">drop</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span>.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">'done'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="kw1">this</span>.<span class="me1">drop</span>.<span class="me1">destroy</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="co1">//Run this animation</span>
+            <span class="kw1">this</span>.<span class="me1">fx</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            <span class="co1">//others that were dropped on.</span>
+            Y.<span class="me1">each</span><span class="br0">&#40;</span>e.<span class="me1">others</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>v<span class="sy0">,</span> k<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="kw2">var</span> node <span class="sy0">=</span> v.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                node.<span class="me1">fx</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="br0">&#125;</span><span class="sy0">,</span> a<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">//on tween of the original anim, we need to sync the drop's shim.</span>
+        a.<span class="me1">fx</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'tween'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="co1">//Do we have an active Drag?</span>
+            <span class="kw1">if</span> <span class="br0">&#40;</span>Y.<span class="me1">DD</span>.<span class="me1">DDM</span>.<span class="me1">activeDrag</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="co1">//Size this shim</span>
+                <span class="kw1">this</span>.<span class="me1">drop</span>.<span class="me1">sizeShim</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="co1">//Force an over target check since we might not be moving the mouse.</span>
+                Y.<span class="me1">Lang</span>.<span class="me1">later</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="sy0">,</span> a<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    <span class="kw1">this</span>.<span class="me1">drop</span>._handleTargetOver<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span><span class="sy0">,</span> a<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        a.<span class="me1">fx</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-946a105b503fe6434b13e5451ca25b47-plain">YUI().use('dd-drop', 'anim', 'dd-plugin', 'dd-drop-plugin', function(Y) {
+    //Get the node #drag
+    var d = Y.one('#drag');
+    d.plug(Y.plugin.Drag, { dragMode: 'intersect' });
+    
+    //Get all the div's with the class anim
+    var anims = Y.Node.all('div.anim');
+    var counter = 0;
+    anims.each(function(v, k) {
+        //Get a reference to the Node instance
+        var a = v; 
+        //Add the FX plugin
+        a.plug(Y.Plugin.NodeFX);
+        //Add the Drop plugin
+        a.plug(Y.Plugin.Drop);
+
+        //Set the attributes on the animation
+        a.fx.setAttrs({
+            from: {
+                left: 0
+            },
+            to: {
+                curve: function() {
+                    var points = [],
+                        n = 10;
+
+                    for (var i = 0; i < n; ++i) {
+                        points.push([
+                            Math.floor(Math.random()*Y.DOM.winWidth() - 60 - a.get('offsetWidth')),
+                            Math.floor(Math.random()*Y.DOM.winHeight() - a.get('offsetHeight'))
+                        ]);
+                    }
+                    return points;
+                }
+            },
+            //Do the animation 20 times
+            iterations: 20,
+            //Alternate it so it "bounces" across the screen
+            direction: 'alternate',
+            //Give all of them a different duration so we get different speeds.
+            duration: ((counter * 1.75) + 1)
+        });
+
+        //When this drop is entered, pause the fx
+        a.drop.on('drop:enter', function() {
+            this.fx.pause();
+        }, a);
+        //When the drop is exited, run the fx again
+        a.drop.on('drop:exit', function() {
+            this.fx.run();
+        }, a);
+        //When a drop is on the node, do something special
+        a.drop.on('drop:hit', function(e) {
+            //Stop the animation
+            this.fx.stop();
+            //remove the tween listener
+            this.fx.unsubscribeAll('tween');
+            //move it to the dock
+            this.fx.setAttrs({
+                from: {
+                    opacity: 1
+                },
+                to: {
+                    height: 50,
+                    width: 50,
+                    left: function() {
+                        var dW = Y.one('body').get('viewportRegion').right;
+                        return ((dW - 60)); //Minus 60 for the dock
+                    },
+                    top: 15,
+                    opacity: .5
+                },
+                direction: 'normal',
+                iterations: 1,
+                duration: .5,
+                //We are using reverse above for the "bouncing", reset it here.
+                reverse: false
+            });
+
+            //On end, add a class and destroy the target
+            this.fx.on('end', function() {
+                this.drop.get('node').addClass('done');
+                this.drop.destroy();
+            }, this);
+            //Run this animation
+            this.fx.run();
+            
+            //others that were dropped on.
+            Y.each(e.others, function(v, k) {
+                var node = v.get('node');
+                node.fx.run();
+            });
+
+        }, a);
+        
+        //on tween of the original anim, we need to sync the drop's shim.
+        a.fx.on('tween', function() {
+            //Do we have an active Drag?
+            if (Y.DD.DDM.activeDrag) {
+                //Size this shim
+                this.drop.sizeShim();
+                //Force an over target check since we might not be moving the mouse.
+                Y.Lang.later(0, a, function() {
+                    this.drop._handleTargetOver();
+                });
+            }
+        }, a);
+
+        a.fx.run();
+    });
+});</textarea></div>
+				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Drag &amp; Drop Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../dd/simple-drag.html'>Simple Drag</a></li><li><a href='../dd/drag-plugin.html'>Drag Node Plugin</a></li><li><a href='../dd/proxy-drag.html'>Proxy Drag</a></li><li><a href='../dd/constrained-drag.html'>Drag Constrained to a Region</a></li><li><a href='../dd/groups-drag.html'>Interaction Groups</a></li><li><a href='../dd/shim-drag.html'>Using the Drag Shim</a></li><li class='selected'><a href='../dd/anim-drop.html'>Animated Drop Targets</a></li><li><a href='../dd/drop-code.html'>Drop Based Coding</a></li><li><a href='../dd/winscroll.html'>Window Scrolling</a></li><li><a href='../dd/delegate.html'>Drag Delegation</a></li><li><a href='../dd/delegate-drop.html'>Drag Delegation with a Drop Target</a></li><li><a href='../dd/delegate-plugins.html'>Using Drag plugins with Delegate</a></li><li><a href='../dd/list-drag.html'>List reorder w/Bubbling</a></li><li><a href='../dd/scroll-list.html'>List reorder w/Scrolling</a></li><li><a href='../dd/portal-drag.html'>Portal Style Example</a></li><li><a href='../dd/photo-browser.html'>Photo Browser</a></li><li><a href='../stylesheet/stylesheet_theme.html'>Adjusting a page theme on the fly (included with examples for StyleSheet)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Drag &amp; Drop Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/dd/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_dd.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="selected "><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Simple DOM Events</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+#container {background-color:#00CCFF; border:1px dotted black; padding:1em; cursor:pointer;}
+</style>
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Simple DOM Events</h1>
+
+<div class="exampleIntro">
+	<p>Clicking in the blue box will pop up a "Hello World!" alert window.  Clicking on the first link will take you to the YUI website; clicking on the second link, which has the same <code>href</code> attribute, will pop up an alert instead and not navigate to a new page.</p>
+
+<p>Event Utility is used here to do two things:</p>
+
+<ol>
+	<li>Attach the <code>click</code> event handler to the blue box;</li>
+	<li>Attach an event handler to the second <code>&lt;a&gt;</code> element that uses <code>preventDefault()</code> to prevent the link, when clicked, from navigating to a new page. </li>
+
+</ol>			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+
+    
+<script language="javascript">
+
+YUI().use("node",
+function(Y) {
+        
+    //A function that pops up a "Hello World" alert:
+    var helloWorld = function(e) {
+        Y.log("helloWorld function firing.", "info", "example");
+        alert("Hello World!");
+    }
+
+    //subscribe the helloWorld function as an event
+    //handler for the click event on the container
+    //div:
+    Y.on("click", helloWorld, "#container");
+
+    //A function that pops up an alert and
+    //prevents the default behavior of the event
+    //for which it is a handler:
+    var interceptLink = function(e) {
+        e.preventDefault();
+        Y.log("You clicked on the second YUI link.", "info", "example");
+        alert("You clicked on the second YUI link.  Because *preventDefault* was called, this link will not navigate away from the page.");
+    }
+
+    //subscribe our interceptLink function
+    //as a click handler for the second anchor
+    //element:
+    Y.on("click", interceptLink, "#secondA");
+
+    //log message to indicate that the example is ready:
+    Y.log("When you begin interacting with the example at left, you'll see log messages appear here.", "info", "example");
+});
+
+</script>
+
+<div id="container">
+<p>Click for Hello World alert.</p>
+</div>
+	<p><a href="http://developer.yahoo.com/yui" id="firstA">The YUI Library. (Link navigates away from page.)</a></p>
+
+	<p><a href="http://developer.yahoo.com/yui" id="secondA">The YUI Library. (Link's default behavior is suppressed.)</a></p>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

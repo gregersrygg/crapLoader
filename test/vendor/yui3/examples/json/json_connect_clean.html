@@ -1,0 +1,102 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>JSON with Y.io</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+<!--there is no custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>JSON with Y.io</h1>
+
+<div class="exampleIntro">
+	<p>A natural fit for JSON is working with the <a href="http://developer.yahoo.com/yui/io/">IO module</a> to parse messages received via XMLHttpRequest (XHR).  In this example, we'll request JSON data from the server using the <code>Y.io</code> method and parse the resulting JSON string data for processing.</p>
+
+<p>Click the Get Messages button to send the request to the server.</p>
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<div id="demo">
+    <input type="button" id="demo_btn" value="Get Messages">
+
+    <div id="demo_msg"></div>
+</div>
+<script type="text/javascript">
+YUI().use("node", "io", "dump", "json-parse",function (Y) {
+
+    var target = Y.Node.get('#demo_msg');
+
+    var callback = {
+
+        timeout : 3000,
+
+        on : {
+            success : function (x,o) {
+                Y.log("RAW JSON DATA: " + o.responseText);
+
+                // Process the JSON data returned from the server
+                var messages = [],
+                    html = '', i, l;
+
+                try {
+                    messages = Y.JSON.parse(o.responseText);
+                }
+                catch (e) {
+                    alert("JSON Parse failed!");
+                    return;
+                }
+
+                Y.log("PARSED DATA: " + Y.Lang.dump(messages));
+
+                // The returned data was parsed into an array of objects.
+                // Add a P element for each received message
+                for (i=0, l=messages.length; i < l; ++i) {
+                    html += '<p>' + messages[i].animal + ' says &quot;' +
+                                    messages[i].message + '&quot;</p>';
+                }
+
+                // Use the Node API to apply the new innerHTML to the target
+                target.set('innerHTML',html);
+            },
+
+            failure : function (x,o) {
+                alert("Async call failed!");
+            }
+
+        }
+    }
+
+    // Attach a click event listener to the button #demo_btn to send the request
+    Y.on('click',function (e) {
+        // Make the call to the server for JSON data
+        transaction = Y.io("assets/jsonConnect.php", callback);
+    },'#demo_btn');
+
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>POST Transaction</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+#container li {margin-left:2em;}
+#container { background-color:#FFFFFF; border:1px dotted #666666; padding:1em; margin-bottom:1em;}
+</style>
+
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>POST Transaction</h1>
+
+<div class="exampleIntro">
+	<p>POSTing data to a server using YUI's IO utility is a simple process.  Click "Send a POST Request" below to try it out, then read the description below to learn how it's done.</p>			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<div id="container">
+	<ul>
+    	<li>IO POST response data will appear here.</li>
+    </ul>
+</div>
+<form><input type="button" id="requestButton" value="Send a POST Request"></form>
+
+<script>
+
+YUI().use("io",
+
+	function(Y) {
+
+		//Get a reference to the Node that we are using
+		//to report results:
+		var div = Y.Node.get('#container ul');
+
+		//A function handler to use for successful requests:
+		var handleSuccess = function(ioId, o){
+			Y.log(arguments);
+			Y.log("The success handler was called.  Id: " + ioId + ".", "info", "example");
+
+			if(o.responseText !== undefined){
+				var s = "<li>Transaction id: " + ioId + "</li>";
+				s += "<li>HTTP status: " + o.status + "</li>";
+				s += "<li>Status code message: " + o.statusText + "</li>";
+				s += "<li>HTTP headers received: <ul>" + o.getAllResponseHeaders() + "</ul></li>";
+				s += "<li>PHP response: " + o.responseText + "</li>";
+				div.set("innerHTML", s);
+			}
+		}
+
+		//A function handler to use for failed requests:
+		var handleFailure = function(ioId, o){
+			Y.log("The failure handler was called.  Id: " + ioId + ".", "info", "example");
+
+			if(o.responseText !== undefined){
+				var s = "<li>Transaction id: " + ioId + "</li>";
+				s += "<li>HTTP status: " + o.status + "</li>";
+				s += "<li>Status code message: " + o.statusText + "</li>";
+				div.set("innerHTML", s);
+			}
+		}
+
+		//Subscribe our handlers to IO's global custom events:
+		Y.on('io:success', handleSuccess);
+		Y.on('io:failure', handleFailure);
+
+
+		/* Configuration object for POST transaction */
+		var cfg = {
+			method: "POST",
+			data: "user=YDN&password=API",
+			headers: { 'X-Transaction': 'POST Example'}
+		};
+
+		//The URL of the resource to which we're POSTing data:
+		var sUrl = "assets/post.php";
+
+		//Handler to make our XHR request when the button is clicked:
+		function makeRequest(){
+
+			div.set("innerHTML", "Loading data from new request...");
+
+			var request = Y.io(sUrl, cfg);
+			Y.log("Initiating request; Id: " + request.id + ".", "info", "example");
+
+		}
+
+		// Make a request when the button is clicked:
+		Y.on("click", makeRequest, "#requestButton");
+
+		Y.log("As you interact with this example, relevant steps in the process will be logged here.", "info", "example");
+	}
+);
+</script>
+
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

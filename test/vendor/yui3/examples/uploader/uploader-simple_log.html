@@ -1,0 +1,390 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Uploader: Single File Upload with Progress Tracking and a Sprite-skinned Button</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+	<style type="text/css">
+		.uploadButton a {
+			display:block;
+			width:100px;
+			height:40px;
+			text-decoration: none;
+		}
+
+		.uploadButton a {
+			background: url("assets/uploadFileButton.png") 0 0 no-repeat;
+		}
+
+	    .uploadButton a:visited {
+			background-position: 0 0;
+		}
+
+	    .uploadButton a:hover {	
+			background-position: 0 -40px;
+		}
+
+	    .uploadButton a:active {
+			background-position: 0 -80px;
+		}
+	</style>
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Uploader: Single File Upload with Progress Tracking and a Sprite-skinned Button</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Uploader: Single File Upload with Progress Tracking and a Sprite-skinned Button</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example demonstrates how to use the <a href="http://developer.yahoo.com/yui/3/uploader/">YUI 3 Uploader</a> to send a single file to the server and to monitor the upload progress. The example also shows how to use a custom image skin for the "Browse" button used by the Uploader.</p>
+
+<p><strong>Please note:</strong> This example will not work when run from a local filesystem because Flash only allows ExternalInterface communication with pages loaded from the network. If you’d like to run this example locally, set up a local web server and launch it from there. </p>	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="uploader-simple_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div id="selectButton" style="width:100px;height:40px"></div> 
+<div class="uploadButton"><a href="#" id="uploadButtonLink"></a></div>
+
+<div id="filename">
+File selected:
+</div>
+<div id="percent">
+Percent uploaded:
+</div>
+
+<script>
+
+YUI().use("uploader", function(Y) {
+
+var uploader = new Y.Uploader({boundingBox:"#selectButton", 
+							   buttonSkin:"assets/selectFileButton.png",
+							   transparent: false
+							   });
+
+uploader.on("uploaderReady", setupUploader);
+uploader.on("fileselect", fileSelect);
+uploader.on("uploadprogress", updateProgress);
+uploader.on("uploadcomplete", uploadComplete);
+
+Y.one("#uploadButtonLink").on("click", uploadFile);
+
+
+function setupUploader (event) {
+	uploader.set("multiFiles", false);
+	uploader.set("log", true);
+	
+	var fileFilters = new Array({description:"Images", extensions:"*.jpg;*.png;*.gif"},
+	                   {description:"Videos", extensions:"*.avi;*.mov;*.mpg"}); 
+	
+    uploader.set("fileFilters", fileFilters);
+}
+
+
+function fileSelect (event) {
+	var fileData = event.fileList;	
+
+	for (var key in fileData) {
+		var output = "File selected: " + fileData[key].name;
+		Y.one("#filename").setContent(output);
+	}
+}
+
+function updateProgress (event) {
+	Y.one("#percent").setContent("Percent uploaded: " + Math.round((100 * event.bytesLoaded / event.bytesTotal)) + "%");
+}
+
+function uploadComplete (event) {
+	Y.one("#percent").setContent("Upload complete!");
+}
+
+function uploadFile (event) {
+	uploader.uploadAll("http://www.yswfblog.com/upload/upload_simple.php");
+}
+
+
+});
+
+</script>	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h2 class="first">Single File Upload with Progress Tracking and a Sprite-skinned Button</h2>
+
+<h3>Set up the Uploader UI</h3>
+
+<p>The Uploader requires that the "Browse" button be implemented as an instance of the Flash Player; all other controls can be regular DOM elements. For this example,  set up a container for the Flash Player and give it the id <code>selectButton</code> and set up a container for the "Upload" button (<code>uploadButton</code>). In addition, set up containers to display the name of the selected file (<code>filename</code>) and the progress of the upload (<code>percent</code>).</p>
+<div id="syntax-e4ee587d258a9d19a92732946a26f786" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;selectButton&quot;</span> style<span class="sy0">=</span><span class="st0">&quot;width:100px;height:40px&quot;</span><span class="sy0">&gt;&lt;/</span>div<span class="sy0">&gt;</span> </div></li><li class="li1"><div class="de1"><span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;uploadButton&quot;</span><span class="sy0">&gt;&lt;</span>a href<span class="sy0">=</span><span class="st0">&quot;#&quot;</span> id<span class="sy0">=</span><span class="st0">&quot;uploadButtonLink&quot;</span><span class="sy0">&gt;&lt;/</span>a<span class="sy0">&gt;&lt;/</span>div<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;filename&quot;</span><span class="sy0">&gt;</span></div></li><li class="li2"><div class="de2">File selected<span class="sy0">:</span></div></li><li class="li1"><div class="de1"><span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1"><span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;percent&quot;</span><span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">Percent uploaded<span class="sy0">:</span></div></li><li class="li1"><div class="de1"><span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;selectButton&quot;</span> style<span class="sy0">=</span><span class="st0">&quot;width:100px;height:40px&quot;</span><span class="sy0">&gt;&lt;/</span>div<span class="sy0">&gt;</span> 
+<span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;uploadButton&quot;</span><span class="sy0">&gt;&lt;</span>a href<span class="sy0">=</span><span class="st0">&quot;#&quot;</span> id<span class="sy0">=</span><span class="st0">&quot;uploadButtonLink&quot;</span><span class="sy0">&gt;&lt;/</span>a<span class="sy0">&gt;&lt;/</span>div<span class="sy0">&gt;</span>
+&nbsp;
+<span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;filename&quot;</span><span class="sy0">&gt;</span>
+File selected<span class="sy0">:</span>
+<span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span>
+<span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;percent&quot;</span><span class="sy0">&gt;</span>
+Percent uploaded<span class="sy0">:</span>
+<span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></pre></div><textarea id="syntax-e4ee587d258a9d19a92732946a26f786-plain"><div id="selectButton" style="width:100px;height:40px"></div> 
+<div class="uploadButton"><a href="#" id="uploadButtonLink"></a></div>
+
+<div id="filename">
+File selected:
+</div>
+<div id="percent">
+Percent uploaded:
+</div></textarea></div>
+<p>In the head section of the example, define custom styles for the <code>uploadButton</code> to give it an image skin that has multiple button states:</p>
+
+<div id="syntax-7516d975e72bbcb8824a8355664fac8e" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sy0">&lt;</span>style type<span class="sy0">=</span><span class="st0">&quot;text/css&quot;</span><span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">	.<span class="me1">uploadButton</span> a <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">		display<span class="sy0">:</span>block<span class="sy0">;</span></div></li><li class="li1"><div class="de1">		width<span class="sy0">:</span>100px<span class="sy0">;</span></div></li><li class="li2"><div class="de2">		height<span class="sy0">:</span>40px<span class="sy0">;</span></div></li><li class="li1"><div class="de1">		text<span class="sy0">-</span>decoration<span class="sy0">:</span> none<span class="sy0">;</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">	.<span class="me1">uploadButton</span> a <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">		background<span class="sy0">:</span> url<span class="br0">&#40;</span><span class="st0">&quot;assets/uploadFileButton.png&quot;</span><span class="br0">&#41;</span> <span class="nu0">0</span> <span class="nu0">0</span> no<span class="sy0">-</span>repeat<span class="sy0">;</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    .<span class="me1">uploadButton</span> a<span class="sy0">:</span>visited <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">		background<span class="sy0">-</span>position<span class="sy0">:</span> <span class="nu0">0</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">	<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    .<span class="me1">uploadButton</span> a<span class="sy0">:</span>hover <span class="br0">&#123;</span>	</div></li><li class="li1"><div class="de1">		background<span class="sy0">-</span>position<span class="sy0">:</span> <span class="nu0">0</span> <span class="sy0">-</span>40px<span class="sy0">;</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    .<span class="me1">uploadButton</span> a<span class="sy0">:</span>active <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">		background<span class="sy0">-</span>position<span class="sy0">:</span> <span class="nu0">0</span> <span class="sy0">-</span>80px<span class="sy0">;</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="sy0">&lt;/</span>style<span class="sy0">&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="sy0">&lt;</span>style type<span class="sy0">=</span><span class="st0">&quot;text/css&quot;</span><span class="sy0">&gt;</span>
+	.<span class="me1">uploadButton</span> a <span class="br0">&#123;</span>
+		display<span class="sy0">:</span>block<span class="sy0">;</span>
+		width<span class="sy0">:</span>100px<span class="sy0">;</span>
+		height<span class="sy0">:</span>40px<span class="sy0">;</span>
+		text<span class="sy0">-</span>decoration<span class="sy0">:</span> none<span class="sy0">;</span>
+	<span class="br0">&#125;</span>
+&nbsp;
+	.<span class="me1">uploadButton</span> a <span class="br0">&#123;</span>
+		background<span class="sy0">:</span> url<span class="br0">&#40;</span><span class="st0">&quot;assets/uploadFileButton.png&quot;</span><span class="br0">&#41;</span> <span class="nu0">0</span> <span class="nu0">0</span> no<span class="sy0">-</span>repeat<span class="sy0">;</span>
+	<span class="br0">&#125;</span>
+&nbsp;
+    .<span class="me1">uploadButton</span> a<span class="sy0">:</span>visited <span class="br0">&#123;</span>
+		background<span class="sy0">-</span>position<span class="sy0">:</span> <span class="nu0">0</span> <span class="nu0">0</span><span class="sy0">;</span>
+	<span class="br0">&#125;</span>
+&nbsp;
+    .<span class="me1">uploadButton</span> a<span class="sy0">:</span>hover <span class="br0">&#123;</span>	
+		background<span class="sy0">-</span>position<span class="sy0">:</span> <span class="nu0">0</span> <span class="sy0">-</span>40px<span class="sy0">;</span>
+	<span class="br0">&#125;</span>
+&nbsp;
+    .<span class="me1">uploadButton</span> a<span class="sy0">:</span>active <span class="br0">&#123;</span>
+		background<span class="sy0">-</span>position<span class="sy0">:</span> <span class="nu0">0</span> <span class="sy0">-</span>80px<span class="sy0">;</span>
+	<span class="br0">&#125;</span>
+<span class="sy0">&lt;/</span>style<span class="sy0">&gt;</span></pre></div><textarea id="syntax-7516d975e72bbcb8824a8355664fac8e-plain"><style type="text/css">
+	.uploadButton a {
+		display:block;
+		width:100px;
+		height:40px;
+		text-decoration: none;
+	}
+
+	.uploadButton a {
+		background: url("assets/uploadFileButton.png") 0 0 no-repeat;
+	}
+
+    .uploadButton a:visited {
+		background-position: 0 0;
+	}
+
+    .uploadButton a:hover {	
+		background-position: 0 -40px;
+	}
+
+    .uploadButton a:active {
+		background-position: 0 -80px;
+	}
+</style></textarea></div>
+<h3>Create a YUI Instance</h3>
+<p>Now that the UI containers and controls are in place, create a YUI instance, using the <code>uploader</code> module, for this example:</p>
+
+<div id="syntax-6606f9518a72488f94b39144479f9a7e" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;uploader&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">	<span class="co1">// Y is the YUI instance.</span></div></li><li class="li1"><div class="de1">	<span class="co1">// The rest of the code in this tutorial is encapsulated </span></div></li><li class="li1"><div class="de1">	<span class="co1">// in this anonymous function.</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;uploader&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+	<span class="co1">// Y is the YUI instance.</span>
+	<span class="co1">// The rest of the code in this tutorial is encapsulated </span>
+	<span class="co1">// in this anonymous function.</span>
+<span class="br0">&#125;</span> <span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-6606f9518a72488f94b39144479f9a7e-plain">YUI().use("uploader", function(Y) {
+	// Y is the YUI instance.
+	// The rest of the code in this tutorial is encapsulated 
+	// in this anonymous function.
+} );</textarea></div>
+<h3>Instantiate the Uploader</h3>
+
+<p>Next, create an instance of an Uploader and configure it. The Uploader only requires the reference to the container in which the "Browse" button should be placed, but in this example an image skin for the button is being used; as result, we need to provide the <code>buttonSkin</code> property with a reference to the image sprite, as well as the <code>transparent</code> Boolean value (this property specifies whether the transparent areas of the image sprite are rendered as such; if no <code>buttonSkin</code> is specified, the entire uploader would render as transparent).</p>
+
+<div id="syntax-6bbff620984dc8693271d231262d6a67" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> uploader <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Uploader</span><span class="br0">&#40;</span><span class="br0">&#123;</span>boundingBox<span class="sy0">:</span><span class="st0">&quot;#selectButton&quot;</span><span class="sy0">,</span> </div></li><li class="li1"><div class="de1">							   buttonSkin<span class="sy0">:</span><span class="st0">&quot;assets/selectFileButton.png&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">							   transparent<span class="sy0">:</span> <span class="kw2">false</span></div></li><li class="li1"><div class="de1">							   <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>	</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> uploader <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Uploader</span><span class="br0">&#40;</span><span class="br0">&#123;</span>boundingBox<span class="sy0">:</span><span class="st0">&quot;#selectButton&quot;</span><span class="sy0">,</span> 
+							   buttonSkin<span class="sy0">:</span><span class="st0">&quot;assets/selectFileButton.png&quot;</span><span class="sy0">,</span>
+							   transparent<span class="sy0">:</span> <span class="kw2">false</span>
+							   <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>	</pre></div><textarea id="syntax-6bbff620984dc8693271d231262d6a67-plain">var uploader = new Y.Uploader({boundingBox:"#selectButton", 
+							   buttonSkin:"assets/selectFileButton.png",
+							   transparent: false
+							   });	</textarea></div><h3>Listen for Uploader Events</h3>
+<p>Next, add event handlers to various uploader events and the <code>click</code> handler for the "Upload" button. The <code>uploaderReady</code> event is particularly important because the uploader may not be ready to accept method calls until this event has fired. Therefore, any method calls and property settings for the uploader should be made within the handler for that event:</p>
+<div id="syntax-f48cec040592eb25c2cbe713c24d11fa" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">uploader.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;uploaderReady&quot;</span><span class="sy0">,</span> setupUploader<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">uploader.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;fileselect&quot;</span><span class="sy0">,</span> fileSelect<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">uploader.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;uploadprogress&quot;</span><span class="sy0">,</span> updateProgress<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">uploader.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;uploadcomplete&quot;</span><span class="sy0">,</span> uploadComplete<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#uploadButtonLink&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> uploadFile<span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">uploader.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;uploaderReady&quot;</span><span class="sy0">,</span> setupUploader<span class="br0">&#41;</span><span class="sy0">;</span>
+uploader.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;fileselect&quot;</span><span class="sy0">,</span> fileSelect<span class="br0">&#41;</span><span class="sy0">;</span>
+uploader.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;uploadprogress&quot;</span><span class="sy0">,</span> updateProgress<span class="br0">&#41;</span><span class="sy0">;</span>
+uploader.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;uploadcomplete&quot;</span><span class="sy0">,</span> uploadComplete<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#uploadButtonLink&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> uploadFile<span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-f48cec040592eb25c2cbe713c24d11fa-plain">uploader.on("uploaderReady", setupUploader);
+uploader.on("fileselect", fileSelect);
+uploader.on("uploadprogress", updateProgress);
+uploader.on("uploadcomplete", uploadComplete);
+
+Y.one("#uploadButtonLink").on("click", uploadFile);</textarea></div>
+<h3>Set Up the Uploader</h3>
+<p>Once the uploader is ready, and the <code>uploaderReady</code> event is fired, set properties to further configure the Uploader. In particular, set the <code>multiFiles</code> property to restrict user to selecting only a single file, the <code>log</code> property to provide debug information (output only if the computer is running the debug version of the Flash player), and the <code>fileFilters</code> property to filter files in the user's "Browse" dialog:</p>
+
+<div id="syntax-ef8312221ff13641267968b68168ba6f" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">function</span> setupUploader <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">	uploader.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;multiFiles&quot;</span><span class="sy0">,</span> <span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">	uploader.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;log&quot;</span><span class="sy0">,</span> <span class="kw2">true</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">	<span class="kw2">var</span> fileFilters <span class="sy0">=</span> <span class="kw2">new</span> Array<span class="br0">&#40;</span><span class="br0">&#123;</span>description<span class="sy0">:</span><span class="st0">&quot;Images&quot;</span><span class="sy0">,</span> extensions<span class="sy0">:</span><span class="st0">&quot;*.jpg;*.png;*.gif&quot;</span><span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">	                   <span class="br0">&#123;</span>description<span class="sy0">:</span><span class="st0">&quot;Videos&quot;</span><span class="sy0">,</span> extensions<span class="sy0">:</span><span class="st0">&quot;*.avi;*.mov;*.mpg&quot;</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span> </div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    uploader.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;fileFilters&quot;</span><span class="sy0">,</span> fileFilters<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">function</span> setupUploader <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+	uploader.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;multiFiles&quot;</span><span class="sy0">,</span> <span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span>
+	uploader.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;log&quot;</span><span class="sy0">,</span> <span class="kw2">true</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+	<span class="kw2">var</span> fileFilters <span class="sy0">=</span> <span class="kw2">new</span> Array<span class="br0">&#40;</span><span class="br0">&#123;</span>description<span class="sy0">:</span><span class="st0">&quot;Images&quot;</span><span class="sy0">,</span> extensions<span class="sy0">:</span><span class="st0">&quot;*.jpg;*.png;*.gif&quot;</span><span class="br0">&#125;</span><span class="sy0">,</span>
+	                   <span class="br0">&#123;</span>description<span class="sy0">:</span><span class="st0">&quot;Videos&quot;</span><span class="sy0">,</span> extensions<span class="sy0">:</span><span class="st0">&quot;*.avi;*.mov;*.mpg&quot;</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span> 
+&nbsp;
+    uploader.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;fileFilters&quot;</span><span class="sy0">,</span> fileFilters<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-ef8312221ff13641267968b68168ba6f-plain">function setupUploader (event) {
+	uploader.set("multiFiles", false);
+	uploader.set("log", true);
+	
+	var fileFilters = new Array({description:"Images", extensions:"*.jpg;*.png;*.gif"},
+	                   {description:"Videos", extensions:"*.avi;*.mov;*.mpg"}); 
+	
+    uploader.set("fileFilters", fileFilters);
+}</textarea></div>
+<h3>Handler for the <code>fileselect</code> Event</h3>
+
+<p>In the handler for the <code>fileselect</code>, extract the file list from the event payload and display the name of the file. In this particular case, the list should only contain one file name, since the user was restricted to selecting a single file:</p>
+
+<div id="syntax-075d8f57ffe028d1641746e31ccc0762" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">function</span> fileSelect <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">	<span class="kw2">var</span> fileData <span class="sy0">=</span> event.<span class="me1">fileList</span><span class="sy0">;</span>	</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">	<span class="kw1">for</span> <span class="br0">&#40;</span><span class="kw2">var</span> key <span class="kw1">in</span> fileData<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">		<span class="kw2">var</span> output <span class="sy0">=</span> <span class="st0">&quot;File selected: &quot;</span> <span class="sy0">+</span> fileData<span class="br0">&#91;</span>key<span class="br0">&#93;</span>.<span class="kw3">name</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">		Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#filename&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span>output<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">function</span> fileSelect <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+	<span class="kw2">var</span> fileData <span class="sy0">=</span> event.<span class="me1">fileList</span><span class="sy0">;</span>	
+&nbsp;
+	<span class="kw1">for</span> <span class="br0">&#40;</span><span class="kw2">var</span> key <span class="kw1">in</span> fileData<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+		<span class="kw2">var</span> output <span class="sy0">=</span> <span class="st0">&quot;File selected: &quot;</span> <span class="sy0">+</span> fileData<span class="br0">&#91;</span>key<span class="br0">&#93;</span>.<span class="kw3">name</span><span class="sy0">;</span>
+		Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#filename&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span>output<span class="br0">&#41;</span><span class="sy0">;</span>
+	<span class="br0">&#125;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-075d8f57ffe028d1641746e31ccc0762-plain">function fileSelect (event) {
+	var fileData = event.fileList;	
+
+	for (var key in fileData) {
+		var output = "File selected: " + fileData[key].name;
+		Y.one("#filename").setContent(output);
+	}
+}</textarea></div>
+<h3>Handler for Other Events</h3>
+
+<p>In the <code>uploadprogress</code> handler, update the content of the <code>percent</code> container based on the values provided in the event payload. In the <code>uploadcomplete</code> handler, place the final message into the <code>percent</code> container. Finally, in the <code>click</code> handler, initiate the upload to a specific URL:</p>
+
+<div id="syntax-f6315661371a0289a211179bc0f5c650" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">function</span> updateProgress <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">	Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#percent&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span><span class="st0">&quot;Percent uploaded: &quot;</span> <span class="sy0">+</span> Math.<span class="me1">round</span><span class="br0">&#40;</span><span class="br0">&#40;</span><span class="nu0">100</span> <span class="sy0">*</span> event.<span class="me1">bytesLoaded</span> <span class="sy0">/</span> event.<span class="me1">bytesTotal</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;%&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="kw2">function</span> uploadComplete <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">	Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#percent&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span><span class="st0">&quot;Upload complete!&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">function</span> uploadFile <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">	uploader.<span class="me1">uploadAll</span><span class="br0">&#40;</span><span class="st0">&quot;http://www.yswfblog.com/upload/upload_simple.php&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">function</span> updateProgress <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+	Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#percent&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span><span class="st0">&quot;Percent uploaded: &quot;</span> <span class="sy0">+</span> Math.<span class="me1">round</span><span class="br0">&#40;</span><span class="br0">&#40;</span><span class="nu0">100</span> <span class="sy0">*</span> event.<span class="me1">bytesLoaded</span> <span class="sy0">/</span> event.<span class="me1">bytesTotal</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;%&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="kw2">function</span> uploadComplete <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+	Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#percent&quot;</span><span class="br0">&#41;</span>.<span class="me1">setContent</span><span class="br0">&#40;</span><span class="st0">&quot;Upload complete!&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="kw2">function</span> uploadFile <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+	uploader.<span class="me1">uploadAll</span><span class="br0">&#40;</span><span class="st0">&quot;http://www.yswfblog.com/upload/upload_simple.php&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-f6315661371a0289a211179bc0f5c650-plain">function updateProgress (event) {
+	Y.one("#percent").setContent("Percent uploaded: " + Math.round((100 * event.bytesLoaded / event.bytesTotal)) + "%");
+}
+
+function uploadComplete (event) {
+	Y.one("#percent").setContent("Upload complete!");
+}
+
+function uploadFile (event) {
+	uploader.uploadAll("http://www.yswfblog.com/upload/upload_simple.php");
+}</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Uploader Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li class='selected'><a href='../uploader/uploader-simple.html'>Single File Upload with Progress Tracking and a Sprite-skinned Button</a></li><li><a href='../uploader/uploader-multiple.html'>Multiple File Upload with Progress Tracking and a Transparent Overlay Upload Button</a></li><li><a href='../uploader/uploader-withvars.html'>Single File Upload with GET and POST Vars Submission and Server Data Return</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Uploader Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/uploader/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_uploader.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="selected "><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

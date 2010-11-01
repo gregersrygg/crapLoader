@@ -1,0 +1,110 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>DataSource with Caching</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+/* custom styles for this example */
+#demo .output {margin-bottom:1em; padding:10px; border:1px solid #D9D9D9;}
+</style>
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>DataSource with Caching</h1>
+
+<div class="exampleIntro">
+	The DataSourceCache plugin enables caching on any DataSource to reduce high-latency calls to remote sources and to reduce server load. In this example, the Cache's <code>max</code> value has been set to <code>3</code>.
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<form id="demo" action="http://search.yahoo.com/search">
+    <h6>Send request to Yahoo! Web Search Webservice:</h6>
+    <input type="input" id="demo_input_query" name="p">
+    <input type="submit" id="demo_query_retrieve" value="Retrieve data =>">
+    <input type="button" id="demo_cache_clear" value="Clear cache =>">
+    <div id="demo_output_response" class="output"></div>
+</form>
+
+<script type="text/javascript">
+YUI().use("dump", "node", "datasource-get", "datasource-jsonschema", "datasource-cache", "datatype-date", function (Y) {
+    var output = Y.one("#demo_output_response"),
+        source = "remote source",
+        myDataSource = new Y.DataSource.Get({source:"http://query.yahooapis.com/v1/public/yql?format=json&"}),
+        callback = {
+            success: function(e){
+                output.setContent("<p>[" +
+                Y.DataType.Date.format(new Date(), {format:"%F %r"}) +
+                "] Retrieved from " + source + ": " + Y.dump(e.response).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;</p>"));
+            },
+            failure: function(e){
+                output.setContent("<p>[" +
+                Y.DataType.Date.format(new Date(), {format:"%F %r"}) +
+                "] Could not retrieve data: " + e.error.message + "</p>");
+            }
+        };
+
+    myDataSource.plug(Y.Plugin.DataSourceJSONSchema, {
+        schema: {
+            resultListLocator: "query.results.result",
+            resultFields: ["title"]
+        }
+    });
+
+    myDataSource.plug(Y.Plugin.DataSourceCache, {max:3});
+    myDataSource.cache.on("retrieve", function(){
+        source = "cache";
+    });
+
+    Y.one("#demo_cache_clear").on("click", function(){
+        myDataSource.cache.flush();
+        output.setContent("<p>[" +
+                Y.DataType.Date.format(new Date(), {format:"%F %r"}) +
+                "] Cache cleared.</p>");
+    });
+
+    Y.on("submit", function(e){
+        e.halt();
+        var query = encodeURIComponent(Y.one("#demo_input_query").get("value").replace(/"/g,'\\"'));
+        if(query) {
+            source = "remote source";
+            myDataSource.sendRequest({
+                request:"q=select%20*%20from%20search.web%20where%20query%3D%22" + query + "%22",
+                callback:callback
+            });
+        }
+        else {
+            output.setContent("<p>Please enter a query.</p>");
+        }
+    }, "#demo");
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

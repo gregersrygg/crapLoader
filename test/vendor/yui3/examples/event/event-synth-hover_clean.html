@@ -1,0 +1,124 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Creating a hover event for DOM subscription</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+    #demo p {
+        background: #fff;
+        border: 1px solid #999;
+        width: 250px;
+        height: 100px;
+        line-height: 100px;
+        text-align: center;
+    }
+
+    #demo .hover {
+        background: #000;
+        color: #fff;
+    }
+</style>
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Creating a hover event for DOM subscription</h1>
+
+<div class="exampleIntro">
+	<p>This example will illustrate how to use the synthetic event creation API.
+We'll create a <code>hover</code> event that accepts two functions at
+subscription time, the first being the function that executes when the hover
+begins, and the second when the hover ends.</p>
+
+<p>Subscribing to this new event will look like this:</p>
+<div id="syntax-1ff5f11603c4945422515db77e5944f9" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">node.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> onHover<span class="sy0">,</span> endHover<span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">node.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;hover&quot;</span><span class="sy0">,</span> onHover<span class="sy0">,</span> endHover<span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-1ff5f11603c4945422515db77e5944f9-plain">node.on("hover", onHover, endHover);</textarea></div>			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<div id="demo">
+    <p>Hover over me</p>
+    <button type="button" id="attach">Attach hover event</button>
+    <button type="button" id="detach">Detach hover event</button>
+</div>
+<script>
+YUI().use("event-synthetic", "event-mouseenter", function (Y) {
+
+    Y.Event.define("hover", {
+        processArgs: function (args) {
+            // Args received here match the Y.on(...) order, so
+            // [ 'hover', onHover, "#demo p", endHover, etc ]
+            var mouseleave = args[3];
+            args.splice(3,1);
+
+            // This will be stored in the subscription's '_extra' property
+            return mouseleave;
+        },
+
+        on: function (node, sub, notifier) {
+            var mouseleave = sub._extra;
+
+            // To make detaching the associated DOM events easy, use a
+            // detach category, but keep the category unique per subscription
+            // by creating the category with Y.guid()
+            sub._evtGuid = Y.guid() + '|';
+
+            node.on( sub._evtGuid + "mouseenter", function (e) {
+                // Firing the notifier event executes the hover subscribers
+                notifier.fire(e);
+            });
+
+            node.on(sub._evtGuid + "mouseleave", mouseleave);
+        },
+
+        detach: function (node, sub, notifier) {
+            // Detach the mouseenter and mouseout subscriptions using the
+            // detach category
+            node.detach(this._evtGuid + '*');
+        }
+    } );
+
+    function onHover(e) {
+        this.addClass("hover");
+    }
+    function endHover(e) {
+        this.removeClass("hover");
+    }
+
+    Y.one("#attach").on("click", function (e) {
+        Y.one("#demo p").on("hover", onHover, endHover);
+    });
+
+    Y.one("#detach").on("click", function (e) {
+        Y.one("#demo p").detach("hover");
+    });
+
+} );
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

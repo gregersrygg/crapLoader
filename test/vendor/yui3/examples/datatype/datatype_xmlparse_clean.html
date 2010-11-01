@@ -1,0 +1,75 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>DataType.XML.parse()</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+/* custom styles for this example */
+#demo input, #demo label {display:block;}
+#demo fieldset {margin:1em;}
+#demo textarea {width:40em;height:25em;}
+</style>
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>DataType.XML.parse()</h1>
+
+<div class="exampleIntro">
+	The XML module of the DataType Utility allows you to take a string and convert it to an XML document.
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<form id="demo">
+    <fieldset>
+        <label for="demo_input">String to parse:</label>
+        <textarea type="text" id="demo_input">&lt;myroot&gt;&lt;item type='foo'&gt;&lt;name&gt;Abc&lt;/name&gt;&lt;rank&gt;1&lt;/rank&gt;&lt;/item&gt;&lt;item type='bar'&gt;&lt;name&gt;Def&lt;/name&gt;&lt;rank&gt;2&lt;/rank&gt;&lt;/item&gt;&lt;item type='bat'&gt;&lt;name&gt;Ghi&lt;/name&gt;&lt;rank&gt;3&lt;/rank&gt;&lt;/item&gt;&lt;/myroot&gt;</textarea>
+        <input type="button" id="demo_btn" value="Alert node type of parsed output">
+    </fieldset>
+</form>
+
+
+
+<script type="text/javascript">
+YUI().use("node", "datatype-xml", function (Y) {
+    Y.on("click", function(e){
+        var input = Y.one("#demo_input").get("value"),
+            output = Y.DataType.XML.parse(input);
+                
+        if(output === "") {
+            output += "(Invalid value)"
+        }
+        
+        alert("node type: " + output.nodeType);
+    }, "#demo_btn");
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

@@ -1,0 +1,1218 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Focus Manager Node Plugin: Accessible TabView</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+
+	/*	The following style rules necessary to override style rules in the 
+		YUI CSS file. */
+
+	#example ul,
+	#example li {
+		list-style: none;
+		list-style: none;		
+	}
+	
+	#example em {
+		font-style: normal;
+	}
+
+	#example .yui3-tabpanel {
+
+		/*	Use the "zoom" property to set the the hasLayout property to true.
+			This ensures that the background color of the tab's panel will 
+			be rendered correctly when the example is running in the 
+			example chrome.
+		*/
+
+		_zoom: 1;
+
+	}
+
+	#example .yui3-tabpanel a {
+		text-decoration: underline;
+		color: blue;
+	}
+	
+	#example h3 {
+		color: #000;
+		font-size: 100%;
+		font-weight: bold;
+	}
+
+	#example .yui3-tabview {
+		margin: 0 .25em;
+	}
+	
+
+	/*	Hide the instructional text used to label the tabview offscreen.
+	 	This ensures it is still available to users of screen readers, but is 
+		not visible to sighted users.	*/
+
+	#tabview-heading em {
+		position: absolute;
+		left: -999em;
+	}
+
+
+	/*	Hide the list while it is being transformed into a tabview.	*/
+
+	.yui3-loading #tabview-1 {
+		display: none;
+	}
+
+</style>
+<script type="text/javascript">
+
+	//	Add a class to the documentElement to prevent the user from seeing 
+	//	the unstyled tabview while the necessary CSS and JavaScript 
+	//	dependancies are being fetched.
+
+	document.documentElement.className = "yui3-loading";
+
+</script>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Focus Manager Node Plugin: Accessible TabView</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Focus Manager Node Plugin: Accessible TabView</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>
+This example illustrates how to create an accessible tabview widget using the 
+Focus Manager Node Plugin, 
+<a href="../../api/YUI.html#event_delegate">Event's delegation support</a>, and 
+Node's support for the 
+<a href="http://www.w3.org/TR/wai-aria/">WAI-ARIA Roles and States</a>.
+</p>	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="node-focusmanager-2_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<h3 id="tabview-heading">Today's News</h3>
+<div id="tabview-1">
+    <ul>
+        <li class="yui3-tab yui3-tab-selected"><a href="#top-stories"><em>Top Stories</em></a></li>
+        <li class="yui3-tab"><a href="#world-news"><em>World</em></a></li>
+        <li class="yui3-tab"><a href="#entertainment-news"><em>Entertainment</em></a></li>
+        <li class="yui3-tab"><a href="#sports-news"><em>Sports</em></a></li>
+        <li class="yui3-tab"><a href="#technology-news"><em>Technology</em></a></li>		
+    </ul>            
+    <div>
+        <div class="yui3-tabpanel yui3-tabpanel-selected" id="top-stories">
+			<h3>Top Stories</h3>
+			<ul>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/quran_burning"><q>US church to go ahead with Sept. 11 Quran burning 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/us_house_stakes"><q>Grim outlook for Democrats puts House up for grabs 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/us_colorado_wildfires"><q>CO firefighters to step up attack on Boulder blaze 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/iran_stoning"><q>EU decries 'barbaric' plans to stone Iranian woman 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_la_am_ca/cb_cuba_fidel_castro"><q>Report: Castro blasts Ahmadinejad as anti-Semitic 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_mi_ea/ml_israel_palestinians"><q>Abbas asks US to step into settlement dispute 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_el_st_lo/us_chicago_mayor"><q>Chicago Mayor Daley won't run for re-election 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_en_ot/us_chapman_parole"><q>John Lennon killer Chapman denied parole in NY 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_he_me/us_med_smoking_rates"><q>US smoking rate still stuck at 1 in 5 adults 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_co_ap_po/fbc_t25_college_fb_poll"><q>Boise State gains ground in AP Top 25 
+    (AP)
+</q></a>
+				</li></ul>	        	
+        </div>
+        <div class="yui3-tabpanel" id="world-news">
+			<h3>World News</h3>
+			<ul>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_mi_ea/ml_iraq_us_casualties"><q>Iraqi soldier fires on US troops, kills 2 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_bi_ge/eu_europe_strikes"><q>Strikes in France, London foreshadow more protests 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/iran_stoning"><q>EU decries 'barbaric' plans to stone Iranian woman 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_as/as_pakistan"><q>Women, kids among 17 dead in NW Pakistani bombing 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_as/as_singapore_good_english"><q>Singapore prods locals to speak better English 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/time/20100907/wl_time/08599201635900"><q>Europe's Sets Up New Banking Police 
+    (Time.com)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/afp/20100907/wl_sthasia_afp/cricketengpakt20"><q>England cruise to T20 win after Pakistan collapse 
+    (AFP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_mi_ea/ml_israel_palestinians"><q>Abbas asks US to step into settlement dispute 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_la_am_ca/lt_colombia_farc_journalist"><q>Colombia orders arrest of reporter in rebel case 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/un_un_congo_rapes"><q>UN reports over 500 rapes in eastern Congo 
+    (AP)
+</q></a>
+				</li></ul>        </div>
+        <div class="yui3-tabpanel" id="entertainment-news">
+			<h3>Entertainment News</h3>
+			<ul>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_ot/us_anna_nicole_smith"><q>Nanny: Bloody syringes in Anna Nicole's bathroom 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_ot/us_tv_cnn_parker_spitzer"><q>CNN christens its new talk show 'Parker Spitzer' 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_ce/us_tv_letterman_view"><q>Walters, Letterman compare notes on heart surgery 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://us.rd.yahoo.com/dailynews/external/omg_rss/rss_omg_en/http___omg_yahoo_com_photos4190/37482215/*http://omg.yahoo.com/photos/la-toya-jackson-milks-it/4190"><q>La Toya Jackson Milks It 
+    (omg!)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_ot/us_white_house_dance"><q>Michelle Obama hosts first White House dance event 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_mu/us_chapman_parole"><q>John Lennon killer Chapman denied parole in NY 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_tv/us_anna_nicole_smith"><q>Nanny: Bloody syringes in Anna Nicole's bathroom 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/nm/20100907/film_nm/us_venice"><q>Venice film fest fights its corner as crisis bites 
+    (Reuters)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_mu/us_music_review_stone_sour"><q>Review: Stone Sour packs punch on `Audio Secrecy' 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/nm/20100907/media_nm/us_venice"><q>Venice film fest fights its corner as crisis bites 
+    (Reuters)
+</q></a>
+				</li></ul>	        	
+        </div>
+        <div class="yui3-tabpanel" id="sports-news">
+			<h3>Sports News</h3>
+			<ul>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_co_ap_po/fbc_t25_college_fb_poll"><q>Boise State gains ground in AP Top 25 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_go_ne/glf_ryder_cup"><q>US Ryder Cup picks: Woods, Johnson, Cink, Fowler 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_te_ga_su/ten_us_open"><q>Youzhny slows Spain's US Open reign, beats Robredo 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/afp/20100907/sp_soccer_afp/fbleuro2012gpbrussvk"><q>Slovakia down Advocaat's Russia 
+    (AFP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_fo_ne/fbn_nfl_umpires"><q>NFL again tweaks positioning of umpires 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_fo_ne/fbn_redskins_titans_haynesworth"><q>AP Sources: Redskins, Titans talking Haynesworth 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_fo_ne/fbn_dolphins_parcells"><q>Parcells turns over control of Dolphins to Ireland 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/nm/20100907/sp_nm/us_nfl_dolphins"><q>Parcells turns over control of Dolphins to GM Ireland 
+    (Reuters)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://us.rd.yahoo.com/dailynews/external/appolicious_rss/rss_appolicious_sp/http___www_appolicious_com_articles3032_playoff_baseball_is_around_the_corner_get_ready_with_these_iphone_apps/37479524/SIG=13o37jpm4/*http://www.appolicious.com/sports/articles/3032-playoff-baseball-is-around-the-corner-get-ready-with-these-iphone-apps"><q>Playoff baseball is around the corner, get ready with these iPhone apps 
+    (Appolicious)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100901/ap_on_sp_bk_ne/bkn_celtics_west"><q>Guard Delonte West returning to Celtics 
+    (AP)
+</q></a>
+				</li></ul>	        	
+        </div>
+        <div class="yui3-tabpanel" id="technology-news">
+			<h3>Technology News</h3>
+			<ul>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20100907/ap_on_hi_te/us_oracle_hurd"><q>HP sues ex-CEO Hurd over new job at rival Oracle 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20100906/ap_on_hi_te/as_apple_s_challenger"><q>Taiwan's HTC: iPhone's `quiet' challenger 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20100905/ap_on_bi_ge/us_craigslist_adult_services"><q>1 'censored' bar won't stop online prostitution 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ytech_gadg/20100830/tc_ytech_gadg/ytech_gadg_tc3511"><q>Able to unplug from work while you’re on vacation? 
+    (Ben Patterson)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ytech_gadg/20100830/tc_ytech_gadg/ytech_gadg_tc3509"><q>Mobile users still wary of being found, survey says 
+    (Ben Patterson)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/macworld/20100907/tc_macworld/macworldintroducesmacworldinsider"><q>Macworld introduces Macworld Insider 
+    (Macworld.com)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20100907/ap_on_hi_te/us_electronic_devices_searches"><q>NY lawsuit seeks to halt suspicionless searches 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/nf/20100907/tc_nf/75061"><q>Yikes! Coming to TV This Fall -- Google And Its Ads 
+    (NewsFactor)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20100907/ap_on_bi_ge/us_millicom_analyst_note"><q>Millicom downgraded at Stifel Nicolaus 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/afp/20100907/tc_afp/usitcompanypolicydiplomacyinternetgoogle"><q>Former State Department official to head 'Google Ideas' 
+    (AFP)
+</q></a>
+				</li></ul>	        	
+        </div>			
+    </div>
+</div>
+
+<script type="text/javascript">
+
+	YUI({ 
+
+			base: "../../build/",
+			modules: {
+				"tabviewcss": {
+					type: "css",
+					fullpath: "assets/tabview.css"
+				},
+				"tabviewjs": {
+					type: "js",
+					fullpath: "assets/tabview.js",
+					requires: ["node-focusmanager", "tabviewcss"]
+				}
+
+			},
+			timeout: 10000
+
+		}).use("tabviewjs", function(Y, result) {
+
+		    //	The callback supplied to use() will be executed regardless of
+		    //	whether the operation was successful or not.  The second parameter
+		    //	is a result object that has the status of the operation.  We can
+		    //	use this to try to recover from failures or timeouts.
+
+		    if (!result.success) {
+
+		        Y.log("Load failure: " + result.msg, "warn", "Example");
+
+				//	Show the tabview HTML if the loader failed that way the 
+				//	original unskinned tabview will be visible so that the 
+				//	user can interact with it either way.
+
+				document.documentElement.className = "";
+
+		    }
+
+	});
+
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Setting Up the HTML</h3>
+<p>
+The tabs in the tabview widget will be represented by a list of
+<code>&#60;a&#62;</code> elements whose <code>href</code> attribute is set to
+the id of an <code>&#60;div&#62;</code> element that contains its content.
+Therefore, without JavaScript and CSS, the tabs function as in-page links.
+</p>
+<div id="syntax-ff3f73c34b3d44eeb63a00a9117a091a" class="yui-syntax-highlight"><div class="numbers"><pre class="html4strict" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">h3</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;tabview-heading&quot;</span>&gt;</span>Today's News<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h3</span>&gt;</span></div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;tabview-1&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">ul</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">li</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tab yui-tab-selected&quot;</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#top-stories&quot;</span>&gt;&lt;<span class="kw2">em</span>&gt;</span>Top Stories<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li2"><div class="de2">        <span class="sc2">&lt;<span class="kw2">li</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tab&quot;</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#world-news&quot;</span>&gt;&lt;<span class="kw2">em</span>&gt;</span>World<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">li</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tab&quot;</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#entertainment-news&quot;</span>&gt;&lt;<span class="kw2">em</span>&gt;</span>Entertainment<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">li</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tab&quot;</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#sports-news&quot;</span>&gt;&lt;<span class="kw2">em</span>&gt;</span>Sports<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">li</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tab&quot;</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#technology-news&quot;</span>&gt;&lt;<span class="kw2">em</span>&gt;</span>Technology<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">ul</span>&gt;</span></div></li><li class="li2"><div class="de2">    <span class="sc2">&lt;<span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tabpanel yui-tabpanel-selected&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;top-stories&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc-1">&lt;!-- Tab Panel Content Here  --&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tabpanel&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;world-news&quot;</span>&gt;</span></div></li><li class="li2"><div class="de2">            <span class="sc-1">&lt;!-- Tab Panel Content Here  --&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tabpanel&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;entertainment-news&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc-1">&lt;!-- Tab Panel Content Here  --&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li2"><div class="de2">        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tabpanel&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;sports-news&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc-1">&lt;!-- Tab Panel Content Here  --&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tabpanel&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;technology-news&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc-1">&lt;!-- Tab Panel Content Here  --&gt;</span></div></li><li class="li2"><div class="de2">        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="html4strict" style="font-family:monospace;"><span class="sc2">&lt;<span class="kw2">h3</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;tabview-heading&quot;</span>&gt;</span>Today's News<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h3</span>&gt;</span>
+<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;tabview-1&quot;</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">ul</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">li</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tab yui-tab-selected&quot;</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#top-stories&quot;</span>&gt;&lt;<span class="kw2">em</span>&gt;</span>Top Stories<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">li</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tab&quot;</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#world-news&quot;</span>&gt;&lt;<span class="kw2">em</span>&gt;</span>World<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">li</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tab&quot;</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#entertainment-news&quot;</span>&gt;&lt;<span class="kw2">em</span>&gt;</span>Entertainment<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">li</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tab&quot;</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#sports-news&quot;</span>&gt;&lt;<span class="kw2">em</span>&gt;</span>Sports<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">li</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tab&quot;</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#technology-news&quot;</span>&gt;&lt;<span class="kw2">em</span>&gt;</span>Technology<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">ul</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tabpanel yui-tabpanel-selected&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;top-stories&quot;</span>&gt;</span>
+            <span class="sc-1">&lt;!-- Tab Panel Content Here  --&gt;</span>
+        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tabpanel&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;world-news&quot;</span>&gt;</span>
+            <span class="sc-1">&lt;!-- Tab Panel Content Here  --&gt;</span>
+        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tabpanel&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;entertainment-news&quot;</span>&gt;</span>
+            <span class="sc-1">&lt;!-- Tab Panel Content Here  --&gt;</span>
+        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tabpanel&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;sports-news&quot;</span>&gt;</span>
+            <span class="sc-1">&lt;!-- Tab Panel Content Here  --&gt;</span>
+        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-tabpanel&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;technology-news&quot;</span>&gt;</span>
+            <span class="sc-1">&lt;!-- Tab Panel Content Here  --&gt;</span>
+        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></pre></div><textarea id="syntax-ff3f73c34b3d44eeb63a00a9117a091a-plain"><h3 id="tabview-heading">Today's News</h3>
+<div id="tabview-1">
+    <ul>
+        <li class="yui3-tab yui-tab-selected"><a href="#top-stories"><em>Top Stories</em></a></li>
+        <li class="yui3-tab"><a href="#world-news"><em>World</em></a></li>
+        <li class="yui3-tab"><a href="#entertainment-news"><em>Entertainment</em></a></li>
+        <li class="yui3-tab"><a href="#sports-news"><em>Sports</em></a></li>
+        <li class="yui3-tab"><a href="#technology-news"><em>Technology</em></a></li>
+    </ul>
+    <div>
+        <div class="yui3-tabpanel yui-tabpanel-selected" id="top-stories">
+            <!-- Tab Panel Content Here  -->
+        </div>
+        <div class="yui3-tabpanel" id="world-news">
+            <!-- Tab Panel Content Here  -->
+        </div>
+        <div class="yui3-tabpanel" id="entertainment-news">
+            <!-- Tab Panel Content Here  -->
+        </div>
+        <div class="yui3-tabpanel" id="sports-news">
+            <!-- Tab Panel Content Here  -->
+        </div>
+        <div class="yui3-tabpanel" id="technology-news">
+            <!-- Tab Panel Content Here  -->
+        </div>
+    </div>
+</div></textarea></div><p>
+For this example the content of each tab panel is created on the server using
+the <a href="http://developer.yahoo.com/yql/">YQL</a> API to fetch the title and
+URL for news stories made available from the various
+<a href="http://news.yahoo.com/rss" title="Yahoo! News - RSS">Yahoo! News RSS feeds</a>.
+Here's the PHP:
+</p>
+<style>
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.php  {font-family:monospace;}
+.php .imp {font-weight: bold; color: red;}
+.php .kw1 {color: #b1b100;}
+.php .kw2 {color: #000000; font-weight: bold;}
+.php .kw3 {color: #990000;}
+.php .co1 {color: #666666; font-style: italic;}
+.php .co2 {color: #666666; font-style: italic;}
+.php .co3 {color: #0000cc; font-style: italic;}
+.php .co4 {color: #009933; font-style: italic;}
+.php .coMULTI {color: #666666; font-style: italic;}
+.php .es0 {color: #000099; font-weight: bold;}
+.php .es1 {color: #000099; font-weight: bold;}
+.php .es2 {color: #660099; font-weight: bold;}
+.php .es3 {color: #660099; font-weight: bold;}
+.php .es4 {color: #006699; font-weight: bold;}
+.php .es5 {color: #006699; font-weight: bold; font-style: italic;}
+.php .es6 {color: #009933; font-weight: bold;}
+.php .es_h {color: #000099; font-weight: bold;}
+.php .br0 {color: #009900;}
+.php .sy0 {color: #339933;}
+.php .sy1 {color: #000000; font-weight: bold;}
+.php .st0 {color: #0000ff;}
+.php .st_h {color: #0000ff;}
+.php .nu0 {color: #cc66cc;}
+.php .nu8 {color: #208080;}
+.php .nu12 {color: #208080;}
+.php .nu19 {color:#800080;}
+.php .me1 {color: #004000;}
+.php .me2 {color: #004000;}
+.php .re0 {color: #000088;}
+.php span.xtra { display:block; }
+
+</style>
+<div id="syntax-017e8e39bd8d1615e14f0d97965dc347" class="yui-syntax-highlight"><div class="numbers"><pre class="php" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">function</span> getFeed<span class="br0">&#40;</span><span class="re0">$sFeed</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="re0">$params</span> <span class="sy0">=</span> <span class="kw3">array</span><span class="br0">&#40;</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;q&quot;</span> <span class="sy0">=&gt;</span> <span class="br0">&#40;</span><span class="st_h">'select title,link from rss where url=&quot;http://rss.news.yahoo.com/rss/$sFeed&quot;'</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        <span class="st0">&quot;format&quot;</span> <span class="sy0">=&gt;</span> <span class="st0">&quot;json&quot;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="re0">$encoded_params</span> <span class="sy0">=</span> <span class="kw3">array</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$params</span> <span class="kw1">as</span> <span class="re0">$k</span> <span class="sy0">=&gt;</span> <span class="re0">$v</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="re0">$encoded_params</span><span class="br0">&#91;</span><span class="br0">&#93;</span> <span class="sy0">=</span> <span class="kw3">urlencode</span><span class="br0">&#40;</span><span class="re0">$k</span><span class="br0">&#41;</span><span class="sy0">.</span><span class="st0">&quot;=&quot;</span><span class="sy0">.</span><span class="kw3">urlencode</span><span class="br0">&#40;</span><span class="re0">$v</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="re0">$url</span> <span class="sy0">=</span> <span class="st0">&quot;http://query.yahooapis.com/v1/public/yql?&quot;</span><span class="sy0">.</span><span class="kw3">implode</span><span class="br0">&#40;</span><span class="st0">&quot;&amp;&quot;</span><span class="sy0">,</span> <span class="re0">$encoded_params</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="re0">$ch</span> <span class="sy0">=</span> curl_init<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    curl_setopt<span class="br0">&#40;</span><span class="re0">$ch</span><span class="sy0">,</span> CURLOPT_URL<span class="sy0">,</span> <span class="re0">$url</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    curl_setopt<span class="br0">&#40;</span><span class="re0">$ch</span><span class="sy0">,</span> CURLOPT_RETURNTRANSFER<span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="re0">$rsp</span> <span class="sy0">=</span> curl_exec<span class="br0">&#40;</span><span class="re0">$ch</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    curl_close<span class="br0">&#40;</span><span class="re0">$ch</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$rsp</span> <span class="sy0">!==</span> <span class="kw2">false</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="re0">$rsp_obj</span> <span class="sy0">=</span> json_decode<span class="br0">&#40;</span><span class="re0">$rsp</span><span class="sy0">,</span> <span class="kw2">true</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="re0">$results</span> <span class="sy0">=</span> <span class="re0">$rsp_obj</span><span class="br0">&#91;</span><span class="st0">&quot;query&quot;</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">&quot;results&quot;</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">&quot;item&quot;</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="re0">$list</span> <span class="sy0">=</span> <span class="st0">&quot;&quot;</span><span class="sy0">;</span> <span class="co1">// HTML output</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="re0">$nResults</span> <span class="sy0">=</span> <span class="kw3">count</span><span class="br0">&#40;</span><span class="re0">$results</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$nResults</span> <span class="sy0">&gt;</span> <span class="nu0">10</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="re0">$nResults</span> <span class="sy0">=</span> <span class="nu0">9</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">for</span> <span class="br0">&#40;</span><span class="re0">$i</span> <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> <span class="re0">$i</span><span class="sy0">&lt;=</span> <span class="re0">$nResults</span><span class="sy0">;</span> <span class="re0">$i</span><span class="sy0">++</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="re0">$result</span> <span class="sy0">=</span> <span class="re0">$results</span><span class="br0">&#91;</span><span class="re0">$i</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">            <span class="re0">$list</span><span class="sy0">.=</span> <span class="co3">&lt;&lt;&lt; END_OF_HTML</span></div></li><li class="li1"><div class="de1"><span class="co3">&nbsp;           &lt;li&gt;</span></div></li><li class="li1"><div class="de1"><span class="co3">&nbsp;               &lt;a href=&quot;${result[&quot;link&quot;]}&quot;&gt;&lt;q&gt;${result[&quot;title&quot;]}&lt;/q&gt;&lt;/a&gt;</span></div></li><li class="li1"><div class="de1"><span class="co3">&nbsp;           &lt;/li&gt;</span></div></li><li class="li1"><div class="de1"><span class="co3">END</span>_OF_HTML<span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">return</span> <span class="br0">&#40;</span><span class="st0">&quot;&lt;ul&gt;&quot;</span> <span class="sy0">.</span> <span class="re0">$list</span> <span class="sy0">.</span> <span class="st0">&quot;&lt;/ul&gt;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="php" style="font-family:monospace;"><span class="kw2">function</span> getFeed<span class="br0">&#40;</span><span class="re0">$sFeed</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="re0">$params</span> <span class="sy0">=</span> <span class="kw3">array</span><span class="br0">&#40;</span>
+        <span class="st0">&quot;q&quot;</span> <span class="sy0">=&gt;</span> <span class="br0">&#40;</span><span class="st_h">'select title,link from rss where url=&quot;http://rss.news.yahoo.com/rss/$sFeed&quot;'</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        <span class="st0">&quot;format&quot;</span> <span class="sy0">=&gt;</span> <span class="st0">&quot;json&quot;</span>
+    <span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="re0">$encoded_params</span> <span class="sy0">=</span> <span class="kw3">array</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$params</span> <span class="kw1">as</span> <span class="re0">$k</span> <span class="sy0">=&gt;</span> <span class="re0">$v</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="re0">$encoded_params</span><span class="br0">&#91;</span><span class="br0">&#93;</span> <span class="sy0">=</span> <span class="kw3">urlencode</span><span class="br0">&#40;</span><span class="re0">$k</span><span class="br0">&#41;</span><span class="sy0">.</span><span class="st0">&quot;=&quot;</span><span class="sy0">.</span><span class="kw3">urlencode</span><span class="br0">&#40;</span><span class="re0">$v</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+    <span class="re0">$url</span> <span class="sy0">=</span> <span class="st0">&quot;http://query.yahooapis.com/v1/public/yql?&quot;</span><span class="sy0">.</span><span class="kw3">implode</span><span class="br0">&#40;</span><span class="st0">&quot;&amp;&quot;</span><span class="sy0">,</span> <span class="re0">$encoded_params</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="re0">$ch</span> <span class="sy0">=</span> curl_init<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    curl_setopt<span class="br0">&#40;</span><span class="re0">$ch</span><span class="sy0">,</span> CURLOPT_URL<span class="sy0">,</span> <span class="re0">$url</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    curl_setopt<span class="br0">&#40;</span><span class="re0">$ch</span><span class="sy0">,</span> CURLOPT_RETURNTRANSFER<span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="re0">$rsp</span> <span class="sy0">=</span> curl_exec<span class="br0">&#40;</span><span class="re0">$ch</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    curl_close<span class="br0">&#40;</span><span class="re0">$ch</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$rsp</span> <span class="sy0">!==</span> <span class="kw2">false</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="re0">$rsp_obj</span> <span class="sy0">=</span> json_decode<span class="br0">&#40;</span><span class="re0">$rsp</span><span class="sy0">,</span> <span class="kw2">true</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="re0">$results</span> <span class="sy0">=</span> <span class="re0">$rsp_obj</span><span class="br0">&#91;</span><span class="st0">&quot;query&quot;</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">&quot;results&quot;</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">&quot;item&quot;</span><span class="br0">&#93;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="re0">$list</span> <span class="sy0">=</span> <span class="st0">&quot;&quot;</span><span class="sy0">;</span> <span class="co1">// HTML output</span>
+&nbsp;
+        <span class="re0">$nResults</span> <span class="sy0">=</span> <span class="kw3">count</span><span class="br0">&#40;</span><span class="re0">$results</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$nResults</span> <span class="sy0">&gt;</span> <span class="nu0">10</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="re0">$nResults</span> <span class="sy0">=</span> <span class="nu0">9</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+        <span class="kw1">for</span> <span class="br0">&#40;</span><span class="re0">$i</span> <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> <span class="re0">$i</span><span class="sy0">&lt;=</span> <span class="re0">$nResults</span><span class="sy0">;</span> <span class="re0">$i</span><span class="sy0">++</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            <span class="re0">$result</span> <span class="sy0">=</span> <span class="re0">$results</span><span class="br0">&#91;</span><span class="re0">$i</span><span class="br0">&#93;</span><span class="sy0">;</span>
+&nbsp;
+            <span class="re0">$list</span><span class="sy0">.=</span> <span class="co3">&lt;&lt;&lt; END_OF_HTML
+            &lt;li&gt;
+                &lt;a href=&quot;${result[&quot;link&quot;]}&quot;&gt;&lt;q&gt;${result[&quot;title&quot;]}&lt;/q&gt;&lt;/a&gt;
+            &lt;/li&gt;
+END</span>_OF_HTML<span class="sy0">;</span>
+&nbsp;
+        <span class="br0">&#125;</span>
+&nbsp;
+        <span class="kw1">return</span> <span class="br0">&#40;</span><span class="st0">&quot;&lt;ul&gt;&quot;</span> <span class="sy0">.</span> <span class="re0">$list</span> <span class="sy0">.</span> <span class="st0">&quot;&lt;/ul&gt;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span>
+&nbsp;
+<span class="br0">&#125;</span>
+&nbsp;</pre></div><textarea id="syntax-017e8e39bd8d1615e14f0d97965dc347-plain">function getFeed($sFeed) {
+
+    $params = array(
+        "q" => ('select title,link from rss where url="http://rss.news.yahoo.com/rss/$sFeed"'),
+        "format" => "json"
+    );
+
+    $encoded_params = array();
+
+    foreach ($params as $k => $v) {
+        $encoded_params[] = urlencode($k)."=".urlencode($v);
+    }
+
+    $url = "http://query.yahooapis.com/v1/public/yql?".implode("&", $encoded_params);
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $rsp = curl_exec($ch);
+    curl_close($ch);
+
+    if ($rsp !== false) {
+
+        $rsp_obj = json_decode($rsp, true);
+
+        $results = $rsp_obj["query"]["results"]["item"];
+
+        $list = ""; // HTML output
+
+        $nResults = count($results);
+        
+        if ($nResults > 10) {
+            $nResults = 9;
+        }
+            
+        for ($i = 0; $i<= $nResults; $i++) {
+            
+            $result = $results[$i];
+
+            $list.= <<< END_OF_HTML
+            <li>
+                <a href="${result["link"]}"><q>${result["title"]}</q></a>
+            </li>
+END_OF_HTML;
+
+        }
+
+        return ("<ul>" . $list . "</ul>");
+
+    }
+
+}
+</textarea></div>
+<h3>Progressive Enhancement</h3>
+<p>
+The markup above will be transformed using both CSS and JavaScript.  To account
+for the scenario where the user has CSS enabled in their browser but JavaScript
+is disabled, the CSS used to style the tabview will be loaded via JavaScript
+using the YUI instance's <a href="http://developer.yahoo.com/yui/3/yui#loader">built-in Loader</a>.
+Additionally, a small block of JavaScript will be placed in the
+<code>&#60;head&#62;</code> &#151; used to temporarily hide the markup
+while the JavaScript and CSS are in the process of loading to prevent the user
+from seeing a flash unstyled content.
+</p>
+<div id="syntax-154572cbf014b8085536e1edf6019b00" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    base<span class="sy0">:</span> <span class="st0">&quot;../../build/&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    modules<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="st0">&quot;tabviewcss&quot;</span><span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            type<span class="sy0">:</span> <span class="st0">&quot;css&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            fullpath<span class="sy0">:</span> <span class="st0">&quot;assets/tabview.css&quot;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;tabviewjs&quot;</span><span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            type<span class="sy0">:</span> <span class="st0">&quot;js&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            fullpath<span class="sy0">:</span> <span class="st0">&quot;assets/tabview.js&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            requires<span class="sy0">:</span> <span class="br0">&#91;</span><span class="st0">&quot;node-focusmanager&quot;</span><span class="sy0">,</span> <span class="st0">&quot;tabviewcss&quot;</span><span class="br0">&#93;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    timeout<span class="sy0">:</span> <span class="nu0">10000</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;tabviewjs&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="sy0">,</span> result<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="co1">//  The callback supplied to use() will be executed regardless of</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  whether the operation was successful or not.  The second parameter</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  is a result object that has the status of the operation.  We can</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  use this to try to recover from failures or timeouts.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>result.<span class="me1">success</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Load failure: &quot;</span> <span class="sy0">+</span> result.<span class="me1">msg</span><span class="sy0">,</span> <span class="st0">&quot;warn&quot;</span><span class="sy0">,</span> <span class="st0">&quot;Example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Show the tabview HTML if the loader failed that way the</span></div></li><li class="li2"><div class="de2">        <span class="co1">//  original unskinned tabview will be visible so that the</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  user can interact with it either way.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        document.<span class="me1">documentElement</span>.<span class="me1">className</span> <span class="sy0">=</span> <span class="st0">&quot;&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>
+&nbsp;
+    base<span class="sy0">:</span> <span class="st0">&quot;../../build/&quot;</span><span class="sy0">,</span>
+    modules<span class="sy0">:</span> <span class="br0">&#123;</span>
+        <span class="st0">&quot;tabviewcss&quot;</span><span class="sy0">:</span> <span class="br0">&#123;</span>
+            type<span class="sy0">:</span> <span class="st0">&quot;css&quot;</span><span class="sy0">,</span>
+            fullpath<span class="sy0">:</span> <span class="st0">&quot;assets/tabview.css&quot;</span>
+        <span class="br0">&#125;</span><span class="sy0">,</span>
+        <span class="st0">&quot;tabviewjs&quot;</span><span class="sy0">:</span> <span class="br0">&#123;</span>
+            type<span class="sy0">:</span> <span class="st0">&quot;js&quot;</span><span class="sy0">,</span>
+            fullpath<span class="sy0">:</span> <span class="st0">&quot;assets/tabview.js&quot;</span><span class="sy0">,</span>
+            requires<span class="sy0">:</span> <span class="br0">&#91;</span><span class="st0">&quot;node-focusmanager&quot;</span><span class="sy0">,</span> <span class="st0">&quot;tabviewcss&quot;</span><span class="br0">&#93;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+    timeout<span class="sy0">:</span> <span class="nu0">10000</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;tabviewjs&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="sy0">,</span> result<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">//  The callback supplied to use() will be executed regardless of</span>
+    <span class="co1">//  whether the operation was successful or not.  The second parameter</span>
+    <span class="co1">//  is a result object that has the status of the operation.  We can</span>
+    <span class="co1">//  use this to try to recover from failures or timeouts.</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>result.<span class="me1">success</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Load failure: &quot;</span> <span class="sy0">+</span> result.<span class="me1">msg</span><span class="sy0">,</span> <span class="st0">&quot;warn&quot;</span><span class="sy0">,</span> <span class="st0">&quot;Example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">//  Show the tabview HTML if the loader failed that way the</span>
+        <span class="co1">//  original unskinned tabview will be visible so that the</span>
+        <span class="co1">//  user can interact with it either way.</span>
+&nbsp;
+        document.<span class="me1">documentElement</span>.<span class="me1">className</span> <span class="sy0">=</span> <span class="st0">&quot;&quot;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-154572cbf014b8085536e1edf6019b00-plain">YUI({
+
+    base: "../../build/",
+    modules: {
+        "tabviewcss": {
+            type: "css",
+            fullpath: "assets/tabview.css"
+        },
+        "tabviewjs": {
+            type: "js",
+            fullpath: "assets/tabview.js",
+            requires: ["node-focusmanager", "tabviewcss"]
+        }
+
+    },
+    timeout: 10000
+
+}).use("tabviewjs", function(Y, result) {
+
+    //  The callback supplied to use() will be executed regardless of
+    //  whether the operation was successful or not.  The second parameter
+    //  is a result object that has the status of the operation.  We can
+    //  use this to try to recover from failures or timeouts.
+
+    if (!result.success) {
+
+        Y.log("Load failure: " + result.msg, "warn", "Example");
+
+        //  Show the tabview HTML if the loader failed that way the
+        //  original unskinned tabview will be visible so that the
+        //  user can interact with it either way.
+
+        document.documentElement.className = "";
+
+    }
+
+});</textarea></div>
+
+<h3>ARIA Support</h3>
+<p>
+Through the use of CSS and JavaScript the HTML for the tabview can be
+transformed into something that looks and behaves like a desktop tab control,
+but users of screen readers won't perceive it as an atomic widget, but rather
+simply as a set of HTML elements.  However, through the application
+of the
+<a href="http://www.w3.org/TR/wai-aria/">WAI-ARIA Roles and States</a>, it is
+possible to improve the semantics of the markup such that users of screen
+readers perceive it as a tab control.
+</p>
+
+
+<h3>Keyboard Functionality</h3>
+<p>
+The keyboard functionality for the tabview widget will be provided by the
+Focus Manager Node Plugin.  The Focus Manager's
+<a href="../../api/plugin.NodeFocusManager.html#config_descendants"><code>descendants</code></a>
+attribute is set to a value of ".yui3-tab>a", so that only one tab in the tabview
+is in the browser's default tab flow.  This allows users navigating via the
+keyboard to use the tab key to quickly move into and out of the tabview.  Once
+the tabview has focus, the user can move focus among each tab using the left
+and right arrows keys, as defined by the value of the
+<a href="../../api/plugin.NodeFocusManager.html#config_keys"><code>keys</code></a>
+attribute.  Lastly, the
+<a href="../../api/plugin.NodeFocusManager.html#config_focusClass"><code>focusClass</code></a>
+attribute is used to apply a class of <code>yui-tab-focus</code> to the parent
+<code>&#60;li&#62;</code> of each <code>&#60;a&#62;</code> when it is focused,
+making it easy to style the tab's focused state in each of the
+<a href="http://developer.yahoo.com/yui/articles/gbs/#gbschart">A-Grade browsers</a>.
+
+<div id="syntax-54133a9fed140ccddfa9aa62ae8f0b4d" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;*&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> tabView <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#tabview-1&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        tabList <span class="sy0">=</span> tabView.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;ul&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        tabHeading <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#tabview-heading&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        sInstructionalText <span class="sy0">=</span> tabHeading.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        selectedTabAnchor <span class="sy0">=</span> tabView.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;.yui3-tab-selected&gt;a&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        bGeckoIEWin <span class="sy0">=</span> <span class="br0">&#40;</span><span class="br0">&#40;</span>Y.<span class="me1">UA</span>.<span class="me1">gecko</span> <span class="sy0">||</span> Y.<span class="me1">UA</span>.<span class="me1">ie</span><span class="br0">&#41;</span> <span class="sy0">&amp;&amp;</span> navigator.<span class="me1">userAgent</span>.<span class="me1">indexOf</span><span class="br0">&#40;</span><span class="st0">&quot;Windows&quot;</span><span class="br0">&#41;</span> <span class="sy0">&gt;</span> <span class="sy0">-</span><span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        panelMap <span class="sy0">=</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    tabView.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-tabview&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//  Remove the &quot;yui-loading&quot; class from the documentElement</span></div></li><li class="li2"><div class="de2">    <span class="co1">//  now that the necessary YUI dependencies are loaded and the</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  tabview has been skinned.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    tabView.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;ownerDocument&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;documentElement&quot;</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-loading&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="co1">//  Apply the ARIA roles, states and properties.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//  Add some instructional text to the heading that will be read by</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  the screen reader when the first tab in the tabview is focused.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    tabHeading.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> <span class="br0">&#40;</span>sInstructionalText <span class="sy0">+</span> <span class="st0">&quot; &lt;em&gt;Press the enter key to load the content of each tab.&lt;/em&gt;&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    tabList.<span class="me1">setAttrs</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;aria-labelledby&quot;</span><span class="sy0">:</span> <span class="st0">&quot;tabview-heading&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        role<span class="sy0">:</span> <span class="st0">&quot;tablist&quot;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    tabView.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;div&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;presentation&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    tabView.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFocusManager</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            descendants<span class="sy0">:</span> <span class="st0">&quot;.yui3-tab&gt;a&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            keys<span class="sy0">:</span> <span class="br0">&#123;</span> next<span class="sy0">:</span> <span class="st0">&quot;down:39&quot;</span><span class="sy0">,</span> <span class="co1">// Right arrow</span></div></li><li class="li1"><div class="de1">                    previous<span class="sy0">:</span> <span class="st0">&quot;down:37&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span>  <span class="co1">// Left arrow</span></div></li><li class="li1"><div class="de1">            focusClass<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                className<span class="sy0">:</span> <span class="st0">&quot;yui-tab-focus&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                fn<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    <span class="kw1">return</span> node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            circular<span class="sy0">:</span> <span class="kw2">true</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//  If the list of tabs loses focus, set the activeDescendant</span></div></li><li class="li2"><div class="de2">    <span class="co1">//  attribute to the currently selected tab.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    tabView.<span class="me1">focusManager</span>.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;focusedChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>event.<span class="me1">newVal</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>    <span class="co1">//  The list of tabs has lost focus</span></div></li><li class="li2"><div class="de2">            <span class="kw1">this</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;activeDescendant&quot;</span><span class="sy0">,</span> selectedTabAnchor<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    tabView.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;.yui3-tab&gt;a&quot;</span><span class="br0">&#41;</span>.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span> <span class="br0">&#40;</span>anchor<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> sHref <span class="sy0">=</span> anchor.<span class="me1">getAttribute</span><span class="br0">&#40;</span><span class="st0">&quot;href&quot;</span><span class="sy0">,</span> <span class="nu0">2</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            sPanelID <span class="sy0">=</span> sHref.<span class="me1">substring</span><span class="br0">&#40;</span><span class="nu0">1</span><span class="sy0">,</span> sHref.<span class="me1">length</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            panel<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Apply the ARIA roles, states and properties to each tab</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        anchor.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;tab&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        anchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;presentation&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Remove the &quot;href&quot; attribute from the anchor element to</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  prevent JAWS and NVDA from reading the value of the &quot;href&quot;</span></div></li><li class="li2"><div class="de2">        <span class="co1">//  attribute when the anchor is focused</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>bGeckoIEWin<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            anchor.<span class="me1">removeAttribute</span><span class="br0">&#40;</span><span class="st0">&quot;href&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Cache a reference to id of the tab's corresponding panel</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  element so that it can be made visible when the tab</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  is clicked.</span></div></li><li class="li1"><div class="de1">        panelMap<span class="br0">&#91;</span>anchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span><span class="br0">&#93;</span> <span class="sy0">=</span> sPanelID<span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Apply the ARIA roles, states and properties to each panel</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        panel <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="br0">&#40;</span><span class="st0">&quot;#&quot;</span> <span class="sy0">+</span> sPanelID<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        panel.<span class="me1">setAttrs</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            role<span class="sy0">:</span> <span class="st0">&quot;tabpanel&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            <span class="st0">&quot;aria-labelledby&quot;</span><span class="sy0">:</span> anchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//  Use the &quot;delegate&quot; custom event to listen for the &quot;click&quot; event</span></div></li><li class="li2"><div class="de2">    <span class="co1">//  of each tab's &lt;A&gt; element.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    tabView.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> selectedPanel<span class="sy0">,</span></div></li><li class="li2"><div class="de2">            sID <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Deselect the currently selected tab and hide its</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  corresponding panel.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="kw1">if</span> <span class="br0">&#40;</span>selectedTabAnchor<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            selectedTabAnchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-tab-selected&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="br0">&#40;</span><span class="st0">&quot;#&quot;</span> <span class="sy0">+</span> panelMap<span class="br0">&#91;</span>selectedTabAnchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-tabpanel-selected&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        selectedTabAnchor <span class="sy0">=</span> <span class="kw1">this</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        selectedTabAnchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span>.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-tab-selected&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        selectedPanel <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="br0">&#40;</span><span class="st0">&quot;#&quot;</span> <span class="sy0">+</span> panelMap<span class="br0">&#91;</span>sID<span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        selectedPanel.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-tabpanel-selected&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        creatingPaging<span class="br0">&#40;</span>selectedPanel<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Prevent the browser from following the URL specified by the</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  anchor's &quot;href&quot; attribute when clicked.</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        event.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;.yui3-tab&gt;a&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//  Since the anchor's &quot;href&quot; attribute has been removed, the</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  element will not fire the click event in Firefox when the</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  user presses the enter key.  To fix this, dispatch the</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  &quot;click&quot; event to the anchor when the user presses the</span></div></li><li class="li2"><div class="de2">    <span class="co1">//  enter key.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>bGeckoIEWin<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        tabView.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;keydown&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw1">if</span> <span class="br0">&#40;</span>event.<span class="me1">charCode</span> <span class="sy0">===</span> <span class="nu0">13</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw1">this</span>.<span class="me1">simulate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;&gt;ul&gt;li&gt;a&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;*&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="kw2">var</span> tabView <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#tabview-1&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        tabList <span class="sy0">=</span> tabView.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;ul&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        tabHeading <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#tabview-heading&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        sInstructionalText <span class="sy0">=</span> tabHeading.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        selectedTabAnchor <span class="sy0">=</span> tabView.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;.yui3-tab-selected&gt;a&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        bGeckoIEWin <span class="sy0">=</span> <span class="br0">&#40;</span><span class="br0">&#40;</span>Y.<span class="me1">UA</span>.<span class="me1">gecko</span> <span class="sy0">||</span> Y.<span class="me1">UA</span>.<span class="me1">ie</span><span class="br0">&#41;</span> <span class="sy0">&amp;&amp;</span> navigator.<span class="me1">userAgent</span>.<span class="me1">indexOf</span><span class="br0">&#40;</span><span class="st0">&quot;Windows&quot;</span><span class="br0">&#41;</span> <span class="sy0">&gt;</span> <span class="sy0">-</span><span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        panelMap <span class="sy0">=</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    tabView.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-tabview&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//  Remove the &quot;yui-loading&quot; class from the documentElement</span>
+    <span class="co1">//  now that the necessary YUI dependencies are loaded and the</span>
+    <span class="co1">//  tabview has been skinned.</span>
+&nbsp;
+    tabView.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;ownerDocument&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;documentElement&quot;</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-loading&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//  Apply the ARIA roles, states and properties.</span>
+&nbsp;
+    <span class="co1">//  Add some instructional text to the heading that will be read by</span>
+    <span class="co1">//  the screen reader when the first tab in the tabview is focused.</span>
+&nbsp;
+    tabHeading.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> <span class="br0">&#40;</span>sInstructionalText <span class="sy0">+</span> <span class="st0">&quot; &lt;em&gt;Press the enter key to load the content of each tab.&lt;/em&gt;&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    tabList.<span class="me1">setAttrs</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+        <span class="st0">&quot;aria-labelledby&quot;</span><span class="sy0">:</span> <span class="st0">&quot;tabview-heading&quot;</span><span class="sy0">,</span>
+        role<span class="sy0">:</span> <span class="st0">&quot;tablist&quot;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    tabView.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;div&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;presentation&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    tabView.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFocusManager</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+            descendants<span class="sy0">:</span> <span class="st0">&quot;.yui3-tab&gt;a&quot;</span><span class="sy0">,</span>
+            keys<span class="sy0">:</span> <span class="br0">&#123;</span> next<span class="sy0">:</span> <span class="st0">&quot;down:39&quot;</span><span class="sy0">,</span> <span class="co1">// Right arrow</span>
+                    previous<span class="sy0">:</span> <span class="st0">&quot;down:37&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span>  <span class="co1">// Left arrow</span>
+            focusClass<span class="sy0">:</span> <span class="br0">&#123;</span>
+                className<span class="sy0">:</span> <span class="st0">&quot;yui-tab-focus&quot;</span><span class="sy0">,</span>
+                fn<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    <span class="kw1">return</span> node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="br0">&#125;</span>
+            <span class="br0">&#125;</span><span class="sy0">,</span>
+            circular<span class="sy0">:</span> <span class="kw2">true</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="co1">//  If the list of tabs loses focus, set the activeDescendant</span>
+    <span class="co1">//  attribute to the currently selected tab.</span>
+&nbsp;
+    tabView.<span class="me1">focusManager</span>.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;focusedChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>event.<span class="me1">newVal</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>    <span class="co1">//  The list of tabs has lost focus</span>
+            <span class="kw1">this</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;activeDescendant&quot;</span><span class="sy0">,</span> selectedTabAnchor<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    tabView.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;.yui3-tab&gt;a&quot;</span><span class="br0">&#41;</span>.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span> <span class="br0">&#40;</span>anchor<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="kw2">var</span> sHref <span class="sy0">=</span> anchor.<span class="me1">getAttribute</span><span class="br0">&#40;</span><span class="st0">&quot;href&quot;</span><span class="sy0">,</span> <span class="nu0">2</span><span class="br0">&#41;</span><span class="sy0">,</span>
+            sPanelID <span class="sy0">=</span> sHref.<span class="me1">substring</span><span class="br0">&#40;</span><span class="nu0">1</span><span class="sy0">,</span> sHref.<span class="me1">length</span><span class="br0">&#41;</span><span class="sy0">,</span>
+            panel<span class="sy0">;</span>
+&nbsp;
+        <span class="co1">//  Apply the ARIA roles, states and properties to each tab</span>
+&nbsp;
+        anchor.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;tab&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        anchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;presentation&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+        <span class="co1">//  Remove the &quot;href&quot; attribute from the anchor element to</span>
+        <span class="co1">//  prevent JAWS and NVDA from reading the value of the &quot;href&quot;</span>
+        <span class="co1">//  attribute when the anchor is focused</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span>bGeckoIEWin<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            anchor.<span class="me1">removeAttribute</span><span class="br0">&#40;</span><span class="st0">&quot;href&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+        <span class="co1">//  Cache a reference to id of the tab's corresponding panel</span>
+        <span class="co1">//  element so that it can be made visible when the tab</span>
+        <span class="co1">//  is clicked.</span>
+        panelMap<span class="br0">&#91;</span>anchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span><span class="br0">&#93;</span> <span class="sy0">=</span> sPanelID<span class="sy0">;</span>
+&nbsp;
+&nbsp;
+        <span class="co1">//  Apply the ARIA roles, states and properties to each panel</span>
+&nbsp;
+        panel <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="br0">&#40;</span><span class="st0">&quot;#&quot;</span> <span class="sy0">+</span> sPanelID<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        panel.<span class="me1">setAttrs</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+            role<span class="sy0">:</span> <span class="st0">&quot;tabpanel&quot;</span><span class="sy0">,</span>
+            <span class="st0">&quot;aria-labelledby&quot;</span><span class="sy0">:</span> anchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="co1">//  Use the &quot;delegate&quot; custom event to listen for the &quot;click&quot; event</span>
+    <span class="co1">//  of each tab's &lt;A&gt; element.</span>
+&nbsp;
+    tabView.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="kw2">var</span> selectedPanel<span class="sy0">,</span>
+            sID <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">//  Deselect the currently selected tab and hide its</span>
+        <span class="co1">//  corresponding panel.</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span>selectedTabAnchor<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            selectedTabAnchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-tab-selected&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="br0">&#40;</span><span class="st0">&quot;#&quot;</span> <span class="sy0">+</span> panelMap<span class="br0">&#91;</span>selectedTabAnchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-tabpanel-selected&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+        selectedTabAnchor <span class="sy0">=</span> <span class="kw1">this</span><span class="sy0">;</span>
+        selectedTabAnchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span>.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-tab-selected&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        selectedPanel <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="br0">&#40;</span><span class="st0">&quot;#&quot;</span> <span class="sy0">+</span> panelMap<span class="br0">&#91;</span>sID<span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        selectedPanel.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-tabpanel-selected&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        creatingPaging<span class="br0">&#40;</span>selectedPanel<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">//  Prevent the browser from following the URL specified by the</span>
+        <span class="co1">//  anchor's &quot;href&quot; attribute when clicked.</span>
+&nbsp;
+        event.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;.yui3-tab&gt;a&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="co1">//  Since the anchor's &quot;href&quot; attribute has been removed, the</span>
+    <span class="co1">//  element will not fire the click event in Firefox when the</span>
+    <span class="co1">//  user presses the enter key.  To fix this, dispatch the</span>
+    <span class="co1">//  &quot;click&quot; event to the anchor when the user presses the</span>
+    <span class="co1">//  enter key.</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">&#40;</span>bGeckoIEWin<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        tabView.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;keydown&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            <span class="kw1">if</span> <span class="br0">&#40;</span>event.<span class="me1">charCode</span> <span class="sy0">===</span> <span class="nu0">13</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="kw1">this</span>.<span class="me1">simulate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+&nbsp;
+        <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;&gt;ul&gt;li&gt;a&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-54133a9fed140ccddfa9aa62ae8f0b4d-plain">YUI().use("*", function (Y) {
+
+    var tabView = Y.one("#tabview-1"),
+        tabList = tabView.one("ul"),
+        tabHeading = Y.one("#tabview-heading"),
+        sInstructionalText = tabHeading.get("innerHTML");
+        selectedTabAnchor = tabView.one(".yui3-tab-selected>a"),
+        bGeckoIEWin = ((Y.UA.gecko || Y.UA.ie) && navigator.userAgent.indexOf("Windows") > -1),
+        panelMap = {};
+
+
+    tabView.addClass("yui-tabview");
+
+    //  Remove the "yui-loading" class from the documentElement
+    //  now that the necessary YUI dependencies are loaded and the
+    //  tabview has been skinned.
+
+    tabView.get("ownerDocument").get("documentElement").removeClass("yui-loading");
+
+    //  Apply the ARIA roles, states and properties.
+
+    //  Add some instructional text to the heading that will be read by
+    //  the screen reader when the first tab in the tabview is focused.
+
+    tabHeading.set("innerHTML", (sInstructionalText + " <em>Press the enter key to load the content of each tab.</em>"));
+
+    tabList.setAttrs({
+        "aria-labelledby": "tabview-heading",
+        role: "tablist"
+    });
+
+    tabView.one("div").set("role", "presentation");
+
+
+    tabView.plug(Y.Plugin.NodeFocusManager, {
+            descendants: ".yui3-tab>a",
+            keys: { next: "down:39", // Right arrow
+                    previous: "down:37" },  // Left arrow
+            focusClass: {
+                className: "yui-tab-focus",
+                fn: function (node) {
+                    return node.get("parentNode");
+                }
+            },
+            circular: true
+        });
+
+
+    //  If the list of tabs loses focus, set the activeDescendant
+    //  attribute to the currently selected tab.
+
+    tabView.focusManager.after("focusedChange", function (event) {
+
+        if (!event.newVal) {    //  The list of tabs has lost focus
+            this.set("activeDescendant", selectedTabAnchor);
+        }
+
+    });
+
+
+    tabView.all(".yui3-tab>a").each(function (anchor) {
+
+        var sHref = anchor.getAttribute("href", 2),
+            sPanelID = sHref.substring(1, sHref.length),
+            panel;
+
+        //  Apply the ARIA roles, states and properties to each tab
+
+        anchor.set("role", "tab");
+        anchor.get("parentNode").set("role", "presentation");
+
+
+        //  Remove the "href" attribute from the anchor element to
+        //  prevent JAWS and NVDA from reading the value of the "href"
+        //  attribute when the anchor is focused
+
+        if (bGeckoIEWin) {
+            anchor.removeAttribute("href");
+        }
+
+        //  Cache a reference to id of the tab's corresponding panel
+        //  element so that it can be made visible when the tab
+        //  is clicked.
+        panelMap[anchor.get("id")] = sPanelID;
+
+
+        //  Apply the ARIA roles, states and properties to each panel
+
+        panel = Y.one(("#" + sPanelID));
+
+        panel.setAttrs({
+            role: "tabpanel",
+            "aria-labelledby": anchor.get("id")
+        });
+
+    });
+
+
+    //  Use the "delegate" custom event to listen for the "click" event
+    //  of each tab's <A> element.
+
+    tabView.delegate("click", function (event) {
+
+        var selectedPanel,
+            sID = this.get("id");
+
+        //  Deselect the currently selected tab and hide its
+        //  corresponding panel.
+
+        if (selectedTabAnchor) {
+            selectedTabAnchor.get("parentNode").removeClass("yui-tab-selected");
+            Y.one(("#" + panelMap[selectedTabAnchor.get("id")])).removeClass("yui-tabpanel-selected");
+        }
+
+        selectedTabAnchor = this;
+        selectedTabAnchor.get("parentNode").addClass("yui-tab-selected");
+
+        selectedPanel = Y.one(("#" + panelMap[sID]));
+        selectedPanel.addClass("yui-tabpanel-selected");
+
+        creatingPaging(selectedPanel);
+
+        //  Prevent the browser from following the URL specified by the
+        //  anchor's "href" attribute when clicked.
+
+        event.preventDefault();
+
+    }, ".yui3-tab>a");
+
+
+    //  Since the anchor's "href" attribute has been removed, the
+    //  element will not fire the click event in Firefox when the
+    //  user presses the enter key.  To fix this, dispatch the
+    //  "click" event to the anchor when the user presses the
+    //  enter key.
+
+    if (bGeckoIEWin) {
+
+        tabView.delegate("keydown", function (event) {
+
+            if (event.charCode === 13) {
+                this.simulate("click");
+            }
+
+        }, ">ul>li>a");
+
+    }
+
+});</textarea></div>
+<h3>Accessibility Sugar</h3>
+<p>
+One of the challenges faced by users of screen readers is knowing when you've
+left the context of a given control.  In the case of this tabview, if it
+were adjacent to another ARIA-enabled widget, the user would know they've
+left the tabview when the screen reader announces the role of the adjacent
+widget.  However, if the tabview is sitting alongside standard HTML content, it
+would be really difficult for the user to know when they've left the context of
+the active panel.
+</p>
+<p>
+One solution to this problem is to add some additional navigation as the last
+child of each tab panel that allows the user to move to the previous and next
+panel in the tabview.  This will not only help alert users of screen readers
+that they've reached the end of the tab's panel, but allow <em>all</em>
+keyboard users to move more quickly to the next/previous panel.  Without this
+additionally navigation, keyboard users would typically have to press
+shift+tab to navigate back up to the list of tabs to move to the next/previous
+tab.
+</p>
+<div id="syntax-369d7d51933762c0b8847c98bc02ce18" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> creatingPaging <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>panel<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> listitem<span class="sy0">,</span></div></li><li class="li1"><div class="de1">        sHTML<span class="sy0">,</span></div></li><li class="li2"><div class="de2">        paging<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>panel.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;.paging&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        listitem <span class="sy0">=</span> selectedTabAnchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        sHTML <span class="sy0">=</span> <span class="st0">&quot;&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>listitem.<span class="me1">previous</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            sHTML <span class="sy0">+=</span> <span class="st0">'&lt;button type=&quot;button&quot; class=&quot;yui3-tabview-prevbtn&quot;&gt;Previous Tab Panel&lt;/button&gt;'</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>listitem.<span class="me1">next</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            sHTML <span class="sy0">+=</span> <span class="st0">'&lt;button type=&quot;button&quot; class=&quot;yui3-tabview-nextbtn&quot;&gt;Next Tab Panel&lt;/button&gt;'</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        paging <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span><span class="st0">'&lt;div class=&quot;paging&quot;&gt;'</span> <span class="sy0">+</span> sHTML <span class="sy0">+</span> <span class="st0">'&lt;/div&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        panel.<span class="me1">appendChild</span><span class="br0">&#40;</span>paging<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">creatingPaging<span class="br0">&#40;</span>Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;.yui3-tabpanel-selected&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">tabView.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> node <span class="sy0">=</span> selectedTabAnchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span>.<span class="me1">previous</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;a&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    tabView.<span class="me1">focusManager</span>.<span class="kw3">focus</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    node.<span class="me1">simulate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;.yui3-tabview-prevbtn&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">tabView.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> node <span class="sy0">=</span> selectedTabAnchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span>.<span class="me1">next</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;a&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    tabView.<span class="me1">focusManager</span>.<span class="kw3">focus</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    node.<span class="me1">simulate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;.yui3-tabview-nextbtn&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> creatingPaging <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>panel<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="kw2">var</span> listitem<span class="sy0">,</span>
+        sHTML<span class="sy0">,</span>
+        paging<span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>panel.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;.paging&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        listitem <span class="sy0">=</span> selectedTabAnchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        sHTML <span class="sy0">=</span> <span class="st0">&quot;&quot;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span>listitem.<span class="me1">previous</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            sHTML <span class="sy0">+=</span> <span class="st0">'&lt;button type=&quot;button&quot; class=&quot;yui3-tabview-prevbtn&quot;&gt;Previous Tab Panel&lt;/button&gt;'</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span>listitem.<span class="me1">next</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            sHTML <span class="sy0">+=</span> <span class="st0">'&lt;button type=&quot;button&quot; class=&quot;yui3-tabview-nextbtn&quot;&gt;Next Tab Panel&lt;/button&gt;'</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+        paging <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span><span class="st0">'&lt;div class=&quot;paging&quot;&gt;'</span> <span class="sy0">+</span> sHTML <span class="sy0">+</span> <span class="st0">'&lt;/div&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        panel.<span class="me1">appendChild</span><span class="br0">&#40;</span>paging<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+creatingPaging<span class="br0">&#40;</span>Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;.yui3-tabpanel-selected&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+tabView.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="kw2">var</span> node <span class="sy0">=</span> selectedTabAnchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span>.<span class="me1">previous</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;a&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    tabView.<span class="me1">focusManager</span>.<span class="kw3">focus</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span><span class="sy0">;</span>
+    node.<span class="me1">simulate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;.yui3-tabview-prevbtn&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+tabView.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="kw2">var</span> node <span class="sy0">=</span> selectedTabAnchor.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span>.<span class="me1">next</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;a&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    tabView.<span class="me1">focusManager</span>.<span class="kw3">focus</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span><span class="sy0">;</span>
+    node.<span class="me1">simulate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;.yui3-tabview-nextbtn&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-369d7d51933762c0b8847c98bc02ce18-plain">var creatingPaging = function (panel) {
+
+    var listitem,
+        sHTML,
+        paging;
+
+    if (!panel.one(".paging")) {
+
+        listitem = selectedTabAnchor.get("parentNode");
+        sHTML = "";
+
+        if (listitem.previous()) {
+            sHTML += '<button type="button" class="yui3-tabview-prevbtn">Previous Tab Panel</button>';
+        }
+
+        if (listitem.next()) {
+            sHTML += '<button type="button" class="yui3-tabview-nextbtn">Next Tab Panel</button>';
+        }
+
+        paging = Y.Node.create('<div class="paging">' + sHTML + '</div>');
+
+        panel.appendChild(paging);
+
+    }
+
+};
+
+creatingPaging(Y.one(".yui3-tabpanel-selected"));
+
+
+tabView.delegate("click", function (event) {
+
+    var node = selectedTabAnchor.get("parentNode").previous().one("a");
+
+    tabView.focusManager.focus(node);
+    node.simulate("click");
+
+}, ".yui3-tabview-prevbtn");
+
+
+tabView.delegate("click", function (event) {
+
+    var node = selectedTabAnchor.get("parentNode").next().one("a");
+
+    tabView.focusManager.focus(node);
+    node.simulate("click");
+
+}, ".yui3-tabview-nextbtn");</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Focus Manager Node Plugin Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../node-focusmanager/node-focusmanager-1.html'>Accessible Toolbar</a></li><li class='selected'><a href='../node-focusmanager/node-focusmanager-2.html'>Accessible TabView</a></li><li><a href='../node-focusmanager/node-focusmanager-3.html'>Accessible Menu Button</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Focus Manager Node Plugin Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/node-focusmanager/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_node-focusmanager.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="selected "><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

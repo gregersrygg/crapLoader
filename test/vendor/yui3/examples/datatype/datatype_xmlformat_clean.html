@@ -1,0 +1,73 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>DataType.XML.format()</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+/* custom styles for this example */
+#demo .output {margin-bottom:1em; padding:10px; border:1px solid #D9D9D9;}
+</style>
+
+</style>
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>DataType.XML.format()</h1>
+
+<div class="exampleIntro">
+	The XML module of the DataType Utility allows you to take an XML document and convert it to a string.
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<form id="demo">
+    <fieldset>
+        <input type="button" id="demo_btn" value="Show XML as a string">
+        <div id="demo_output" class="output"></div>
+    </fieldset>
+</form>
+
+
+
+<script type="text/javascript">
+YUI().use("node", "datatype-xml", function (Y) {
+    Y.on("click", function(e){
+        var myXMLDoc = Y.DataType.XML.parse("<myroot><item type='foo'><name>Abc</name><rank>1</rank></item><item type='bar'><name>Def</name><rank>2</rank></item><item type='bat'><name>Ghhi</name><rank>3</rank></item></myroot>"),
+            output = Y.DataType.XML.format(myXMLDoc);
+
+        if(output === "") {
+            output += "(Invalid XML document)"
+        }
+        Y.one("#demo_output").setContent(output.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"));
+    }, "#demo_btn");
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

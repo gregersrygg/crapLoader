@@ -1,0 +1,256 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: YQL Query: YQL 2-Legged oAuth</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+
+<!--there is no custom header content for this example-->
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: YQL Query: YQL 2-Legged oAuth</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>YQL Query: YQL 2-Legged oAuth</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example pairs the <a href="http://yuilibrary.com/gallery/show/oauth">YUI Gallery oAuth</a> module with YQL Query to make <a href="http://developer.yahoo.com/yql/console/?q=select%20title%2Cabstract%2Curl%2Csource%20from%20search.news%20where%20query%3D%22endangered%20species%22" title="YQL Console">an authenticated YQL request to Yahoo! Search's news search Web service.</a>.</p>
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="yql-oauth_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<style>
+#res .mod {
+    background-color:white;
+    border:1px solid black;
+    padding:1em;
+}
+#res h3 {
+    color: black;
+}
+#res cite {
+    font-style: italic;
+}
+</style>
+
+
+<div id="res">Loading data from YQL..</div>
+
+
+<script>
+
+YUI({ gallery: 'gallery-2010.08.11-20-39' }).use('node', 'yql', 'gallery-oauth', function(Y) {    
+
+    //Using with YQL oAuth Gallery module
+    Y.oAuth.ready(function() {
+        
+        Y.YQL('select title,abstract,url,source from search.news where query="endangered species"', function(r) {
+            if (r.query.results) {
+                var list = Y.Node.create('<ul></ul>');
+                Y.each(r.query.results.result, function(v) {
+                    list.append(Y.Lang.sub('<li><a href="{url}" target="_blank" title="{abstract}">{title}</a> (<cite>{source}</cite>)</li>', v));
+                });
+                Y.one('#res').set('innerHTML', '<h3>News Headlines</h3>').append(list);
+            }
+        }, {
+            key: 'dj0yJmk9SXNaaTF2TGVMM1Q3JmQ9WVdrOVJGSlJRelpHTlRJbWNHbzlNelF6TlRjMk9EWXkmcz1jb25zdW1lcnNlY3JldCZ4PWMw',
+            secret: 'f6cb68d25da294a584b541ff29da599a3f53db76',
+            base: '://query.yahooapis.com/v1/yql?'
+        });
+
+    });
+
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Setting up the Query</h3>
+<p>The easiest way to build a YQL query is by visiting the <a href="http://developer.yahoo.com/yql/console/">YQL Console</a>. In this example we will be using the <code><a href="http://developer.yahoo.com/yql/console/?q=select%20title%2Cabstract%2Curl%2Csource%20from%20search.news%20where%20query%3D%22endangered%20species%22">search.news</a></code> table. The <code>YQL</code> statement that we are using looks like this:</p>
+<style>
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.sql  {font-family:monospace;}
+.sql .imp {font-weight: bold; color: red;}
+.sql .kw1 {color: #993333; font-weight: bold;}
+.sql .co1 {color: #808080; font-style: italic;}
+.sql .co2 {color: #808080; font-style: italic;}
+.sql .coMULTI {color: #808080; font-style: italic;}
+.sql .es0 {color: #000099; font-weight: bold;}
+.sql .br0 {color: #66cc66;}
+.sql .sy0 {color: #66cc66;}
+.sql .st0 {color: #ff0000;}
+.sql .nu0 {color: #cc66cc;}
+.sql span.xtra { display:block; }
+
+</style>
+<div id="syntax-3cf6e409d33c68643e3c5c49de43eeea" class="yui-syntax-highlight"><div class="numbers"><pre class="sql" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw1">SELECT</span> title<span class="sy0">,</span>abstract<span class="sy0">,</span>url<span class="sy0">,</span>source <span class="kw1">FROM</span> search<span class="sy0">.</span>news <span class="kw1">WHERE</span> query<span class="sy0">=</span><span class="st0">&quot;endangered species&quot;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="sql" style="font-family:monospace;"><span class="kw1">SELECT</span> title<span class="sy0">,</span>abstract<span class="sy0">,</span>url<span class="sy0">,</span>source <span class="kw1">FROM</span> search<span class="sy0">.</span>news <span class="kw1">WHERE</span> query<span class="sy0">=</span><span class="st0">&quot;endangered species&quot;</span></pre></div><textarea id="syntax-3cf6e409d33c68643e3c5c49de43eeea-plain">select title,abstract,url,source from search.news where query="endangered species"</textarea></div>
+<h3>Setting up the YUI Instance</h3>
+<p>Now we need to create our YUI instance and tell it to load the <code>yql</code>, <code>node</code> and <code>gallery-oauth</code> modules.</p>
+<div id="syntax-4a7790a4db7ef2412013b4aa18cb03e6" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="sy0">,</span> <span class="st0">'yql'</span><span class="sy0">,</span> <span class="st0">'gallery-oauth'</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="sy0">,</span> <span class="st0">'yql'</span><span class="sy0">,</span> <span class="st0">'gallery-oauth'</span></pre></div><textarea id="syntax-4a7790a4db7ef2412013b4aa18cb03e6-plain">YUI().use('node', 'yql', 'gallery-oauth'</textarea></div>
+
+<h3>Making the query</h3>
+<p>Now that we have a YUI instance with the <code>yql</code> and <code>gallery-oauth</code> modules, we need to ensure that the oAuth external libraries have been loaded.</p>
+<p>In the code snippet below, you will notice that the YQL call is now wrapped in a call to <code>Y.oAuth.ready</code>. This allows the oAuth module to load the required files and get them ready to be used.</p>
+<p>Once that is loaded, you are free to make your YQL call by supplying the query, callback, key and secret.</p>
+<p><strong>Note: </strong> The key and secret in the code snippet below is invalid an should not be used. To get your very own YQL app key please visit the <a href="https://developer.apps.yahoo.com/projects">My Projects</a> page on YDN.</p>
+<div id="syntax-985a71573c9f21e2eb92218f9cec0eb5" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span> gallery<span class="sy0">:</span> <span class="st0">'gallery-2010.08.11-20-39'</span> <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="sy0">,</span> <span class="st0">'yql'</span><span class="sy0">,</span> <span class="st0">'gallery-oauth'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>    </div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//Using with YQL oAuth Gallery module</span></div></li><li class="li1"><div class="de1">    Y.<span class="me1">oAuth</span>.<span class="me1">ready</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        Y.<span class="me1">YQL</span><span class="br0">&#40;</span><span class="st0">'select title,abstract,url,source from search.news where query=&quot;endangered species&quot;'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>r<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">if</span> <span class="br0">&#40;</span>r.<span class="me1">query</span>.<span class="me1">results</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw2">var</span> list <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span><span class="st0">'&lt;ul&gt;&lt;/ul&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                Y.<span class="me1">each</span><span class="br0">&#40;</span>r.<span class="me1">query</span>.<span class="me1">results</span>.<span class="me1">result</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>v<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                    list.<span class="me1">append</span><span class="br0">&#40;</span>Y.<span class="me1">Lang</span>.<span class="me1">sub</span><span class="br0">&#40;</span><span class="st0">'&lt;li&gt;&lt;a href=&quot;{url}&quot; target=&quot;_blank&quot; title=&quot;{abstract}&quot;&gt;{title}&lt;/a&gt; (&lt;cite&gt;{source}&lt;/cite&gt;)&lt;/li&gt;'</span><span class="sy0">,</span> v<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#res'</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span> <span class="st0">'&lt;h3&gt;News Headlines&lt;/h3&gt;'</span><span class="br0">&#41;</span>.<span class="me1">append</span><span class="br0">&#40;</span>list<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            key<span class="sy0">:</span> <span class="st0">'xxx'</span><span class="sy0">,</span> <span class="co1">//get key and secret from https://developer.apps.yahoo.com/projects</span></div></li><li class="li1"><div class="de1">            secret<span class="sy0">:</span> <span class="st0">'xxx'</span><span class="sy0">,</span> <span class="co1">//get key and secret from https://developer.apps.yahoo.com/projects</span></div></li><li class="li1"><div class="de1">            base<span class="sy0">:</span> <span class="st0">'://query.yahooapis.com/v1/yql?'</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span> gallery<span class="sy0">:</span> <span class="st0">'gallery-2010.08.11-20-39'</span> <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'node'</span><span class="sy0">,</span> <span class="st0">'yql'</span><span class="sy0">,</span> <span class="st0">'gallery-oauth'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>    
+&nbsp;
+    <span class="co1">//Using with YQL oAuth Gallery module</span>
+    Y.<span class="me1">oAuth</span>.<span class="me1">ready</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        Y.<span class="me1">YQL</span><span class="br0">&#40;</span><span class="st0">'select title,abstract,url,source from search.news where query=&quot;endangered species&quot;'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>r<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">if</span> <span class="br0">&#40;</span>r.<span class="me1">query</span>.<span class="me1">results</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="kw2">var</span> list <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span><span class="st0">'&lt;ul&gt;&lt;/ul&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                Y.<span class="me1">each</span><span class="br0">&#40;</span>r.<span class="me1">query</span>.<span class="me1">results</span>.<span class="me1">result</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>v<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    list.<span class="me1">append</span><span class="br0">&#40;</span>Y.<span class="me1">Lang</span>.<span class="me1">sub</span><span class="br0">&#40;</span><span class="st0">'&lt;li&gt;&lt;a href=&quot;{url}&quot; target=&quot;_blank&quot; title=&quot;{abstract}&quot;&gt;{title}&lt;/a&gt; (&lt;cite&gt;{source}&lt;/cite&gt;)&lt;/li&gt;'</span><span class="sy0">,</span> v<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#res'</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span> <span class="st0">'&lt;h3&gt;News Headlines&lt;/h3&gt;'</span><span class="br0">&#41;</span>.<span class="me1">append</span><span class="br0">&#40;</span>list<span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+            key<span class="sy0">:</span> <span class="st0">'xxx'</span><span class="sy0">,</span> <span class="co1">//get key and secret from https://developer.apps.yahoo.com/projects</span>
+            secret<span class="sy0">:</span> <span class="st0">'xxx'</span><span class="sy0">,</span> <span class="co1">//get key and secret from https://developer.apps.yahoo.com/projects</span>
+            base<span class="sy0">:</span> <span class="st0">'://query.yahooapis.com/v1/yql?'</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;</pre></div><textarea id="syntax-985a71573c9f21e2eb92218f9cec0eb5-plain">YUI({ gallery: 'gallery-2010.08.11-20-39' }).use('node', 'yql', 'gallery-oauth', function(Y) {    
+
+    //Using with YQL oAuth Gallery module
+    Y.oAuth.ready(function() {
+        
+        Y.YQL('select title,abstract,url,source from search.news where query="endangered species"', function(r) {
+            if (r.query.results) {
+                var list = Y.Node.create('<ul></ul>');
+                Y.each(r.query.results.result, function(v) {
+                    list.append(Y.Lang.sub('<li><a href="{url}" target="_blank" title="{abstract}">{title}</a> (<cite>{source}</cite>)</li>', v));
+                });
+                Y.one('#res').set('innerHTML', '<h3>News Headlines</h3>').append(list);
+            }
+        }, {
+            key: 'xxx', //get key and secret from https://developer.apps.yahoo.com/projects
+            secret: 'xxx', //get key and secret from https://developer.apps.yahoo.com/projects
+            base: '://query.yahooapis.com/v1/yql?'
+        });
+
+    });
+
+});
+</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    YQL Query Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../yql/simple-yql.html'>Simple YQL Query</a></li><li><a href='../yql/yql-flickr-requery.html'>YQL Flickr Requery</a></li><li class='selected'><a href='../yql/yql-oauth.html'>YQL 2-Legged oAuth</a></li><li><a href='../dd/photo-browser.html'>Photo Browser (included with examples for Drag &amp; Drop)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More YQL Query Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/yql/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_yql.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="selected "><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

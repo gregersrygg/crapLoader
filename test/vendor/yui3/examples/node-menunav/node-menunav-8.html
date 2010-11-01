@@ -1,0 +1,678 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: MenuNav Node Plugin: Adding Submenus On The Fly</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+
+<!--there is no custom header content for this example-->
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: MenuNav Node Plugin: Adding Submenus On The Fly</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>MenuNav Node Plugin: Adding Submenus On The Fly</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>
+This example demonstrates how to use the <a href="../../io/">IO Utility</a> to 
+add submenus to a menu built using the MenuNav Node Plugin.
+</p>
+
+	</div>	
+
+	<div class="module example-container  newWindow">
+			<div id="example-canvas" class="bd">
+
+		<p class="newWindowButton yui-skin-sam">
+        <span id="newWindowLink">
+            <span class="first-child">
+                <a href="node-menunav-8_source.html" target="_blank">View example in new window.</a>
+            </span>
+        </span>	
+    </p>
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Design Goal</h3>
+<p>
+This menu will be created using the
+<a href="http://en.wikipedia.org/wiki/Progressive_enhancement">Progressive Enhancement</a> design
+pattern, so that the accessibility of the menu can be tailored based on the capabilities of
+the user's browser.  The goal is to design a menu that satisfies each of the following use cases:
+</p>
+
+<table class="yui3-table">
+    <thead>
+        <tr>
+            <th><a href="http://developer.yahoo.com/yui/articles/gbs/">Browser Grade</a></th>
+            <th>Technologies</th>
+            <th>User Experience</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>C</td>
+            <td>HTML</td>
+            <td>The user is using a browser for which CSS and JavaScript are being withheld.</td>
+        </tr>
+        <tr>
+            <td>A</td>
+            <td>HTML + CSS</td>
+            <td>The user is using an A-Grade browser, but has chosen to disable JavaScript.</td>
+        </tr>
+        <tr>
+            <td>A</td>
+            <td>HTML + CSS + JavaScript</td>
+            <td>The user is using an A-Grade browser with CSS and JavaScript enabled.</td>
+        </tr>
+        <tr>
+            <td>A</td>
+            <td>HTML + CSS + JavaScript + ARIA</td>
+            <td>
+                The user is using an ARIA-capable, A-Grade browser with CSS and
+                JavaScript enabled.
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<p>
+The MenuNav Node Plugin helps support most of the these use cases out of the box.  By using an
+established, semantic, list-based pattern for markup, the core, C-grade experience is easily
+cemented using the MenuNav Node Plugin.  Using JavaScript, the MenuNav Node Plugin implements
+established mouse and keyboard interaction patterns to deliver a user experience that is both
+familiar and easy to use, as well as support for the
+<a href="http://www.w3.org/TR/wai-aria/">WAI-ARIA Roles and States</a>, making it easy to satisfy
+the last two use cases.  The second is the only use case that <em>is not</em> handled out of the box
+when using the MenuNav Node Plugin.
+</p>
+
+<p>
+One common solution to making a menuing system work when CSS is enabled, but JavaScript is
+disabled is to leverage the <code>:hover</code> and <code>:focus</code> pseudo classes to provide
+support for both the mouse and the keyboard.  However, there are a couple of problems with this
+approach:
+</p>
+
+<dl>
+    <dt>Inconsistent Browser Support</dt>
+    <dd>
+        IE 6 only supports the <code>:hover</code> and <code>:focus</code> pseudo classes on
+        <code>&#60;a&#62;</code> elements.  And while IE 7 supports <code>:hover</code> on all
+        elements, it only supports <code>:focus</code> pseudo class on <code>&#60;a&#62;</code>
+        elements.  This solution won't work if the goal is to provide a consistent user
+        experience across all of the
+        <a href="http://developer.yahoo.com/yui/articles/gbs/#a-grade">A-grade browsers</a> when
+        JavaScript is disabled.
+    </dd>
+    <dt>Poor User Experience</dt>
+    <dd>
+        Even if the <code>:hover</code> and <code>:focus</code> pseudo classes were supported
+        consistently across all
+        <a href="http://developer.yahoo.com/yui/articles/gbs/#a-grade">A-grade browsers</a>, it
+        would be a solution that would work, <em>but wouldn't work well</em>.  Use of
+        the <code>:focus</code> pseudo class to enable keyboard support for a menu results in an
+        unfamiliar, potentially cumbersome experience for keyboard users.  Having a menu
+        appear in response to its label simply being focused isn't an established interaction
+        pattern for menus on the desktop, and implementing that pattern could result in menus that
+        popup unexpectedly, and as a result, have the potential to get in the user's way.  While use of the
+        <code>:hover</code> pseudo class can be used to show submenus in response to a
+        <code>mouseover</code> event, it doesn't allow the user to move diagonally from a label to
+        its corresponding submenu &#151; an established interaction pattern that greatly improves a
+        menu's usability.
+    </dd>
+    <dt>Bloats Code</dt>
+    <dd>
+        Relying on <code>:hover</code> and <code>:focus</code> as an intermediate solution when
+        JavaScript is disabled adds bloat to a menu's CSS.  And relying on these pseudo classes
+        would also likely mean additional code on the server to detect IE, so that submenu HTML
+        that is inaccessible to IE users with JavaScript disabled is not delivered to the browser.
+    </dd>
+</dl>
+
+<p>
+As the functionality for displaying submenus cannot be implemented in CSS to work
+consistently and well in all
+<a href="http://developer.yahoo.com/yui/articles/gbs/#a-grade">A-grade browsers</a>, then that
+functionality is better implemented using JavaScript.  And if submenus are only accessible if
+JavaScript is enabled, then it is best to only add the HTML for submenus via JavaScript.  Adding
+submenus via JavaScript has the additional advantage of speeding up the initial load time of
+a page.
+</p>
+
+<h3>Approach</h3>
+
+<p>
+The approach for this menu will be to create horizontal top navigation that, when JavaScript is
+enabled, is enhanced into split buttons.  The content of each submenu is functionality that is
+accessible via the page linked from the anchor of each submenu's label.  Each submenu is purely
+sugar &#151; a faster means of accessing functionality that is accessible via another path.
+</p>
+
+<h3>Setting Up the HTML</h3>
+
+<p>
+Start by providing the markup for the root horizontal menu, following the pattern outlined in the
+<a href="node-menunav-4.html">Split Button Top Nav</a> example, minus the application of the
+<code>yui-splitbuttonnav</code> class to the menu's bounding box, the markup for the submenus,
+and the <code>&#60;a href="&#8230;" class="yui3-menu-toggle"&#62;</code> elements inside each label
+that toggle each submenu's display.  Include the MenuNav Node Plugin CSS in the
+<code>&#60;head&#62;</code> so that menu is styled even if JS is disabled.  The following
+illustrates what the initial menu markup:
+</p>
+
+<div id="syntax-92e2b47e281a8330240a0274d6fde21e" class="yui-syntax-highlight"><div class="numbers"><pre class="html4strict" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;productsandservices&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-menu yui-menu-horizontal&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-menu-content&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">ul</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">li</span>&gt;</span></div></li><li class="li2"><div class="de2">                <span class="sc2">&lt;<span class="kw2">span</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;answers-label&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-menu-label&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    <span class="sc2">&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;http://answers.yahoo.com&quot;</span>&gt;</span>Answers<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">li</span>&gt;</span></div></li><li class="li2"><div class="de2">                <span class="sc2">&lt;<span class="kw2">span</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;flickr-label&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-menu-label&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    <span class="sc2">&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;http://www.flickr.com&quot;</span>&gt;</span>Flickr<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">li</span>&gt;</span></div></li><li class="li2"><div class="de2">                <span class="sc2">&lt;<span class="kw2">span</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;mobile-label&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-menu-label&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    <span class="sc2">&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;http://mobile.yahoo.com&quot;</span>&gt;</span>Mobile<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">li</span>&gt;</span></div></li><li class="li2"><div class="de2">                <span class="sc2">&lt;<span class="kw2">span</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;upcoming-label&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-menu-label&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    <span class="sc2">&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;http://upcoming.yahoo.com/&quot;</span>&gt;</span>Upcoming<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">li</span>&gt;</span></div></li><li class="li2"><div class="de2">                <span class="sc2">&lt;<span class="kw2">span</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;forgood-label&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-menu-label&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                    <span class="sc2">&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;http://forgood.yahoo.com/index.html&quot;</span>&gt;</span>Yahoo! for Good<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">ul</span>&gt;</span></div></li><li class="li2"><div class="de2">    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="html4strict" style="font-family:monospace;"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;productsandservices&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-menu yui-menu-horizontal&quot;</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-menu-content&quot;</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">ul</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">li</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">span</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;answers-label&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-menu-label&quot;</span>&gt;</span>
+                    <span class="sc2">&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;http://answers.yahoo.com&quot;</span>&gt;</span>Answers<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;</span>
+                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;</span>
+            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">li</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">span</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;flickr-label&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-menu-label&quot;</span>&gt;</span>
+                    <span class="sc2">&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;http://www.flickr.com&quot;</span>&gt;</span>Flickr<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;</span>
+                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;</span>
+            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">li</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">span</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;mobile-label&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-menu-label&quot;</span>&gt;</span>
+                    <span class="sc2">&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;http://mobile.yahoo.com&quot;</span>&gt;</span>Mobile<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;</span>
+                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;</span>
+            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">li</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">span</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;upcoming-label&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-menu-label&quot;</span>&gt;</span>
+                    <span class="sc2">&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;http://upcoming.yahoo.com/&quot;</span>&gt;</span>Upcoming<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;</span>
+                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;</span>
+            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">li</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">span</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;forgood-label&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-menu-label&quot;</span>&gt;</span>
+                    <span class="sc2">&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;http://forgood.yahoo.com/index.html&quot;</span>&gt;</span>Yahoo! for Good<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;</span>
+                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;</span>
+            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">ul</span>&gt;</span>
+    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></pre></div><textarea id="syntax-92e2b47e281a8330240a0274d6fde21e-plain"><div id="productsandservices" class="yui3-menu yui-menu-horizontal">
+    <div class="yui3-menu-content">
+        <ul>
+            <li>
+                <span id="answers-label" class="yui3-menu-label">
+                    <a href="http://answers.yahoo.com">Answers</a>
+                </span>
+            </li>
+            <li>
+                <span id="flickr-label" class="yui3-menu-label">
+                    <a href="http://www.flickr.com">Flickr</a>
+                </span>
+            </li>
+            <li>
+                <span id="mobile-label" class="yui3-menu-label">
+                    <a href="http://mobile.yahoo.com">Mobile</a>
+                </span>
+            </li>
+            <li>
+                <span id="upcoming-label" class="yui3-menu-label">
+                    <a href="http://upcoming.yahoo.com/">Upcoming</a>
+                </span>
+            </li>
+            <li>
+                <span id="forgood-label" class="yui3-menu-label">
+                    <a href="http://forgood.yahoo.com/index.html">Yahoo! for Good</a>
+                </span>
+            </li>
+        </ul>
+    </div>
+</div></textarea></div>
+<h3>Setting Up the script</h3>
+<p>
+With the core markup for the menu in place, JavaScript will be responsible for transforming the
+simple horizontal menu into top navigation rendered like split buttons.  The script will
+appended a submenu toggle to each menu label as well as add the <code>yui-splitbuttonnav</code>
+class to the menu's bounding box.  Each submenu's label will be responsible for creating its
+corresponding submenu the first time its display is requested by the user.  The content of each
+submenu is fetched asynchronously using <code>Y.io</code>.
+</p>
+
+<div id="syntax-251d7b8110ba8f078c49ad570c85fde2" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">//  Call the &quot;use&quot; method, passing in &quot;node-menunav&quot;.  This will load the</span></div></li><li class="li1"><div class="de1"><span class="co1">//  script and CSS for the MenuNav Node Plugin and all of the required</span></div></li><li class="li1"><div class="de1"><span class="co1">//  dependencies.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node-menunav&quot;</span><span class="sy0">,</span> <span class="st0">&quot;io&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> applyARIA <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>menu<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> oMenuLabel<span class="sy0">,</span></div></li><li class="li2"><div class="de2">            oMenuToggle<span class="sy0">,</span></div></li><li class="li1"><div class="de1">            sID<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        menu.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;menu&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        oMenuLabel <span class="sy0">=</span> menu.<span class="me1">previous</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        oMenuToggle <span class="sy0">=</span> oMenuLabel.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;.yui3-menu-toggle&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>oMenuToggle<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            oMenuLabel <span class="sy0">=</span> oMenuToggle<span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        sID <span class="sy0">=</span> Y.<span class="me1">stamp</span><span class="br0">&#40;</span>oMenuLabel<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>oMenuLabel.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            oMenuLabel.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="sy0">,</span> sID<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        menu.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;aria-labelledby&quot;</span><span class="sy0">,</span> sID<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        menu.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;ul,li,.yui3-menu-content&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;presentation&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        menu.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;.yui3-menuitem-content&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;menuitem&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> onIOComplete <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>transactionID<span class="sy0">,</span> response<span class="sy0">,</span> submenuNode<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> sHTML <span class="sy0">=</span> response.<span class="me1">responseText</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        submenuNode.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;.yui3-menu-content&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> sHTML<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        submenuNode.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;ul&quot;</span><span class="br0">&#41;</span>.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;first-of-type&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        applyARIA<span class="br0">&#40;</span>submenuNode<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Need to set the width of the submenu to &quot;&quot; to clear it, then to nothing</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  (or the offsetWidth for IE &lt; 8) so that the width of the submenu is</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  rendered correctly, otherwise the width will be rendered at the width</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  before the new content for the submenu was loaded.</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        submenuNode.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;width&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>Y.<span class="me1">UA</span>.<span class="me1">ie</span> <span class="sy0">&amp;&amp;</span> Y.<span class="me1">UA</span>.<span class="me1">ie</span> <span class="sy0">&lt;</span> <span class="nu0">8</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            submenuNode.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;width&quot;</span><span class="sy0">,</span> <span class="br0">&#40;</span>submenuNode.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;offsetWidth&quot;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;px&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> oAnchor <span class="sy0">=</span> submenuNode.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;a&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="kw1">if</span> <span class="br0">&#40;</span>oAnchor<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            oAnchor.<span class="kw3">focus</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> addSubmenu <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="sy0">,</span> submenuIdBase<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> sSubmenuId <span class="sy0">=</span> submenuIdBase <span class="sy0">+</span> <span class="st0">&quot;-options&quot;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            bIsKeyDown <span class="sy0">=</span> <span class="br0">&#40;</span>event.<span class="me1">type</span> <span class="sy0">===</span> <span class="st0">&quot;keydown&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            nKeyCode <span class="sy0">=</span> event.<span class="me1">keyCode</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            sURI<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="br0">&#40;</span>bIsKeyDown <span class="sy0">&amp;&amp;</span> nKeyCode <span class="sy0">===</span> <span class="nu0">40</span><span class="br0">&#41;</span> <span class="sy0">||</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#40;</span>event.<span class="me1">target</span>.<span class="me1">hasClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-menu-toggle&quot;</span><span class="br0">&#41;</span> <span class="sy0">&amp;&amp;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#40;</span>event.<span class="me1">type</span> <span class="sy0">===</span> <span class="st0">&quot;mousedown&quot;</span> <span class="sy0">||</span> <span class="br0">&#40;</span>bIsKeyDown <span class="sy0">&amp;&amp;</span> nKeyCode <span class="sy0">===</span> <span class="nu0">13</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="co1">//  Build the bounding box and content box for the submenu and fill</span></div></li><li class="li2"><div class="de2">            <span class="co1">//  the content box with a &quot;Loading...&quot; message so that the user</span></div></li><li class="li1"><div class="de1">            <span class="co1">//  knows the submenu's content is in the process of loading.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span>.<span class="me1">append</span><span class="br0">&#40;</span><span class="st0">'&lt;div id=&quot;'</span> <span class="sy0">+</span> sSubmenuId <span class="sy0">+</span> <span class="st0">'&quot; class=&quot;yui3-menu yui-menu-hidden&quot;&gt;&lt;div class=&quot;yui3-menu-content&quot;&gt;&lt;p&gt;Loading&amp;#8230;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="co1">//  Use Y.io to fetch the content of the submenu</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            sURI <span class="sy0">=</span> <span class="st0">&quot;assets/submenus.php?menu=&quot;</span> <span class="sy0">+</span> sSubmenuId<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">            Y.<span class="me1">io</span><span class="br0">&#40;</span>sURI<span class="sy0">,</span> <span class="br0">&#123;</span> on<span class="sy0">:</span> <span class="br0">&#123;</span> complete<span class="sy0">:</span> onIOComplete <span class="br0">&#125;</span><span class="sy0">,</span> arguments<span class="sy0">:</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="br0">&#40;</span><span class="st0">&quot;#&quot;</span> <span class="sy0">+</span> sSubmenuId<span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="co1">//  Detach event listeners so that this code runs only once</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">            <span class="kw1">this</span>.<span class="me1">detach</span><span class="br0">&#40;</span><span class="st0">&quot;mousedown&quot;</span><span class="sy0">,</span> addSubmenu<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">this</span>.<span class="me1">detach</span><span class="br0">&#40;</span><span class="st0">&quot;keydown&quot;</span><span class="sy0">,</span> addSubmenu<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//  Retrieve the Node instance representing the root menu</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  (&lt;div id=&quot;productsandservices&quot;&gt;)</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> menu <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#productsandservices&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    menu.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-splitbuttonnav&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> oSubmenuToggles <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            answers<span class="sy0">:</span> <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Answers Options&quot;</span><span class="sy0">,</span> url<span class="sy0">:</span> <span class="st0">&quot;#answers-options&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            flickr<span class="sy0">:</span> <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Flickr Options&quot;</span><span class="sy0">,</span> url<span class="sy0">:</span> <span class="st0">&quot;#flickr-options&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            mobile<span class="sy0">:</span> <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Mobile Options&quot;</span><span class="sy0">,</span> url<span class="sy0">:</span> <span class="st0">&quot;#mobile-options&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            upcoming<span class="sy0">:</span> <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Upcoming Options&quot;</span><span class="sy0">,</span> url<span class="sy0">:</span> <span class="st0">&quot;#upcoming-options&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            forgood<span class="sy0">:</span> <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Yahoo! for Good Options&quot;</span><span class="sy0">,</span> url<span class="sy0">:</span> <span class="st0">&quot;#forgood-options&quot;</span> <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        sKey<span class="sy0">,</span></div></li><li class="li2"><div class="de2">        oToggleData<span class="sy0">,</span></div></li><li class="li1"><div class="de1">        oSubmenuToggle<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//  Add the menu toggle to each menu label</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    menu.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;.yui3-menu-label&quot;</span><span class="br0">&#41;</span>.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        sKey <span class="sy0">=</span> node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span>.<span class="me1">split</span><span class="br0">&#40;</span><span class="st0">&quot;-&quot;</span><span class="br0">&#41;</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        oToggleData <span class="sy0">=</span> oSubmenuToggles<span class="br0">&#91;</span>sKey<span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        oSubmenuToggle <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span><span class="st0">'&lt;a class=&quot;yui3-menu-toggle&quot;&gt;'</span> <span class="sy0">+</span> oToggleData.<span class="me1">label</span> <span class="sy0">+</span> <span class="st0">'&lt;/a&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Need to set the &quot;href&quot; attribute via the &quot;set&quot; method as opposed to</span></div></li><li class="li2"><div class="de2">        <span class="co1">//  including it in the string passed to &quot;Y.Node.create&quot; to work around a</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  bug in IE.  The MenuNav Node Plugin code examines the &quot;href&quot; attribute</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  of all &lt;A&gt;s in a menu.  To do this, the MenuNav Node Plugin retrieves</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  the value of the &quot;href&quot; attribute by passing &quot;2&quot; as a second argument</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  to the &quot;getAttribute&quot; method.  This is necessary for IE in order to get</span></div></li><li class="li2"><div class="de2">        <span class="co1">//  the value of the &quot;href&quot; attribute exactly as it was set in script or in</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  the source document, as opposed to a fully qualified path.  (See</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  http://msdn.microsoft.com/en-gb/library/ms536429(VS.85).aspx for</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  more info.)  However, when the &quot;href&quot; attribute is set inline via the</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  string passed to &quot;Y.Node.create&quot;, calls to &quot;getAttribute('href', 2)&quot;</span></div></li><li class="li2"><div class="de2">        <span class="co1">//  will STILL return a fully qualified URL rather than the value of the</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  &quot;href&quot; attribute exactly as it was set in script.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        oSubmenuToggle.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;href&quot;</span><span class="sy0">,</span> oToggleData.<span class="me1">url</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Add a &quot;mousedown&quot; and &quot;keydown&quot; listener to each menu label that</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  will build the submenu the first time the users requests it.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        node.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;mousedown&quot;</span><span class="sy0">,</span> addSubmenu<span class="sy0">,</span> node<span class="sy0">,</span> sKey<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        node.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;keydown&quot;</span><span class="sy0">,</span> addSubmenu<span class="sy0">,</span> node<span class="sy0">,</span> sKey<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        node.<span class="me1">appendChild</span><span class="br0">&#40;</span>oSubmenuToggle<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//  Call the &quot;plug&quot; method passing in a reference to the</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  MenuNav Node Plugin.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    menu.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeMenuNav</span><span class="sy0">,</span> <span class="br0">&#123;</span> autoSubmenuDisplay<span class="sy0">:</span> <span class="kw2">false</span><span class="sy0">,</span> mouseOutHideDelay<span class="sy0">:</span> <span class="nu0">0</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">//  Call the &quot;use&quot; method, passing in &quot;node-menunav&quot;.  This will load the</span>
+<span class="co1">//  script and CSS for the MenuNav Node Plugin and all of the required</span>
+<span class="co1">//  dependencies.</span>
+&nbsp;
+YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node-menunav&quot;</span><span class="sy0">,</span> <span class="st0">&quot;io&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="kw2">var</span> applyARIA <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>menu<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="kw2">var</span> oMenuLabel<span class="sy0">,</span>
+            oMenuToggle<span class="sy0">,</span>
+            sID<span class="sy0">;</span>
+&nbsp;
+        menu.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;menu&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        oMenuLabel <span class="sy0">=</span> menu.<span class="me1">previous</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        oMenuToggle <span class="sy0">=</span> oMenuLabel.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;.yui3-menu-toggle&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span>oMenuToggle<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            oMenuLabel <span class="sy0">=</span> oMenuToggle<span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+        sID <span class="sy0">=</span> Y.<span class="me1">stamp</span><span class="br0">&#40;</span>oMenuLabel<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>oMenuLabel.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            oMenuLabel.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="sy0">,</span> sID<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+        menu.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;aria-labelledby&quot;</span><span class="sy0">,</span> sID<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        menu.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;ul,li,.yui3-menu-content&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;presentation&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        menu.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;.yui3-menuitem-content&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;menuitem&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="kw2">var</span> onIOComplete <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>transactionID<span class="sy0">,</span> response<span class="sy0">,</span> submenuNode<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="kw2">var</span> sHTML <span class="sy0">=</span> response.<span class="me1">responseText</span><span class="sy0">;</span>
+&nbsp;
+        submenuNode.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;.yui3-menu-content&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> sHTML<span class="br0">&#41;</span><span class="sy0">;</span>
+        submenuNode.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;ul&quot;</span><span class="br0">&#41;</span>.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;first-of-type&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        applyARIA<span class="br0">&#40;</span>submenuNode<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">//  Need to set the width of the submenu to &quot;&quot; to clear it, then to nothing</span>
+        <span class="co1">//  (or the offsetWidth for IE &lt; 8) so that the width of the submenu is</span>
+        <span class="co1">//  rendered correctly, otherwise the width will be rendered at the width</span>
+        <span class="co1">//  before the new content for the submenu was loaded.</span>
+&nbsp;
+        submenuNode.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;width&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span>Y.<span class="me1">UA</span>.<span class="me1">ie</span> <span class="sy0">&amp;&amp;</span> Y.<span class="me1">UA</span>.<span class="me1">ie</span> <span class="sy0">&lt;</span> <span class="nu0">8</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            submenuNode.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;width&quot;</span><span class="sy0">,</span> <span class="br0">&#40;</span>submenuNode.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;offsetWidth&quot;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;px&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+&nbsp;
+        <span class="kw2">var</span> oAnchor <span class="sy0">=</span> submenuNode.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;a&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span>oAnchor<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            oAnchor.<span class="kw3">focus</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="kw2">var</span> addSubmenu <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="sy0">,</span> submenuIdBase<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="kw2">var</span> sSubmenuId <span class="sy0">=</span> submenuIdBase <span class="sy0">+</span> <span class="st0">&quot;-options&quot;</span><span class="sy0">,</span>
+            bIsKeyDown <span class="sy0">=</span> <span class="br0">&#40;</span>event.<span class="me1">type</span> <span class="sy0">===</span> <span class="st0">&quot;keydown&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+            nKeyCode <span class="sy0">=</span> event.<span class="me1">keyCode</span><span class="sy0">,</span>
+            sURI<span class="sy0">;</span>
+&nbsp;
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="br0">&#40;</span>bIsKeyDown <span class="sy0">&amp;&amp;</span> nKeyCode <span class="sy0">===</span> <span class="nu0">40</span><span class="br0">&#41;</span> <span class="sy0">||</span>
+            <span class="br0">&#40;</span>event.<span class="me1">target</span>.<span class="me1">hasClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-menu-toggle&quot;</span><span class="br0">&#41;</span> <span class="sy0">&amp;&amp;</span>
+            <span class="br0">&#40;</span>event.<span class="me1">type</span> <span class="sy0">===</span> <span class="st0">&quot;mousedown&quot;</span> <span class="sy0">||</span> <span class="br0">&#40;</span>bIsKeyDown <span class="sy0">&amp;&amp;</span> nKeyCode <span class="sy0">===</span> <span class="nu0">13</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            <span class="co1">//  Build the bounding box and content box for the submenu and fill</span>
+            <span class="co1">//  the content box with a &quot;Loading...&quot; message so that the user</span>
+            <span class="co1">//  knows the submenu's content is in the process of loading.</span>
+&nbsp;
+            <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span>.<span class="me1">append</span><span class="br0">&#40;</span><span class="st0">'&lt;div id=&quot;'</span> <span class="sy0">+</span> sSubmenuId <span class="sy0">+</span> <span class="st0">'&quot; class=&quot;yui3-menu yui-menu-hidden&quot;&gt;&lt;div class=&quot;yui3-menu-content&quot;&gt;&lt;p&gt;Loading&amp;#8230;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+            <span class="co1">//  Use Y.io to fetch the content of the submenu</span>
+&nbsp;
+            sURI <span class="sy0">=</span> <span class="st0">&quot;assets/submenus.php?menu=&quot;</span> <span class="sy0">+</span> sSubmenuId<span class="sy0">;</span>
+&nbsp;
+            Y.<span class="me1">io</span><span class="br0">&#40;</span>sURI<span class="sy0">,</span> <span class="br0">&#123;</span> on<span class="sy0">:</span> <span class="br0">&#123;</span> complete<span class="sy0">:</span> onIOComplete <span class="br0">&#125;</span><span class="sy0">,</span> arguments<span class="sy0">:</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="br0">&#40;</span><span class="st0">&quot;#&quot;</span> <span class="sy0">+</span> sSubmenuId<span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+            <span class="co1">//  Detach event listeners so that this code runs only once</span>
+&nbsp;
+            <span class="kw1">this</span>.<span class="me1">detach</span><span class="br0">&#40;</span><span class="st0">&quot;mousedown&quot;</span><span class="sy0">,</span> addSubmenu<span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="kw1">this</span>.<span class="me1">detach</span><span class="br0">&#40;</span><span class="st0">&quot;keydown&quot;</span><span class="sy0">,</span> addSubmenu<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="br0">&#125;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="co1">//  Retrieve the Node instance representing the root menu</span>
+    <span class="co1">//  (&lt;div id=&quot;productsandservices&quot;&gt;)</span>
+&nbsp;
+    <span class="kw2">var</span> menu <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#productsandservices&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    menu.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-splitbuttonnav&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="kw2">var</span> oSubmenuToggles <span class="sy0">=</span> <span class="br0">&#123;</span>
+            answers<span class="sy0">:</span> <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Answers Options&quot;</span><span class="sy0">,</span> url<span class="sy0">:</span> <span class="st0">&quot;#answers-options&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span>
+            flickr<span class="sy0">:</span> <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Flickr Options&quot;</span><span class="sy0">,</span> url<span class="sy0">:</span> <span class="st0">&quot;#flickr-options&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span>
+            mobile<span class="sy0">:</span> <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Mobile Options&quot;</span><span class="sy0">,</span> url<span class="sy0">:</span> <span class="st0">&quot;#mobile-options&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span>
+            upcoming<span class="sy0">:</span> <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Upcoming Options&quot;</span><span class="sy0">,</span> url<span class="sy0">:</span> <span class="st0">&quot;#upcoming-options&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span>
+            forgood<span class="sy0">:</span> <span class="br0">&#123;</span> label<span class="sy0">:</span> <span class="st0">&quot;Yahoo! for Good Options&quot;</span><span class="sy0">,</span> url<span class="sy0">:</span> <span class="st0">&quot;#forgood-options&quot;</span> <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+        sKey<span class="sy0">,</span>
+        oToggleData<span class="sy0">,</span>
+        oSubmenuToggle<span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="co1">//  Add the menu toggle to each menu label</span>
+&nbsp;
+    menu.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;.yui3-menu-label&quot;</span><span class="br0">&#41;</span>.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        sKey <span class="sy0">=</span> node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span>.<span class="me1">split</span><span class="br0">&#40;</span><span class="st0">&quot;-&quot;</span><span class="br0">&#41;</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="sy0">;</span>
+&nbsp;
+        oToggleData <span class="sy0">=</span> oSubmenuToggles<span class="br0">&#91;</span>sKey<span class="br0">&#93;</span><span class="sy0">;</span>
+&nbsp;
+        oSubmenuToggle <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span><span class="st0">'&lt;a class=&quot;yui3-menu-toggle&quot;&gt;'</span> <span class="sy0">+</span> oToggleData.<span class="me1">label</span> <span class="sy0">+</span> <span class="st0">'&lt;/a&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">//  Need to set the &quot;href&quot; attribute via the &quot;set&quot; method as opposed to</span>
+        <span class="co1">//  including it in the string passed to &quot;Y.Node.create&quot; to work around a</span>
+        <span class="co1">//  bug in IE.  The MenuNav Node Plugin code examines the &quot;href&quot; attribute</span>
+        <span class="co1">//  of all &lt;A&gt;s in a menu.  To do this, the MenuNav Node Plugin retrieves</span>
+        <span class="co1">//  the value of the &quot;href&quot; attribute by passing &quot;2&quot; as a second argument</span>
+        <span class="co1">//  to the &quot;getAttribute&quot; method.  This is necessary for IE in order to get</span>
+        <span class="co1">//  the value of the &quot;href&quot; attribute exactly as it was set in script or in</span>
+        <span class="co1">//  the source document, as opposed to a fully qualified path.  (See</span>
+        <span class="co1">//  http://msdn.microsoft.com/en-gb/library/ms536429(VS.85).aspx for</span>
+        <span class="co1">//  more info.)  However, when the &quot;href&quot; attribute is set inline via the</span>
+        <span class="co1">//  string passed to &quot;Y.Node.create&quot;, calls to &quot;getAttribute('href', 2)&quot;</span>
+        <span class="co1">//  will STILL return a fully qualified URL rather than the value of the</span>
+        <span class="co1">//  &quot;href&quot; attribute exactly as it was set in script.</span>
+&nbsp;
+        oSubmenuToggle.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;href&quot;</span><span class="sy0">,</span> oToggleData.<span class="me1">url</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+        <span class="co1">//  Add a &quot;mousedown&quot; and &quot;keydown&quot; listener to each menu label that</span>
+        <span class="co1">//  will build the submenu the first time the users requests it.</span>
+&nbsp;
+        node.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;mousedown&quot;</span><span class="sy0">,</span> addSubmenu<span class="sy0">,</span> node<span class="sy0">,</span> sKey<span class="br0">&#41;</span><span class="sy0">;</span>
+        node.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;keydown&quot;</span><span class="sy0">,</span> addSubmenu<span class="sy0">,</span> node<span class="sy0">,</span> sKey<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        node.<span class="me1">appendChild</span><span class="br0">&#40;</span>oSubmenuToggle<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="co1">//  Call the &quot;plug&quot; method passing in a reference to the</span>
+    <span class="co1">//  MenuNav Node Plugin.</span>
+&nbsp;
+    menu.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeMenuNav</span><span class="sy0">,</span> <span class="br0">&#123;</span> autoSubmenuDisplay<span class="sy0">:</span> <span class="kw2">false</span><span class="sy0">,</span> mouseOutHideDelay<span class="sy0">:</span> <span class="nu0">0</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-251d7b8110ba8f078c49ad570c85fde2-plain">//  Call the "use" method, passing in "node-menunav".  This will load the
+//  script and CSS for the MenuNav Node Plugin and all of the required
+//  dependencies.
+
+YUI().use("node-menunav", "io", function(Y) {
+
+    var applyARIA = function (menu) {
+
+        var oMenuLabel,
+            oMenuToggle,
+            sID;
+
+        menu.set("role", "menu");
+
+        oMenuLabel = menu.previous();
+        oMenuToggle = oMenuLabel.one(".yui3-menu-toggle");
+
+        if (oMenuToggle) {
+            oMenuLabel = oMenuToggle;
+        }
+
+        sID = Y.stamp(oMenuLabel);
+
+        if (!oMenuLabel.get("id")) {
+            oMenuLabel.set("id", sID);
+        }
+
+        menu.set("aria-labelledby", sID);
+
+        menu.all("ul,li,.yui3-menu-content").set("role", "presentation");
+
+        menu.all(".yui3-menuitem-content").set("role", "menuitem");
+
+    };
+
+
+    var onIOComplete = function (transactionID, response, submenuNode) {
+
+        var sHTML = response.responseText;
+
+        submenuNode.one(".yui3-menu-content").set("innerHTML", sHTML);
+        submenuNode.one("ul").addClass("first-of-type");
+
+        applyARIA(submenuNode);
+
+        //  Need to set the width of the submenu to "" to clear it, then to nothing
+        //  (or the offsetWidth for IE < 8) so that the width of the submenu is
+        //  rendered correctly, otherwise the width will be rendered at the width
+        //  before the new content for the submenu was loaded.
+
+        submenuNode.setStyle("width", "");
+
+        if (Y.UA.ie && Y.UA.ie < 8) {
+            submenuNode.setStyle("width", (submenuNode.get("offsetWidth") + "px"));
+        }
+
+
+        var oAnchor = submenuNode.one("a");
+
+        if (oAnchor) {
+            oAnchor.focus();
+        }
+
+    };
+
+
+    var addSubmenu = function (event, submenuIdBase) {
+
+        var sSubmenuId = submenuIdBase + "-options",
+            bIsKeyDown = (event.type === "keydown"),
+            nKeyCode = event.keyCode,
+            sURI;
+
+
+        if ((bIsKeyDown && nKeyCode === 40) ||
+            (event.target.hasClass("yui-menu-toggle") &&
+            (event.type === "mousedown" || (bIsKeyDown && nKeyCode === 13)))) {
+
+            //  Build the bounding box and content box for the submenu and fill
+            //  the content box with a "Loading..." message so that the user
+            //  knows the submenu's content is in the process of loading.
+
+            this.get("parentNode").append('<div id="' + sSubmenuId + '" class="yui3-menu yui-menu-hidden"><div class="yui3-menu-content"><p>Loading&#8230;</p></div></div>');
+
+
+            //  Use Y.io to fetch the content of the submenu
+
+            sURI = "assets/submenus.php?menu=" + sSubmenuId;
+
+            Y.io(sURI, { on: { complete: onIOComplete }, arguments: Y.one(("#" + sSubmenuId)) });
+
+
+            //  Detach event listeners so that this code runs only once
+
+            this.detach("mousedown", addSubmenu);
+            this.detach("keydown", addSubmenu);
+
+        }
+
+    };
+
+
+    //  Retrieve the Node instance representing the root menu
+    //  (<div id="productsandservices">)
+
+    var menu = Y.one("#productsandservices");
+
+    menu.addClass("yui-splitbuttonnav");
+
+
+    var oSubmenuToggles = {
+            answers: { label: "Answers Options", url: "#answers-options" },
+            flickr: { label: "Flickr Options", url: "#flickr-options" },
+            mobile: { label: "Mobile Options", url: "#mobile-options" },
+            upcoming: { label: "Upcoming Options", url: "#upcoming-options" },
+            forgood: { label: "Yahoo! for Good Options", url: "#forgood-options" }
+        },
+
+        sKey,
+        oToggleData,
+        oSubmenuToggle;
+
+
+    //  Add the menu toggle to each menu label
+
+    menu.all(".yui3-menu-label").each(function(node) {
+
+        sKey = node.get("id").split("-")[0];
+
+        oToggleData = oSubmenuToggles[sKey];
+
+        oSubmenuToggle = Y.Node.create('<a class="yui3-menu-toggle">' + oToggleData.label + '</a>');
+
+        //  Need to set the "href" attribute via the "set" method as opposed to
+        //  including it in the string passed to "Y.Node.create" to work around a
+        //  bug in IE.  The MenuNav Node Plugin code examines the "href" attribute
+        //  of all <A>s in a menu.  To do this, the MenuNav Node Plugin retrieves
+        //  the value of the "href" attribute by passing "2" as a second argument
+        //  to the "getAttribute" method.  This is necessary for IE in order to get
+        //  the value of the "href" attribute exactly as it was set in script or in
+        //  the source document, as opposed to a fully qualified path.  (See
+        //  http://msdn.microsoft.com/en-gb/library/ms536429(VS.85).aspx for
+        //  more info.)  However, when the "href" attribute is set inline via the
+        //  string passed to "Y.Node.create", calls to "getAttribute('href', 2)"
+        //  will STILL return a fully qualified URL rather than the value of the
+        //  "href" attribute exactly as it was set in script.
+
+        oSubmenuToggle.set("href", oToggleData.url);
+
+
+        //  Add a "mousedown" and "keydown" listener to each menu label that
+        //  will build the submenu the first time the users requests it.
+
+        node.on("mousedown", addSubmenu, node, sKey);
+        node.on("keydown", addSubmenu, node, sKey);
+
+        node.appendChild(oSubmenuToggle);
+
+    });
+
+
+    //  Call the "plug" method passing in a reference to the
+    //  MenuNav Node Plugin.
+
+    menu.plug(Y.Plugin.NodeMenuNav, { autoSubmenuDisplay: false, mouseOutHideDelay: 0 });
+
+});</textarea></div><em>Note:</em> In keeping with the
+<a href="http://developer.yahoo.com/performance/">Exceptional Performance</a>
+team's recommendation, the script block used to instantiate the menu will be
+<a href="http://developer.yahoo.com/performance/rules.html#js_bottom">placed at the bottom of the page</a>.
+This not only improves performance, it helps ensure that the DOM subtree of the
+element representing the root menu
+(<code>&#60;div id="productsandservices"&#62;</code>) is ready to be scripted.
+</p>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    MenuNav Node Plugin Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../node-menunav/node-menunav-1.html'>Basic Left Nav</a></li><li><a href='../node-menunav/node-menunav-2.html'>Basic Top Nav</a></li><li><a href='../node-menunav/node-menunav-3.html'>Menu Button Top Nav</a></li><li><a href='../node-menunav/node-menunav-4.html'>Split Button Top Nav</a></li><li><a href='../node-menunav/node-menunav-5.html'>Left Nav With Submenus With Shadows</a></li><li><a href='../node-menunav/node-menunav-6.html'>Left Nav With Submenus With Rounded Corners</a></li><li><a href='../node-menunav/node-menunav-7.html'>Skinning Menus Created Using the MenuNav Node Plugin</a></li><li class='selected'><a href='../node-menunav/node-menunav-8.html'>Adding Submenus On The Fly</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More MenuNav Node Plugin Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/node-menunav/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_node-menunav.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="selected "><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

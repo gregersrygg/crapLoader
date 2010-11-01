@@ -1,0 +1,186 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Constrain Support</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+
+/* Overlay Look/Feel */
+.yui3-overlay-content {
+    text-align:center;
+    padding:2px;
+    border:1px solid #000;
+    background-color:#aaa;
+    font-size:93%;
+}
+
+.yui3-overlay-content .yui3-widget-hd {
+    font-weight:bold;
+    padding:5px;
+    border:2px solid #aa0000;
+    background-color:#fff;
+}
+
+.yui3-overlay-content .yui3-widget-ft {
+    padding:5px;
+    border:2px solid #000;
+    background-color:#ccc;
+}
+
+.yui3-overlay-content .yui3-widget-bd {
+    padding:5px;
+    border:2px solid #0000aa;
+    background-color:#fff;
+}
+
+/* Example Layout CSS */
+.overlay-example {
+    position:relative;
+    height:450px;
+    width:550px;
+}
+
+#constrain-box {
+    border:1px solid #000;
+    background-color:#004C6D;
+
+    position:relative;
+
+    top:80px;
+    left:80px;
+
+    width:350px;
+    height:300px;
+}
+
+.yui3-slider {
+    position:absolute;
+    background-color:transparent;
+}
+
+#x {
+    position:absolute;
+    top:10px;
+    left:30px;
+}
+
+#y {
+    position:absolute;
+    top:30px;
+    left:10px;
+}
+
+</style>
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Constrain Support</h1>
+
+<div class="exampleIntro">
+	This example shows how you can use Overlay's constrained positioning support to constrain the XY position of the overlay so that it remains within another node on the page (or within the viewport).
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<div class="overlay-example" id="overlay-example">
+    <div id="constrain-box"></div>
+</div>
+
+<script type="text/javascript">
+YUI().use("overlay", "slider", function(Y) {
+
+    /* Create Overlay from script */
+    var overlay = new Y.Overlay({
+        id:"overlay",
+
+        width:"140px",
+        height:"120px",
+
+        headerContent: "Constrained",
+        bodyContent: "Use the sliders to move the overlay",
+        footerContent: '<label><input type="checkbox" id="constrain"> Constrain </label>',
+
+        align:{node:"#constrain-box", points:["cc", "cc"]},
+        constrain:"#constrain-box",
+
+        render: "#overlay-example"
+    });
+
+    var checkbox = Y.one("#constrain");
+
+    function enableConstraints(constrain) {
+        if (constrain) {
+            overlay.set("constrain", "#constrain-box");
+            overlay.set("headerContent", "Constrained");
+        } else {
+            overlay.set("constrain", false);
+            overlay.set("headerContent", "Unconstrained");
+        }
+    };
+
+    checkbox.on("click", function(e) {
+        enableConstraints(this.get("checked"));
+    });
+
+    checkbox.set("checked", true);
+    enableConstraints(true);
+
+    var overlayXY = Y.one("#overlay").getXY();
+    var constrainRegion = Y.one("#constrain-box").get("region");
+
+    var sx = new Y.Slider({
+        id:"x",
+        length: "450px",
+        min: constrainRegion.left - 50,
+        max: constrainRegion.right + 50,
+        value: overlayXY[0],
+        render:"#overlay-example"
+    });
+
+    var sy = new Y.Slider({
+        id:"y",
+        axis: 'y',
+        length: "400px",
+        min: constrainRegion.top - 50, 
+        max:constrainRegion.bottom + 50,
+        value: overlayXY[1],
+        render: "#overlay-example"
+    });
+
+    sx.after("valueChange", function(e) {
+        overlay.set("x", e.newVal);
+    });
+
+    sy.after("valueChange", function(e) {
+        overlay.set("y", e.newVal);
+    });
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

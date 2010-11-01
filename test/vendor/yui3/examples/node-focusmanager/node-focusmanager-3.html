@@ -1,0 +1,920 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Focus Manager Node Plugin: Accessible Menu Button</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+
+	/*	The following two styles are necessary to override style rules in the 
+		YUI CSS file. */
+
+	#example ul {
+		margin: 0;
+	}
+
+	#example a:hover {
+		text-decoration: none;
+	}
+
+
+	/*	Hide the list while it is being transformed into a menu.	*/
+
+	.yui3-loading #menu-1,
+	.yui3-loading #button-1 {
+		display: none;
+	}
+	
+</style>
+
+<script type="text/javascript">
+
+	//	Add a class to the documentElement to prevent the user from seeing 
+	//	the unstyled menu while the necessary CSS and JavaScript 
+	//	dependancies are being fetched.
+
+	document.documentElement.className = "yui3-loading";
+
+</script>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Focus Manager Node Plugin: Accessible Menu Button</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Focus Manager Node Plugin: Accessible Menu Button</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>
+This example illustrates how to use the Focus Manager Node Plugin, 
+Event's <a href="../../api/YUI.html#event_delegate">delegation support</a> and 
+<a href="../../api/YUI.html#event_mouseenter">mouseenter</a> event, along with 
+the <a href="../../overlay/">Overlay widget</a> and Node's support for the 
+<a href="http://www.w3.org/TR/wai-aria/">WAI-ARIA Roles and States</a> to
+create an accessible menu button.
+</p>	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="node-focusmanager-3_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<a id="button-1" href="#menu-1"><span><span>Move To</span></span></a>
+<div id="menu-1">
+	<ul>
+		<li><input type="button" name="button-1" value="Inbox"></li>
+		<li><input type="button" name="button-2" value="Archive"></li>
+		<li><input type="button" name="button-3" value="Trash"></li>
+	</ul>        	
+</div>
+
+<script type="text/javascript">
+
+	YUI({	
+		base:"../../build/", 
+		timeout: 10000,
+		modules: {
+			"menubuttoncss": {
+				type: "css",
+				fullpath: "assets/menubutton.css"
+			},
+			"menubuttonjs": {
+				type: "js",
+				fullpath: "assets/menubutton.js",
+				requires: ["menubuttoncss", "node-focusmanager", "node-event-simulate", "overlay"]
+			}			
+		}
+
+	}).use("menubuttonjs", function(Y, result) {
+
+	    //	The callback supplied to use() will be executed regardless of
+	    //	whether the operation was successful or not.  The second parameter
+	    //	is a result object that has the status of the operation.  We can
+	    //	use this to try to recover from failures or timeouts.
+
+	    if (!result.success) {
+
+	        Y.log("Load failure: " + result.msg, "warn", "Example");
+
+			//	Show the menu button HTML if loading the JavaScript resources
+			//	failed, that way the original unskinned menu button 
+			//	will be visible so that the user can interact with the menu 
+			//	either way.
+
+			document.documentElement.className = "";
+
+	    }
+
+	});
+
+</script>	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Setting Up the HTML</h3>
+<p>
+For a menu button, start with an <code>&#60;a&#62;</code> element whose
+<code>href</code> attribute is set to the id of an <code>&#60;div&#62;</code>
+that wraps a list of <code>&#60;input&#62;</code> elements.
+Therefore, without JavaScript and CSS, the menu button is simply an in-page
+link to a set of additional buttons.
+</p>
+<div id="syntax-736785b15070c530567ee1d37e81cfaa" class="yui-syntax-highlight"><div class="numbers"><pre class="html4strict" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">a</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;button-1&quot;</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#menu-1&quot;</span>&gt;&lt;<span class="kw2">span</span>&gt;&lt;<span class="kw2">span</span>&gt;</span>Move To<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;</span></div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;menu-1&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">ul</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">li</span>&gt;&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;button-1&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;Inbox&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li2"><div class="de2">        <span class="sc2">&lt;<span class="kw2">li</span>&gt;&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;button-2&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;Archive&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">li</span>&gt;&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;button-3&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;Trash&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">ul</span>&gt;</span></div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="html4strict" style="font-family:monospace;"><span class="sc2">&lt;<span class="kw2">a</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;button-1&quot;</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#menu-1&quot;</span>&gt;&lt;<span class="kw2">span</span>&gt;&lt;<span class="kw2">span</span>&gt;</span>Move To<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;</span>
+<span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;menu-1&quot;</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">ul</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">li</span>&gt;&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;button-1&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;Inbox&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">li</span>&gt;&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;button-2&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;Archive&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">li</span>&gt;&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;button-3&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;Trash&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">ul</span>&gt;</span>
+<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></pre></div><textarea id="syntax-736785b15070c530567ee1d37e81cfaa-plain"><a id="button-1" href="#menu-1"><span><span>Move To</span></span></a>
+<div id="menu-1">
+    <ul>
+        <li><input type="button" name="button-1" value="Inbox"></li>
+        <li><input type="button" name="button-2" value="Archive"></li>
+        <li><input type="button" name="button-3" value="Trash"></li>
+    </ul>
+</div></textarea></div>
+
+<h3>Progressive Enhancement</h3>
+<p>
+The markup above will be transformed using both CSS and JavaScript.  To account
+for the scenario where the user has CSS enabled in their browser but JavaScript
+is disabled, the CSS used to style the menu button will be loaded via JavaScript
+using the YUI instance's <a href="http://developer.yahoo.com/yui/3/yui#loader">built-in Loader</a>.
+Additionally, a small block of JavaScript will be placed in the
+<code>&#60;head&#62;</code> &#151; used to temporarily hide the markup
+while the JavaScript and CSS are in the process of loading to prevent the user
+from seeing a flash unstyled content.
+</p>
+<div id="syntax-265d3482553411ad501c4e66f14c0b7b" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    base<span class="sy0">:</span><span class="st0">&quot;../../build/&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    timeout<span class="sy0">:</span> <span class="nu0">10000</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    modules<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="st0">&quot;menubuttoncss&quot;</span><span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            type<span class="sy0">:</span> <span class="st0">&quot;css&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            fullpath<span class="sy0">:</span> <span class="st0">&quot;assets/menubutton.css&quot;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;menubuttonjs&quot;</span><span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            type<span class="sy0">:</span> <span class="st0">&quot;js&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            fullpath<span class="sy0">:</span> <span class="st0">&quot;assets/menubutton.js&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            requires<span class="sy0">:</span> <span class="br0">&#91;</span><span class="st0">&quot;menubuttoncss&quot;</span><span class="sy0">,</span> <span class="st0">&quot;node-focusmanager&quot;</span><span class="sy0">,</span> <span class="st0">&quot;node-event-simulate&quot;</span><span class="sy0">,</span> <span class="st0">&quot;overlay&quot;</span><span class="br0">&#93;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;menubuttonjs&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="sy0">,</span> result<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//  The callback supplied to use() will be executed regardless of</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  whether the operation was successful or not.  The second parameter</span></div></li><li class="li2"><div class="de2">    <span class="co1">//  is a result object that has the status of the operation.  We can</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  use this to try to recover from failures or timeouts.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>result.<span class="me1">success</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Load failure: &quot;</span> <span class="sy0">+</span> result.<span class="me1">msg</span><span class="sy0">,</span> <span class="st0">&quot;warn&quot;</span><span class="sy0">,</span> <span class="st0">&quot;Example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Show the menu button HTML if loading the JavaScript resources</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  failed, that way the original unskinned menu button</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  will be visible so that the user can interact with the menu</span></div></li><li class="li2"><div class="de2">        <span class="co1">//  either way.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        document.<span class="me1">documentElement</span>.<span class="me1">className</span> <span class="sy0">=</span> <span class="st0">&quot;&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>
+    base<span class="sy0">:</span><span class="st0">&quot;../../build/&quot;</span><span class="sy0">,</span>
+    timeout<span class="sy0">:</span> <span class="nu0">10000</span><span class="sy0">,</span>
+    modules<span class="sy0">:</span> <span class="br0">&#123;</span>
+        <span class="st0">&quot;menubuttoncss&quot;</span><span class="sy0">:</span> <span class="br0">&#123;</span>
+            type<span class="sy0">:</span> <span class="st0">&quot;css&quot;</span><span class="sy0">,</span>
+            fullpath<span class="sy0">:</span> <span class="st0">&quot;assets/menubutton.css&quot;</span>
+        <span class="br0">&#125;</span><span class="sy0">,</span>
+        <span class="st0">&quot;menubuttonjs&quot;</span><span class="sy0">:</span> <span class="br0">&#123;</span>
+            type<span class="sy0">:</span> <span class="st0">&quot;js&quot;</span><span class="sy0">,</span>
+            fullpath<span class="sy0">:</span> <span class="st0">&quot;assets/menubutton.js&quot;</span><span class="sy0">,</span>
+            requires<span class="sy0">:</span> <span class="br0">&#91;</span><span class="st0">&quot;menubuttoncss&quot;</span><span class="sy0">,</span> <span class="st0">&quot;node-focusmanager&quot;</span><span class="sy0">,</span> <span class="st0">&quot;node-event-simulate&quot;</span><span class="sy0">,</span> <span class="st0">&quot;overlay&quot;</span><span class="br0">&#93;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;menubuttonjs&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="sy0">,</span> result<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">//  The callback supplied to use() will be executed regardless of</span>
+    <span class="co1">//  whether the operation was successful or not.  The second parameter</span>
+    <span class="co1">//  is a result object that has the status of the operation.  We can</span>
+    <span class="co1">//  use this to try to recover from failures or timeouts.</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>result.<span class="me1">success</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Load failure: &quot;</span> <span class="sy0">+</span> result.<span class="me1">msg</span><span class="sy0">,</span> <span class="st0">&quot;warn&quot;</span><span class="sy0">,</span> <span class="st0">&quot;Example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">//  Show the menu button HTML if loading the JavaScript resources</span>
+        <span class="co1">//  failed, that way the original unskinned menu button</span>
+        <span class="co1">//  will be visible so that the user can interact with the menu</span>
+        <span class="co1">//  either way.</span>
+&nbsp;
+        document.<span class="me1">documentElement</span>.<span class="me1">className</span> <span class="sy0">=</span> <span class="st0">&quot;&quot;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-265d3482553411ad501c4e66f14c0b7b-plain">YUI({
+    base:"../../build/",
+    timeout: 10000,
+    modules: {
+        "menubuttoncss": {
+            type: "css",
+            fullpath: "assets/menubutton.css"
+        },
+        "menubuttonjs": {
+            type: "js",
+            fullpath: "assets/menubutton.js",
+            requires: ["menubuttoncss", "node-focusmanager", "node-event-simulate", "overlay"]
+        }
+    }
+
+}).use("menubuttonjs", function(Y, result) {
+
+    //  The callback supplied to use() will be executed regardless of
+    //  whether the operation was successful or not.  The second parameter
+    //  is a result object that has the status of the operation.  We can
+    //  use this to try to recover from failures or timeouts.
+
+    if (!result.success) {
+
+        Y.log("Load failure: " + result.msg, "warn", "Example");
+
+        //  Show the menu button HTML if loading the JavaScript resources
+        //  failed, that way the original unskinned menu button
+        //  will be visible so that the user can interact with the menu
+        //  either way.
+
+        document.documentElement.className = "";
+
+    }
+
+});</textarea></div>
+
+<h3>ARIA Support</h3>
+<p>
+Through the use of CSS and JavaScript the HTML for the menu button can be
+transformed into something that looks and behaves like a desktop menu button,
+but users of screen readers won't perceive it as an atomic widget, but rather
+simply as a set of HTML elements.  However, through the application
+of the
+<a href="http://www.w3.org/TR/wai-aria/">WAI-ARIA Roles and States</a>, it is
+possible to improve the semantics of the markup such that users of screen
+readers perceive it as a menu button control.
+</p>
+
+
+<h3>Keyboard Functionality</h3>
+<p>
+The keyboard functionality for the button's menu will be provided by the Focus
+Manager Node Plugin.  The Focus Manager's
+<a href="../../api/plugin.NodeFocusManager.html#config_descendants"><code>descendants</code></a>
+attribute is set to a value of "input", so that only one menuitem in the
+button's menu  is in the browser's default tab flow.  This allows users
+navigating via the keyboard to use the tab key to quickly move into and out of
+the menu.  Once the menu has focus, the user can move focus among each menuitem
+using the up and down arrows keys, as defined by the value of the
+<a href="../../api/plugin.NodeFocusManager.html#config_keys"><code>keys</code></a>
+attribute.  The
+<a href="../../api/plugin.NodeFocusManager.html#config_focusClass"><code>focusClass</code></a>
+attribute is used to apply a class of <code>yui-menuitem-active</code> to
+the parent <code>&#60;li&#62;</code> of each
+<code>&#60;input&#62;</code> when it is focused, making it easy to style the
+menuitem's focused state in each of the
+<a href="http://developer.yahoo.com/yui/articles/gbs/#gbschart">A-Grade browsers</a>.
+
+<div id="syntax-313983d21be35a78a4fb565e8ba0a97b" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;*&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> menuButton <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#button-1&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        menu<span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> initMenu <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        menu <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Overlay</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            contentBox<span class="sy0">:</span> <span class="st0">&quot;#menu-1&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            visible<span class="sy0">:</span> <span class="kw2">false</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            tabIndex<span class="sy0">:</span> <span class="kw2">null</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        menu.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#menu-1&quot;</span><span class="br0">&#41;</span>.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;display&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="kw2">var</span> boundingBox <span class="sy0">=</span> menu.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            contentBox <span class="sy0">=</span> menu.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;contentBox&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        boundingBox.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-buttonmenu&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        contentBox.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-buttonmenu-content&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Append a decorator element to the bounding box to render the shadow.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        boundingBox.<span class="me1">append</span><span class="br0">&#40;</span><span class="st0">'&lt;div class=&quot;yui3-menu-shadow&quot;&gt;&lt;/div&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Apply the ARIA roles, states and properties to the menu.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        boundingBox.<span class="me1">setAttrs</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            role<span class="sy0">:</span> <span class="st0">&quot;menu&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            <span class="st0">&quot;aria-labelledby&quot;</span><span class="sy0">:</span> menuButton.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        boundingBox.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;input&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;menuitem&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  For NVDA: Add the role of &quot;presentation&quot; to each LI</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  element to prevent NVDA from announcing the</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  &quot;listitem&quot; role.</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        boundingBox.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;div,ul,li&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;presentation&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Use the FocusManager Node Plugin to manage the focusability</span></div></li><li class="li2"><div class="de2">        <span class="co1">//  of each menuitem in the menu.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        contentBox.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFocusManager</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                descendants<span class="sy0">:</span> <span class="st0">&quot;input&quot;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                keys<span class="sy0">:</span> <span class="br0">&#123;</span> next<span class="sy0">:</span> <span class="st0">&quot;down:40&quot;</span><span class="sy0">,</span> <span class="co1">// Down arrow</span></div></li><li class="li1"><div class="de1">                        previous<span class="sy0">:</span> <span class="st0">&quot;down:38&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span>  <span class="co1">// Up arrow</span></div></li><li class="li1"><div class="de1">                focusClass<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    className<span class="sy0">:</span> <span class="st0">&quot;yui-menuitem-active&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                    fn<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">                        <span class="kw1">return</span> node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                circular<span class="sy0">:</span> <span class="kw2">true</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Subscribe to the change event for the &quot;focused&quot; attribute</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  to listen for when the menu initially gains focus, and</span></div></li><li class="li2"><div class="de2">        <span class="co1">//  when the menu has lost focus completely.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        contentBox.<span class="me1">focusManager</span>.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;focusedChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>event.<span class="me1">newVal</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>    <span class="co1">// The menu has lost focus</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="co1">//  Set the &quot;activeDescendant&quot; attribute to 0 when the</span></div></li><li class="li1"><div class="de1">                <span class="co1">//  menu is hidden so that the user can tab from the</span></div></li><li class="li1"><div class="de1">                <span class="co1">//  button to the first item in the menu the next time</span></div></li><li class="li1"><div class="de1">                <span class="co1">//  the menu is made visible.</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="kw1">this</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;activeDescendant&quot;</span><span class="sy0">,</span> <span class="nu0">0</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Hide the button's menu if the user presses the escape key</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  while focused either on the button or its menu.</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;key&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            menu.<span class="me1">hide</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            menuButton.<span class="kw3">focus</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span> <span class="br0">&#91;</span>menuButton<span class="sy0">,</span> boundingBox<span class="br0">&#93;</span> <span class="sy0">,</span><span class="st0">&quot;down:27&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>Y.<span class="me1">UA</span>.<span class="me1">ie</span> <span class="sy0">===</span> <span class="nu0">6</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="co1">//  Set the width and height of the menu's bounding box -</span></div></li><li class="li1"><div class="de1">            <span class="co1">//  this is necessary for IE 6 so that the CSS for the</span></div></li><li class="li1"><div class="de1">            <span class="co1">//  shadow element can simply set the shadow's width and</span></div></li><li class="li1"><div class="de1">            <span class="co1">//  height to 100% to ensure that dimensions of the shadow</span></div></li><li class="li2"><div class="de2">            <span class="co1">//  are always sync'd to the that of its parent menu.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            menu.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;visibleChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="kw1">if</span> <span class="br0">&#40;</span>event.<span class="me1">newVal</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">                    boundingBox.<span class="me1">setStyles</span><span class="br0">&#40;</span><span class="br0">&#123;</span> height<span class="sy0">:</span> <span class="st0">&quot;&quot;</span><span class="sy0">,</span> width<span class="sy0">:</span> <span class="st0">&quot;&quot;</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                    boundingBox.<span class="me1">setStyles</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                        height<span class="sy0">:</span> <span class="br0">&#40;</span>boundingBox.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;offsetHeight&quot;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;px&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                        width<span class="sy0">:</span> <span class="br0">&#40;</span>boundingBox.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;offsetWidth&quot;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;px&quot;</span><span class="br0">&#41;</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        menu.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;visibleChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw2">var</span> bVisible <span class="sy0">=</span> event.<span class="me1">newVal</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="co1">//  Focus the first item when the menu is made visible</span></div></li><li class="li1"><div class="de1">            <span class="co1">//  to allow users to navigate the menu via the keyboard</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw1">if</span> <span class="br0">&#40;</span>bVisible<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="co1">//  Need to set focus via a timer for Webkit and Opera</span></div></li><li class="li1"><div class="de1">                Y.<span class="me1">Lang</span>.<span class="me1">later</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="sy0">,</span> contentBox.<span class="me1">focusManager</span><span class="sy0">,</span> contentBox.<span class="me1">focusManager</span>.<span class="kw3">focus</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            boundingBox.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;aria-hidden&quot;</span><span class="sy0">,</span> <span class="br0">&#40;</span><span class="sy0">!</span>bVisible<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Hide the menu when one of menu items is clicked.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        boundingBox.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw3">alert</span><span class="br0">&#40;</span><span class="st0">&quot;You clicked &quot;</span> <span class="sy0">+</span> <span class="kw1">this</span>.<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">&quot;input&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            contentBox.<span class="me1">focusManager</span>.<span class="kw3">blur</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">            menu.<span class="me1">hide</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;li&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="co1">//  Focus each menuitem as the user moves the mouse over</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  the menu.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        boundingBox.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;mouseenter&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">            <span class="kw2">var</span> focusManager <span class="sy0">=</span> contentBox.<span class="me1">focusManager</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw1">if</span> <span class="br0">&#40;</span>focusManager.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;focused&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                focusManager.<span class="kw3">focus</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">&quot;input&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;li&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Hide the menu if the user clicks outside of it or if the</span></div></li><li class="li2"><div class="de2">        <span class="co1">//  user doesn't click on the button</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        boundingBox.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;ownerDocument&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;mousedown&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw2">var</span> oTarget <span class="sy0">=</span> event.<span class="me1">target</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>oTarget.<span class="me1">compareTo</span><span class="br0">&#40;</span>menuButton<span class="br0">&#41;</span> <span class="sy0">&amp;&amp;</span></div></li><li class="li1"><div class="de1">                <span class="sy0">!</span>menuButton.<span class="me1">contains</span><span class="br0">&#40;</span>oTarget<span class="br0">&#41;</span> <span class="sy0">&amp;&amp;</span></div></li><li class="li1"><div class="de1">                <span class="sy0">!</span>oTarget.<span class="me1">compareTo</span><span class="br0">&#40;</span>boundingBox<span class="br0">&#41;</span> <span class="sy0">&amp;&amp;</span></div></li><li class="li1"><div class="de1">                <span class="sy0">!</span>boundingBox.<span class="me1">contains</span><span class="br0">&#40;</span>oTarget<span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">                menu.<span class="me1">hide</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    menuButton.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-menubutton&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//  Hide the list until it is transformed into a menu</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#menu-1&quot;</span><span class="br0">&#41;</span>.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;display&quot;</span><span class="sy0">,</span> <span class="st0">&quot;none&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//  Remove the &quot;yui-loading&quot; class from the documentElement</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  now that the necessary YUI dependencies are loaded and the</span></div></li><li class="li2"><div class="de2">    <span class="co1">//  menu button has been skinned.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    menuButton.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;ownerDocument&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;documentElement&quot;</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-loading&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="co1">//  Apply the ARIA roles, states and properties to the anchor.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    menuButton.<span class="me1">setAttrs</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        role<span class="sy0">:</span> <span class="st0">&quot;button&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;aria-haspopup&quot;</span><span class="sy0">:</span> <span class="kw2">true</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//  Remove the &quot;href&quot; attribute from the anchor element to</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  prevent JAWS and NVDA from reading the value of the &quot;href&quot;</span></div></li><li class="li2"><div class="de2">    <span class="co1">//  attribute when the anchor is focused.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="br0">&#40;</span>Y.<span class="me1">UA</span>.<span class="me1">gecko</span> <span class="sy0">||</span> Y.<span class="me1">UA</span>.<span class="me1">ie</span><span class="br0">&#41;</span> <span class="sy0">&amp;&amp;</span> navigator.<span class="me1">userAgent</span>.<span class="me1">indexOf</span><span class="br0">&#40;</span><span class="st0">&quot;Windows&quot;</span><span class="br0">&#41;</span> <span class="sy0">&gt;</span> <span class="sy0">-</span><span class="nu0">1</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        menuButton.<span class="me1">removeAttribute</span><span class="br0">&#40;</span><span class="st0">&quot;href&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Since the anchor's &quot;href&quot; attribute has been removed, the</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  element will not fire the click event in Firefox when the</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  user presses the enter key.  To fix this, dispatch the</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  &quot;click&quot; event to the anchor when the user presses the</span></div></li><li class="li2"><div class="de2">        <span class="co1">//  enter key.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;key&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            menuButton.<span class="me1">simulate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span> menuButton<span class="sy0">,</span> <span class="st0">&quot;down:13&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//  Set the &quot;tabIndex&quot; attribute of the anchor element to 0 to</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  place it in the browser's default tab flow.  This is</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  necessary since 1) anchor elements are not in the default</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  tab flow in Opera and 2) removing the &quot;href&quot; attribute</span></div></li><li class="li2"><div class="de2">    <span class="co1">//  prevents the anchor from firing its &quot;click&quot; event</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  in Firefox.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    menuButton.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;tabIndex&quot;</span><span class="sy0">,</span> <span class="nu0">0</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> showMenu <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  For performance: Defer the creation of the menu until</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  the first time the button is clicked.</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>menu<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            initMenu<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>menu.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;visible&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            menu.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;align&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                node<span class="sy0">:</span> menuButton<span class="sy0">,</span></div></li><li class="li2"><div class="de2">                points<span class="sy0">:</span> <span class="br0">&#91;</span>Y.<span class="me1">WidgetPositionAlign</span>.<span class="me1">TL</span><span class="sy0">,</span> Y.<span class="me1">WidgetPositionAlign</span>.<span class="me1">BL</span><span class="br0">&#93;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            menu.<span class="me1">show</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//  Prevent the anchor element from being focused</span></div></li><li class="li1"><div class="de1">        <span class="co1">//  when the users mouses down on it.</span></div></li><li class="li1"><div class="de1">        event.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//  Bind both a &quot;mousedown&quot; and &quot;click&quot; event listener to</span></div></li><li class="li2"><div class="de2">    <span class="co1">//  ensure the button's menu can be invoked using both the</span></div></li><li class="li1"><div class="de1">    <span class="co1">//  mouse and the keyboard.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    menuButton.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;mousedown&quot;</span><span class="sy0">,</span> showMenu<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    menuButton.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> showMenu<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;*&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="kw2">var</span> menuButton <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#button-1&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+        menu<span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="kw2">var</span> initMenu <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        menu <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Overlay</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+            contentBox<span class="sy0">:</span> <span class="st0">&quot;#menu-1&quot;</span><span class="sy0">,</span>
+            visible<span class="sy0">:</span> <span class="kw2">false</span><span class="sy0">,</span>
+            tabIndex<span class="sy0">:</span> <span class="kw2">null</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        menu.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+        Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#menu-1&quot;</span><span class="br0">&#41;</span>.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;display&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw2">var</span> boundingBox <span class="sy0">=</span> menu.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+            contentBox <span class="sy0">=</span> menu.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;contentBox&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        boundingBox.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-buttonmenu&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        contentBox.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-buttonmenu-content&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+        <span class="co1">// Append a decorator element to the bounding box to render the shadow.</span>
+&nbsp;
+        boundingBox.<span class="me1">append</span><span class="br0">&#40;</span><span class="st0">'&lt;div class=&quot;yui3-menu-shadow&quot;&gt;&lt;/div&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+        <span class="co1">//  Apply the ARIA roles, states and properties to the menu.</span>
+&nbsp;
+        boundingBox.<span class="me1">setAttrs</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+            role<span class="sy0">:</span> <span class="st0">&quot;menu&quot;</span><span class="sy0">,</span>
+            <span class="st0">&quot;aria-labelledby&quot;</span><span class="sy0">:</span> menuButton.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        boundingBox.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;input&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;menuitem&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+        <span class="co1">//  For NVDA: Add the role of &quot;presentation&quot; to each LI</span>
+        <span class="co1">//  element to prevent NVDA from announcing the</span>
+        <span class="co1">//  &quot;listitem&quot; role.</span>
+&nbsp;
+        boundingBox.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;div,ul,li&quot;</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;role&quot;</span><span class="sy0">,</span> <span class="st0">&quot;presentation&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+        <span class="co1">//  Use the FocusManager Node Plugin to manage the focusability</span>
+        <span class="co1">//  of each menuitem in the menu.</span>
+&nbsp;
+        contentBox.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFocusManager</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+&nbsp;
+                descendants<span class="sy0">:</span> <span class="st0">&quot;input&quot;</span><span class="sy0">,</span>
+                keys<span class="sy0">:</span> <span class="br0">&#123;</span> next<span class="sy0">:</span> <span class="st0">&quot;down:40&quot;</span><span class="sy0">,</span> <span class="co1">// Down arrow</span>
+                        previous<span class="sy0">:</span> <span class="st0">&quot;down:38&quot;</span> <span class="br0">&#125;</span><span class="sy0">,</span>  <span class="co1">// Up arrow</span>
+                focusClass<span class="sy0">:</span> <span class="br0">&#123;</span>
+                    className<span class="sy0">:</span> <span class="st0">&quot;yui-menuitem-active&quot;</span><span class="sy0">,</span>
+                    fn<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>node<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                        <span class="kw1">return</span> node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                    <span class="br0">&#125;</span>
+                <span class="br0">&#125;</span><span class="sy0">,</span>
+                circular<span class="sy0">:</span> <span class="kw2">true</span>
+&nbsp;
+            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+        <span class="co1">//  Subscribe to the change event for the &quot;focused&quot; attribute</span>
+        <span class="co1">//  to listen for when the menu initially gains focus, and</span>
+        <span class="co1">//  when the menu has lost focus completely.</span>
+&nbsp;
+        contentBox.<span class="me1">focusManager</span>.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;focusedChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>event.<span class="me1">newVal</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>    <span class="co1">// The menu has lost focus</span>
+&nbsp;
+                <span class="co1">//  Set the &quot;activeDescendant&quot; attribute to 0 when the</span>
+                <span class="co1">//  menu is hidden so that the user can tab from the</span>
+                <span class="co1">//  button to the first item in the menu the next time</span>
+                <span class="co1">//  the menu is made visible.</span>
+&nbsp;
+                <span class="kw1">this</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;activeDescendant&quot;</span><span class="sy0">,</span> <span class="nu0">0</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            <span class="br0">&#125;</span>
+&nbsp;
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+        <span class="co1">//  Hide the button's menu if the user presses the escape key</span>
+        <span class="co1">//  while focused either on the button or its menu.</span>
+&nbsp;
+        Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;key&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            menu.<span class="me1">hide</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            menuButton.<span class="kw3">focus</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="br0">&#125;</span><span class="sy0">,</span> <span class="br0">&#91;</span>menuButton<span class="sy0">,</span> boundingBox<span class="br0">&#93;</span> <span class="sy0">,</span><span class="st0">&quot;down:27&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span>Y.<span class="me1">UA</span>.<span class="me1">ie</span> <span class="sy0">===</span> <span class="nu0">6</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            <span class="co1">//  Set the width and height of the menu's bounding box -</span>
+            <span class="co1">//  this is necessary for IE 6 so that the CSS for the</span>
+            <span class="co1">//  shadow element can simply set the shadow's width and</span>
+            <span class="co1">//  height to 100% to ensure that dimensions of the shadow</span>
+            <span class="co1">//  are always sync'd to the that of its parent menu.</span>
+&nbsp;
+            menu.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;visibleChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+                <span class="kw1">if</span> <span class="br0">&#40;</span>event.<span class="me1">newVal</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+                    boundingBox.<span class="me1">setStyles</span><span class="br0">&#40;</span><span class="br0">&#123;</span> height<span class="sy0">:</span> <span class="st0">&quot;&quot;</span><span class="sy0">,</span> width<span class="sy0">:</span> <span class="st0">&quot;&quot;</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+                    boundingBox.<span class="me1">setStyles</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+                        height<span class="sy0">:</span> <span class="br0">&#40;</span>boundingBox.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;offsetHeight&quot;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;px&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+                        width<span class="sy0">:</span> <span class="br0">&#40;</span>boundingBox.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;offsetWidth&quot;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;px&quot;</span><span class="br0">&#41;</span> <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+                <span class="br0">&#125;</span>
+&nbsp;
+            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="br0">&#125;</span>
+&nbsp;
+&nbsp;
+        menu.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;visibleChange&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            <span class="kw2">var</span> bVisible <span class="sy0">=</span> event.<span class="me1">newVal</span><span class="sy0">;</span>
+&nbsp;
+            <span class="co1">//  Focus the first item when the menu is made visible</span>
+            <span class="co1">//  to allow users to navigate the menu via the keyboard</span>
+&nbsp;
+            <span class="kw1">if</span> <span class="br0">&#40;</span>bVisible<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+                <span class="co1">//  Need to set focus via a timer for Webkit and Opera</span>
+                Y.<span class="me1">Lang</span>.<span class="me1">later</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="sy0">,</span> contentBox.<span class="me1">focusManager</span><span class="sy0">,</span> contentBox.<span class="me1">focusManager</span>.<span class="kw3">focus</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            <span class="br0">&#125;</span>
+&nbsp;
+            boundingBox.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;aria-hidden&quot;</span><span class="sy0">,</span> <span class="br0">&#40;</span><span class="sy0">!</span>bVisible<span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+        <span class="co1">//  Hide the menu when one of menu items is clicked.</span>
+&nbsp;
+        boundingBox.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            <span class="kw3">alert</span><span class="br0">&#40;</span><span class="st0">&quot;You clicked &quot;</span> <span class="sy0">+</span> <span class="kw1">this</span>.<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">&quot;input&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            contentBox.<span class="me1">focusManager</span>.<span class="kw3">blur</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            menu.<span class="me1">hide</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;li&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+        <span class="co1">//  Focus each menuitem as the user moves the mouse over</span>
+        <span class="co1">//  the menu.</span>
+&nbsp;
+        boundingBox.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;mouseenter&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            <span class="kw2">var</span> focusManager <span class="sy0">=</span> contentBox.<span class="me1">focusManager</span><span class="sy0">;</span>
+&nbsp;
+            <span class="kw1">if</span> <span class="br0">&#40;</span>focusManager.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;focused&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                focusManager.<span class="kw3">focus</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">&quot;input&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+&nbsp;
+        <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;li&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+        <span class="co1">//  Hide the menu if the user clicks outside of it or if the</span>
+        <span class="co1">//  user doesn't click on the button</span>
+&nbsp;
+        boundingBox.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;ownerDocument&quot;</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;mousedown&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            <span class="kw2">var</span> oTarget <span class="sy0">=</span> event.<span class="me1">target</span><span class="sy0">;</span>
+&nbsp;
+            <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>oTarget.<span class="me1">compareTo</span><span class="br0">&#40;</span>menuButton<span class="br0">&#41;</span> <span class="sy0">&amp;&amp;</span>
+                <span class="sy0">!</span>menuButton.<span class="me1">contains</span><span class="br0">&#40;</span>oTarget<span class="br0">&#41;</span> <span class="sy0">&amp;&amp;</span>
+                <span class="sy0">!</span>oTarget.<span class="me1">compareTo</span><span class="br0">&#40;</span>boundingBox<span class="br0">&#41;</span> <span class="sy0">&amp;&amp;</span>
+                <span class="sy0">!</span>boundingBox.<span class="me1">contains</span><span class="br0">&#40;</span>oTarget<span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+                menu.<span class="me1">hide</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            <span class="br0">&#125;</span>
+&nbsp;
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    menuButton.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-menubutton&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="co1">//  Hide the list until it is transformed into a menu</span>
+&nbsp;
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#menu-1&quot;</span><span class="br0">&#41;</span>.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;display&quot;</span><span class="sy0">,</span> <span class="st0">&quot;none&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="co1">//  Remove the &quot;yui-loading&quot; class from the documentElement</span>
+    <span class="co1">//  now that the necessary YUI dependencies are loaded and the</span>
+    <span class="co1">//  menu button has been skinned.</span>
+&nbsp;
+    menuButton.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;ownerDocument&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;documentElement&quot;</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">&quot;yui-loading&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="co1">//  Apply the ARIA roles, states and properties to the anchor.</span>
+&nbsp;
+    menuButton.<span class="me1">setAttrs</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+        role<span class="sy0">:</span> <span class="st0">&quot;button&quot;</span><span class="sy0">,</span>
+        <span class="st0">&quot;aria-haspopup&quot;</span><span class="sy0">:</span> <span class="kw2">true</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="co1">//  Remove the &quot;href&quot; attribute from the anchor element to</span>
+    <span class="co1">//  prevent JAWS and NVDA from reading the value of the &quot;href&quot;</span>
+    <span class="co1">//  attribute when the anchor is focused.</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="br0">&#40;</span>Y.<span class="me1">UA</span>.<span class="me1">gecko</span> <span class="sy0">||</span> Y.<span class="me1">UA</span>.<span class="me1">ie</span><span class="br0">&#41;</span> <span class="sy0">&amp;&amp;</span> navigator.<span class="me1">userAgent</span>.<span class="me1">indexOf</span><span class="br0">&#40;</span><span class="st0">&quot;Windows&quot;</span><span class="br0">&#41;</span> <span class="sy0">&gt;</span> <span class="sy0">-</span><span class="nu0">1</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        menuButton.<span class="me1">removeAttribute</span><span class="br0">&#40;</span><span class="st0">&quot;href&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">//  Since the anchor's &quot;href&quot; attribute has been removed, the</span>
+        <span class="co1">//  element will not fire the click event in Firefox when the</span>
+        <span class="co1">//  user presses the enter key.  To fix this, dispatch the</span>
+        <span class="co1">//  &quot;click&quot; event to the anchor when the user presses the</span>
+        <span class="co1">//  enter key.</span>
+&nbsp;
+        Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;key&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            menuButton.<span class="me1">simulate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="br0">&#125;</span><span class="sy0">,</span> menuButton<span class="sy0">,</span> <span class="st0">&quot;down:13&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span>
+&nbsp;
+&nbsp;
+    <span class="co1">//  Set the &quot;tabIndex&quot; attribute of the anchor element to 0 to</span>
+    <span class="co1">//  place it in the browser's default tab flow.  This is</span>
+    <span class="co1">//  necessary since 1) anchor elements are not in the default</span>
+    <span class="co1">//  tab flow in Opera and 2) removing the &quot;href&quot; attribute</span>
+    <span class="co1">//  prevents the anchor from firing its &quot;click&quot; event</span>
+    <span class="co1">//  in Firefox.</span>
+&nbsp;
+    menuButton.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;tabIndex&quot;</span><span class="sy0">,</span> <span class="nu0">0</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="kw2">var</span> showMenu <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>event<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="co1">//  For performance: Defer the creation of the menu until</span>
+        <span class="co1">//  the first time the button is clicked.</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>menu<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            initMenu<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>menu.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;visible&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            menu.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;align&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+                node<span class="sy0">:</span> menuButton<span class="sy0">,</span>
+                points<span class="sy0">:</span> <span class="br0">&#91;</span>Y.<span class="me1">WidgetPositionAlign</span>.<span class="me1">TL</span><span class="sy0">,</span> Y.<span class="me1">WidgetPositionAlign</span>.<span class="me1">BL</span><span class="br0">&#93;</span>
+            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            menu.<span class="me1">show</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="br0">&#125;</span>
+&nbsp;
+        <span class="co1">//  Prevent the anchor element from being focused</span>
+        <span class="co1">//  when the users mouses down on it.</span>
+        event.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    <span class="co1">//  Bind both a &quot;mousedown&quot; and &quot;click&quot; event listener to</span>
+    <span class="co1">//  ensure the button's menu can be invoked using both the</span>
+    <span class="co1">//  mouse and the keyboard.</span>
+&nbsp;
+    menuButton.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;mousedown&quot;</span><span class="sy0">,</span> showMenu<span class="br0">&#41;</span><span class="sy0">;</span>
+    menuButton.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> showMenu<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-313983d21be35a78a4fb565e8ba0a97b-plain">YUI().use("*", function (Y) {
+
+    var menuButton = Y.one("#button-1"),
+        menu;
+
+
+    var initMenu = function () {
+
+        menu = new Y.Overlay({
+            contentBox: "#menu-1",
+            visible: false,
+            tabIndex: null
+        });
+
+        menu.render();
+
+
+        Y.one("#menu-1").setStyle("display", "");
+
+        var boundingBox = menu.get("boundingBox"),
+            contentBox = menu.get("contentBox");
+
+        boundingBox.addClass("yui-buttonmenu");
+        contentBox.addClass("yui-buttonmenu-content");
+
+
+        // Append a decorator element to the bounding box to render the shadow.
+
+        boundingBox.append('<div class="yui3-menu-shadow"></div>');
+
+
+        //  Apply the ARIA roles, states and properties to the menu.
+
+        boundingBox.setAttrs({
+            role: "menu",
+            "aria-labelledby": menuButton.get("id")
+        });
+
+        boundingBox.all("input").set("role", "menuitem");
+
+
+        //  For NVDA: Add the role of "presentation" to each LI
+        //  element to prevent NVDA from announcing the
+        //  "listitem" role.
+
+        boundingBox.all("div,ul,li").set("role", "presentation");
+
+
+        //  Use the FocusManager Node Plugin to manage the focusability
+        //  of each menuitem in the menu.
+
+        contentBox.plug(Y.Plugin.NodeFocusManager, {
+
+                descendants: "input",
+                keys: { next: "down:40", // Down arrow
+                        previous: "down:38" },  // Up arrow
+                focusClass: {
+                    className: "yui-menuitem-active",
+                    fn: function (node) {
+                        return node.get("parentNode");
+                    }
+                },
+                circular: true
+
+            });
+
+
+        //  Subscribe to the change event for the "focused" attribute
+        //  to listen for when the menu initially gains focus, and
+        //  when the menu has lost focus completely.
+
+        contentBox.focusManager.after("focusedChange", function (event) {
+
+            if (!event.newVal) {    // The menu has lost focus
+
+                //  Set the "activeDescendant" attribute to 0 when the
+                //  menu is hidden so that the user can tab from the
+                //  button to the first item in the menu the next time
+                //  the menu is made visible.
+
+                this.set("activeDescendant", 0);
+
+            }
+
+        });
+
+
+        //  Hide the button's menu if the user presses the escape key
+        //  while focused either on the button or its menu.
+
+        Y.on("key", function () {
+
+            menu.hide();
+            menuButton.focus();
+
+        }, [menuButton, boundingBox] ,"down:27");
+
+
+        if (Y.UA.ie === 6) {
+
+            //  Set the width and height of the menu's bounding box -
+            //  this is necessary for IE 6 so that the CSS for the
+            //  shadow element can simply set the shadow's width and
+            //  height to 100% to ensure that dimensions of the shadow
+            //  are always sync'd to the that of its parent menu.
+
+            menu.on("visibleChange", function (event) {
+
+                if (event.newVal) {
+
+                    boundingBox.setStyles({ height: "", width: "" });
+
+                    boundingBox.setStyles({
+                        height: (boundingBox.get("offsetHeight") + "px"),
+                        width: (boundingBox.get("offsetWidth") + "px") });
+
+                }
+
+            });
+
+        }
+
+
+        menu.after("visibleChange", function (event) {
+
+            var bVisible = event.newVal;
+
+            //  Focus the first item when the menu is made visible
+            //  to allow users to navigate the menu via the keyboard
+
+            if (bVisible) {
+
+                //  Need to set focus via a timer for Webkit and Opera
+                Y.Lang.later(0, contentBox.focusManager, contentBox.focusManager.focus);
+
+            }
+
+            boundingBox.set("aria-hidden", (!bVisible));
+
+        });
+
+
+        //  Hide the menu when one of menu items is clicked.
+
+        boundingBox.delegate("click", function (event) {
+
+            alert("You clicked " + this.query("input").get("value"));
+
+            contentBox.focusManager.blur();
+            menu.hide();
+
+        }, "li");
+
+
+        //  Focus each menuitem as the user moves the mouse over
+        //  the menu.
+
+        boundingBox.delegate("mouseenter", function (event) {
+
+            var focusManager = contentBox.focusManager;
+
+            if (focusManager.get("focused")) {
+                focusManager.focus(this.query("input"));
+            }
+
+        }, "li");
+
+
+        //  Hide the menu if the user clicks outside of it or if the
+        //  user doesn't click on the button
+
+        boundingBox.get("ownerDocument").on("mousedown", function (event) {
+
+            var oTarget = event.target;
+
+            if (!oTarget.compareTo(menuButton) &&
+                !menuButton.contains(oTarget) &&
+                !oTarget.compareTo(boundingBox) &&
+                !boundingBox.contains(oTarget)) {
+
+                menu.hide();
+
+            }
+
+        });
+
+    };
+
+
+    menuButton.addClass("yui-menubutton");
+
+
+    //  Hide the list until it is transformed into a menu
+
+    Y.one("#menu-1").setStyle("display", "none");
+
+
+    //  Remove the "yui-loading" class from the documentElement
+    //  now that the necessary YUI dependencies are loaded and the
+    //  menu button has been skinned.
+
+    menuButton.get("ownerDocument").get("documentElement").removeClass("yui-loading");
+
+
+    //  Apply the ARIA roles, states and properties to the anchor.
+
+    menuButton.setAttrs({
+        role: "button",
+        "aria-haspopup": true
+    });
+
+
+    //  Remove the "href" attribute from the anchor element to
+    //  prevent JAWS and NVDA from reading the value of the "href"
+    //  attribute when the anchor is focused.
+
+    if ((Y.UA.gecko || Y.UA.ie) && navigator.userAgent.indexOf("Windows") > -1) {
+
+        menuButton.removeAttribute("href");
+
+        //  Since the anchor's "href" attribute has been removed, the
+        //  element will not fire the click event in Firefox when the
+        //  user presses the enter key.  To fix this, dispatch the
+        //  "click" event to the anchor when the user presses the
+        //  enter key.
+
+        Y.on("key", function (event) {
+
+            menuButton.simulate("click");
+
+        }, menuButton, "down:13");
+
+    }
+
+
+    //  Set the "tabIndex" attribute of the anchor element to 0 to
+    //  place it in the browser's default tab flow.  This is
+    //  necessary since 1) anchor elements are not in the default
+    //  tab flow in Opera and 2) removing the "href" attribute
+    //  prevents the anchor from firing its "click" event
+    //  in Firefox.
+
+    menuButton.set("tabIndex", 0);
+
+
+    var showMenu = function (event) {
+
+        //  For performance: Defer the creation of the menu until
+        //  the first time the button is clicked.
+
+        if (!menu) {
+            initMenu();
+        }
+
+
+        if (!menu.get("visible")) {
+
+            menu.set("align", {
+                node: menuButton,
+                points: [Y.WidgetPositionAlign.TL, Y.WidgetPositionAlign.BL]
+            });
+
+            menu.show();
+
+        }
+
+        //  Prevent the anchor element from being focused
+        //  when the users mouses down on it.
+        event.preventDefault();
+
+    };
+
+
+    //  Bind both a "mousedown" and "click" event listener to
+    //  ensure the button's menu can be invoked using both the
+    //  mouse and the keyboard.
+
+    menuButton.on("mousedown", showMenu);
+    menuButton.on("click", showMenu);
+
+});</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Focus Manager Node Plugin Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../node-focusmanager/node-focusmanager-1.html'>Accessible Toolbar</a></li><li><a href='../node-focusmanager/node-focusmanager-2.html'>Accessible TabView</a></li><li class='selected'><a href='../node-focusmanager/node-focusmanager-3.html'>Accessible Menu Button</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Focus Manager Node Plugin Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/node-focusmanager/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_node-focusmanager.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="selected "><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

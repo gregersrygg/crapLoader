@@ -1,0 +1,856 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: AsyncQueue: Building a UI with AsyncQueue</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+    #init {
+        margin-top: 1em;
+    }
+
+    #demo .yui3-module {
+        position: relative;
+        width: 28em;
+    }
+    #demo .yui3-module .yui3-hd,
+    #demo .yui3-module .yui3-bd,
+    #demo .yui3-module .yui3-ft {
+        margin: 0;
+        padding: 1ex 1em;
+    }
+    #demo .yui3-module .yui3-hd {
+        background: #406ED9;
+    }
+    #demo .yui3-module .yui3-hd h4 {
+        color: #fff;
+        margin: 0;
+    }
+    #demo .yui3-module .yui3-bd {
+        background: #ABCEFF;
+        border-left: 1px solid #7A97BB;
+        border-right: 1px solid #7A97BB;
+        height: 5em;
+        padding-top: 4.5em;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+    #demo .yui3-module .yui3-ft {
+        background: #fff;
+        border: 1px solid #7A97BB;
+        border-top-color: #ccc;
+        padding-right: 25px;
+    }
+    #demo .yui3-module .yui3-status {
+        margin: 0;
+        padding: 0 25px 0 0;
+        height: 1.3em;
+    }
+    #demo .yui3-module .yui3-nav {
+        background: #fff;
+        border-bottom: 1px solid #ccc;
+        left: 0;
+        padding: .5em;
+        position: absolute;
+        width: 27em;
+    }
+    #demo .yui3-module .yui3-nav ul,
+    #demo .yui3-module .yui3-nav li {
+        display: inline;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    #demo .yui3-module .yui3-nav a {
+        color: #ffa928;
+        padding: 0 1.1em;
+    }
+    #demo .yui3-module .working {
+        background: #fff url(http://l.yimg.com/a/i/nt/ic/ut/bsc/busyarr_1.gif) no-repeat 26em 50%;
+    }
+</style>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: AsyncQueue: Building a UI with AsyncQueue</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>AsyncQueue: Building a UI with AsyncQueue</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example illustrates how to break up the initial rendering of an application UI into queued code chunks, yielding back to the browser regularly to draw portions of the UI as they are ready.</p>
+<p><em>Note</em>: This method should be reserved for apps constructing complex DOM structures.  While the DOM structure contained in this example is not complex, some artificial delays are injected to simulate process-intensive operations that would normally cause such delays.</p>
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="queue_app_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div id="demo">
+    <p>The module will be inserted here.  <em>Click the button below</em>.</p>
+</div>
+
+<button id="init">Initialize Application</button>
+
+<script type="text/javascript">
+YUI().use("anim", "async-queue",function (Y) {
+
+var MyApp = {
+    NAME : 'Asynchronous Queue Demo',
+
+    q : new Y.AsyncQueue(),
+
+    nodes : {
+        root    : null,
+        status  : null,
+        nav     : null,
+        content : null,
+        foot    : null
+    },
+
+    render : function (container) {
+        if (MyApp.nodes.root) {
+            MyApp.q.stop();
+        }
+
+        // artificial delays have been inserted to simulate _renderNav or
+        // _renderContent being process intensive and taking a while to complete
+        MyApp.q.add(
+            // pass the container param to the callback using Y.bind
+            Y.bind(MyApp._renderFramework, MyApp, container),
+            {fn: function () {}, timeout: 700}, // artificial delay
+            MyApp._renderNav,
+            {fn: function () {}, timeout: 700}, // artificial delay
+            MyApp._renderContent).run();
+    },
+
+    setStatus : function (message,working) {
+        MyApp.nodes.status.setContent(message);
+
+        MyApp.nodes.foot[working?'addClass':'removeClass']('working');
+    },
+
+    _renderFramework : function (container) {
+        var root = MyApp.nodes.root = Y.one(container);
+
+        root.setContent(
+        '<div class="yui3-module">'+
+            '<div class="yui3-hd">'+
+                '<h4>'+MyApp.NAME+'</h4>'+
+            '</div>'+
+            '<div class="yui3-bd">'+
+                '<div class="yui3-nav"></div>'+
+                '<div class="yui3-content"></div>'+
+            '</div>'+
+            '<div class="yui3-ft">'+
+                '<p class="yui3-status"></p>'+
+            '</div>'+
+        '</div>');
+
+        MyApp.nodes.status  = root.one('p.yui3-status');
+        MyApp.nodes.nav     = root.one('.yui3-nav');
+        MyApp.nodes.content = root.one('.yui3-content');
+        MyApp.nodes.foot    = root.one('.yui3-ft');
+
+        MyApp.nodes.nav.setStyle('top','-30px');
+        MyApp.nodes.content.setStyle('opacity',0);
+
+        MyApp.setStatus('Loading...',true);
+    },
+
+    _renderNav : function () {
+        var nav = MyApp.nodes.nav;
+        nav.appendChild(Y.Node.create(
+            '<ul>'+
+                '<li><a href="#">Nav Lorem</a></li>'+
+                '<li><a href="#">Nav Ipsum</a></li>'+
+                '<li><a href="#">Nav Dolor</a></li>'+
+                '<li><a href="#">Nav Sit</a></li>'+
+            '</ul>'));
+
+        new Y.Anim({
+            node : nav,
+            to :   { top : 0 },
+            duration : .3
+        }).run();
+    },
+
+    _renderContent : function () {
+        var content = MyApp.nodes.content;
+
+        content.appendChild(Y.Node.create(
+            '<p>[ App content here ]</p>'));
+
+        new Y.Anim({
+            node : content,
+            to :   { opacity : 1 },
+            duration : .8
+        }).run();
+
+        MyApp.setStatus('App initialized',false);
+    }
+};
+
+Y.on('click',function (e) {
+    e.preventDefault();
+    this.set('text','Re-initialize Application');
+
+    MyApp.render('#demo');
+},'#init');
+
+// expose the example structure
+YUI.example = { MyApp : MyApp };
+
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>The Markup</h3>
+<p>The markup will start with just a place holder element for our application.</p>
+<div id="syntax-0bb21b4c6a45a133ff4165bb1082fd70" class="yui-syntax-highlight"><div class="numbers"><pre class="html4strict" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;demo&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">p</span>&gt;</span>The module will be inserted here.  <span class="sc2">&lt;<span class="kw2">em</span>&gt;</span>Click the button below<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;</span>.<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span></div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="sc2">&lt;<span class="kw2">button</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;init&quot;</span>&gt;</span>Initialize Application<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">button</span>&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="html4strict" style="font-family:monospace;"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;demo&quot;</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">p</span>&gt;</span>The module will be inserted here.  <span class="sc2">&lt;<span class="kw2">em</span>&gt;</span>Click the button below<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;</span>.<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span>
+<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+&nbsp;
+<span class="sc2">&lt;<span class="kw2">button</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;init&quot;</span>&gt;</span>Initialize Application<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">button</span>&gt;</span></pre></div><textarea id="syntax-0bb21b4c6a45a133ff4165bb1082fd70-plain"><div id="demo">
+    <p>The module will be inserted here.  <em>Click the button below</em>.</p>
+</div>
+
+<button id="init">Initialize Application</button></textarea></div>
+<p>And will end with the following markup (indented for readability):</p>
+<div id="syntax-6edb10c26533283633800e5fc1d63271" class="yui-syntax-highlight"><div class="numbers"><pre class="html4strict" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;demo&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-module&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-hd&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>AsyncQueue Demo<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span></div></li><li class="li2"><div class="de2">        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-bd&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-nav&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="kw2">ul</span>&gt;</span></div></li><li class="li1"><div class="de1">                    <span class="sc2">&lt;<span class="kw2">li</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#&quot;</span>&gt;</span>Nav Lorem<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li2"><div class="de2">                    <span class="sc2">&lt;<span class="kw2">li</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#&quot;</span>&gt;</span>Nav Ipsum<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li1"><div class="de1">                    <span class="sc2">&lt;<span class="kw2">li</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#&quot;</span>&gt;</span>Nav Dolor<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li1"><div class="de1">                    <span class="sc2">&lt;<span class="kw2">li</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#&quot;</span>&gt;</span>Nav Sit<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">ul</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li2"><div class="de2">            <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-content&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">                <span class="sc2">&lt;<span class="kw2">p</span>&gt;</span>[ App content here ]<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-ft&quot;</span>&gt;</span></div></li><li class="li2"><div class="de2">            <span class="sc2">&lt;<span class="kw2">p</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-status&quot;</span>&gt;</span>(status message here)<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="sc2">&lt;<span class="kw2">button</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;init&quot;</span>&gt;</span>Re-initialize Application<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">button</span>&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="html4strict" style="font-family:monospace;"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;demo&quot;</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-module&quot;</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-hd&quot;</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>AsyncQueue Demo<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span>
+        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-bd&quot;</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-nav&quot;</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">ul</span>&gt;</span>
+                    <span class="sc2">&lt;<span class="kw2">li</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#&quot;</span>&gt;</span>Nav Lorem<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+                    <span class="sc2">&lt;<span class="kw2">li</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#&quot;</span>&gt;</span>Nav Ipsum<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+                    <span class="sc2">&lt;<span class="kw2">li</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#&quot;</span>&gt;</span>Nav Dolor<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+                    <span class="sc2">&lt;<span class="kw2">li</span>&gt;&lt;<span class="kw2">a</span> <span class="kw3">href</span><span class="sy0">=</span><span class="st0">&quot;#&quot;</span>&gt;</span>Nav Sit<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">li</span>&gt;</span>
+                <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">ul</span>&gt;</span>
+            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-content&quot;</span>&gt;</span>
+                <span class="sc2">&lt;<span class="kw2">p</span>&gt;</span>[ App content here ]<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span>
+            <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-ft&quot;</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">p</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-status&quot;</span>&gt;</span>(status message here)<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span>
+        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+&nbsp;
+<span class="sc2">&lt;<span class="kw2">button</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;init&quot;</span>&gt;</span>Re-initialize Application<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">button</span>&gt;</span></pre></div><textarea id="syntax-6edb10c26533283633800e5fc1d63271-plain"><div id="demo">
+    <div class="yui3-module">
+        <div class="yui3-hd">
+            <h4>AsyncQueue Demo</h4>
+        </div>
+        <div class="yui3-bd">
+            <div class="yui3-nav">
+                <ul>
+                    <li><a href="#">Nav Lorem</a></li>
+                    <li><a href="#">Nav Ipsum</a></li>
+                    <li><a href="#">Nav Dolor</a></li>
+                    <li><a href="#">Nav Sit</a></li>
+                </ul>
+            </div>
+            <div class="yui3-content">
+                <p>[ App content here ]</p>
+            </div>
+        </div>
+        <div class="yui3-ft">
+            <p class="yui3-status">(status message here)</p>
+        </div>
+    </div>
+</div>
+
+<button id="init">Re-initialize Application</button></textarea></div>
+<h3>The CSS</h3>
+<p>Some CSS is added to make it look like an application.</p>
+<div id="syntax-8480c48a8722cb8518285b689502f174" class="yui-syntax-highlight yui-syntax-highlight-linenumbers"><div class="numbers"><pre class="css" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="re0">#init</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">margin-top</span><span class="sy0">:</span> <span class="re3">1em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">relative</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">28em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#demo</span> <span class="re1">.yui3-module</span> .yui3-hd<span class="sy0">,</span></div></li><li class="li2"><div class="de2"><span class="re0">#demo</span> <span class="re1">.yui3-module</span> .yui3-bd<span class="sy0">,</span></div></li><li class="li1"><div class="de1"><span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-ft</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">padding</span><span class="sy0">:</span> <span class="re3">1ex</span> <span class="re3">1em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li2"><div class="de2"><span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-hd</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background</span><span class="sy0">:</span> <span class="re0">#406ED9</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-hd</span> h4 <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">color</span><span class="sy0">:</span> <span class="re0">#fff</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-bd</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background</span><span class="sy0">:</span> <span class="re0">#ABCEFF</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">border-left</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="re0">#7A97BB</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">border-right</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="re0">#7A97BB</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">5em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">padding-top</span><span class="sy0">:</span> <span class="re3">4.5em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">relative</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">overflow</span><span class="sy0">:</span> <span class="kw2">hidden</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">text-align</span><span class="sy0">:</span> <span class="kw2">center</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-ft</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background</span><span class="sy0">:</span> <span class="re0">#fff</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="re0">#7A97BB</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">border-top-color</span><span class="sy0">:</span> <span class="re0">#ccc</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">padding-right</span><span class="sy0">:</span> <span class="re3">25px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-status</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">padding</span><span class="sy0">:</span> <span class="nu0">0</span> <span class="re3">25px</span> <span class="nu0">0</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">1.3em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-nav</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background</span><span class="sy0">:</span> <span class="re0">#fff</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">border-bottom</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="re0">#ccc</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">left</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">padding</span><span class="sy0">:</span> <span class="re3">.5em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">absolute</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">27em</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-nav</span> ul<span class="sy0">,</span></div></li><li class="li1"><div class="de1"><span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-nav</span> li <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">display</span><span class="sy0">:</span> <span class="kw2">inline</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">list-style</span><span class="sy0">:</span> <span class="kw2">none</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">padding</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-nav</span> a <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">color</span><span class="sy0">:</span> <span class="re0">#ffa928</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">padding</span><span class="sy0">:</span> <span class="nu0">0</span> <span class="re3">1.1em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.working</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">background</span><span class="sy0">:</span> <span class="re0">#fff</span> <span class="kw2">url</span><span class="br0">&#40;</span>http<span class="sy0">:</span>//l<span class="re1">.yimg</span>.com/a/i/nt/ic/ut/bsc/busyarr_1.gif<span class="br0">&#41;</span> <span class="kw2">no-repeat</span> <span class="re3">26em</span> <span class="re3"><span class="nu0">50</span>%</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="css" style="font-family:monospace;"><span class="re0">#init</span> <span class="br0">&#123;</span>
+    <span class="kw1">margin-top</span><span class="sy0">:</span> <span class="re3">1em</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="br0">&#123;</span>
+    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">relative</span><span class="sy0">;</span>
+    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">28em</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#demo</span> <span class="re1">.yui3-module</span> .yui3-hd<span class="sy0">,</span>
+<span class="re0">#demo</span> <span class="re1">.yui3-module</span> .yui3-bd<span class="sy0">,</span>
+<span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-ft</span> <span class="br0">&#123;</span>
+    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span>
+    <span class="kw1">padding</span><span class="sy0">:</span> <span class="re3">1ex</span> <span class="re3">1em</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-hd</span> <span class="br0">&#123;</span>
+    <span class="kw1">background</span><span class="sy0">:</span> <span class="re0">#406ED9</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-hd</span> h4 <span class="br0">&#123;</span>
+    <span class="kw1">color</span><span class="sy0">:</span> <span class="re0">#fff</span><span class="sy0">;</span>
+    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-bd</span> <span class="br0">&#123;</span>
+    <span class="kw1">background</span><span class="sy0">:</span> <span class="re0">#ABCEFF</span><span class="sy0">;</span>
+    <span class="kw1">border-left</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="re0">#7A97BB</span><span class="sy0">;</span>
+    <span class="kw1">border-right</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="re0">#7A97BB</span><span class="sy0">;</span>
+    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">5em</span><span class="sy0">;</span>
+    <span class="kw1">padding-top</span><span class="sy0">:</span> <span class="re3">4.5em</span><span class="sy0">;</span>
+    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">relative</span><span class="sy0">;</span>
+    <span class="kw1">overflow</span><span class="sy0">:</span> <span class="kw2">hidden</span><span class="sy0">;</span>
+    <span class="kw1">text-align</span><span class="sy0">:</span> <span class="kw2">center</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-ft</span> <span class="br0">&#123;</span>
+    <span class="kw1">background</span><span class="sy0">:</span> <span class="re0">#fff</span><span class="sy0">;</span>
+    <span class="kw1">border</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="re0">#7A97BB</span><span class="sy0">;</span>
+    <span class="kw1">border-top-color</span><span class="sy0">:</span> <span class="re0">#ccc</span><span class="sy0">;</span>
+    <span class="kw1">padding-right</span><span class="sy0">:</span> <span class="re3">25px</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-status</span> <span class="br0">&#123;</span>
+    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span>
+    <span class="kw1">padding</span><span class="sy0">:</span> <span class="nu0">0</span> <span class="re3">25px</span> <span class="nu0">0</span> <span class="nu0">0</span><span class="sy0">;</span>
+    <span class="kw1">height</span><span class="sy0">:</span> <span class="re3">1.3em</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-nav</span> <span class="br0">&#123;</span>
+    <span class="kw1">background</span><span class="sy0">:</span> <span class="re0">#fff</span><span class="sy0">;</span>
+    <span class="kw1">border-bottom</span><span class="sy0">:</span> <span class="re3">1px</span> <span class="kw2">solid</span> <span class="re0">#ccc</span><span class="sy0">;</span>
+    <span class="kw1">left</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span>
+    <span class="kw1">padding</span><span class="sy0">:</span> <span class="re3">.5em</span><span class="sy0">;</span>
+    <span class="kw1">position</span><span class="sy0">:</span> <span class="kw2">absolute</span><span class="sy0">;</span>
+    <span class="kw1">width</span><span class="sy0">:</span> <span class="re3">27em</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-nav</span> ul<span class="sy0">,</span>
+<span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-nav</span> li <span class="br0">&#123;</span>
+    <span class="kw1">display</span><span class="sy0">:</span> <span class="kw2">inline</span><span class="sy0">;</span>
+    <span class="kw1">list-style</span><span class="sy0">:</span> <span class="kw2">none</span><span class="sy0">;</span>
+    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span>
+    <span class="kw1">padding</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.yui3-nav</span> a <span class="br0">&#123;</span>
+    <span class="kw1">color</span><span class="sy0">:</span> <span class="re0">#ffa928</span><span class="sy0">;</span>
+    <span class="kw1">padding</span><span class="sy0">:</span> <span class="nu0">0</span> <span class="re3">1.1em</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#demo</span> <span class="re1">.yui3-module</span> <span class="re1">.working</span> <span class="br0">&#123;</span>
+    <span class="kw1">background</span><span class="sy0">:</span> <span class="re0">#fff</span> <span class="kw2">url</span><span class="br0">&#40;</span>http<span class="sy0">:</span>//l<span class="re1">.yimg</span>.com/a/i/nt/ic/ut/bsc/busyarr_1.gif<span class="br0">&#41;</span> <span class="kw2">no-repeat</span> <span class="re3">26em</span> <span class="re3"><span class="nu0">50</span>%</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-8480c48a8722cb8518285b689502f174-plain">#init {
+    margin-top: 1em;
+}
+
+#demo .yui3-module {
+    position: relative;
+    width: 28em;
+}
+#demo .yui3-module .yui3-hd,
+#demo .yui3-module .yui3-bd,
+#demo .yui3-module .yui3-ft {
+    margin: 0;
+    padding: 1ex 1em;
+}
+#demo .yui3-module .yui3-hd {
+    background: #406ED9;
+}
+#demo .yui3-module .yui3-hd h4 {
+    color: #fff;
+    margin: 0;
+}
+#demo .yui3-module .yui3-bd {
+    background: #ABCEFF;
+    border-left: 1px solid #7A97BB;
+    border-right: 1px solid #7A97BB;
+    height: 5em;
+    padding-top: 4.5em;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+#demo .yui3-module .yui3-ft {
+    background: #fff;
+    border: 1px solid #7A97BB;
+    border-top-color: #ccc;
+    padding-right: 25px;
+}
+#demo .yui3-module .yui3-status {
+    margin: 0;
+    padding: 0 25px 0 0;
+    height: 1.3em;
+}
+#demo .yui3-module .yui3-nav {
+    background: #fff;
+    border-bottom: 1px solid #ccc;
+    left: 0;
+    padding: .5em;
+    position: absolute;
+    width: 27em;
+}
+#demo .yui3-module .yui3-nav ul,
+#demo .yui3-module .yui3-nav li {
+    display: inline;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+#demo .yui3-module .yui3-nav a {
+    color: #ffa928;
+    padding: 0 1.1em;
+}
+#demo .yui3-module .working {
+    background: #fff url(http://l.yimg.com/a/i/nt/ic/ut/bsc/busyarr_1.gif) no-repeat 26em 50%;
+}</textarea></div>
+<h3>Example application structure</h3>
+<p>For this example, we'll create a simple application that we'll contain under the <code>MyApp</code> namespace.  The basic structure of the namespace will be as follows:</p>
+
+<div id="syntax-ea4e9ff734e643da9850127c39e5aa97" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;anim&quot;</span><span class="sy0">,</span> <span class="st0">&quot;async-queue&quot;</span><span class="sy0">,</span><span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">var</span> MyApp <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">// the name of the application</span></div></li><li class="li2"><div class="de2">    <span class="kw3">NAME</span> <span class="sy0">:</span> <span class="st0">&quot;AsyncQueue Demo&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// rendering AsyncQueue</span></div></li><li class="li1"><div class="de1">    q <span class="sy0">:</span> <span class="kw2">new</span> Y.<span class="me1">AsyncQueue</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="co1">// cache of frequently used nodes in the DOM structure</span></div></li><li class="li1"><div class="de1">    nodes <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        root    <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        <span class="kw3">status</span>  <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        nav     <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        content <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        foot    <span class="sy0">:</span> <span class="kw2">null</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co2">/*** Public API methods ***/</span></div></li><li class="li2"><div class="de2">    <span class="co1">// draws the UI in the specified container</span></div></li><li class="li1"><div class="de1">    render <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>container<span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// update the status bar at the bottom of the app</span></div></li><li class="li1"><div class="de1">    setStatus <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>message<span class="sy0">,</span>working<span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co2">/*** private methods ***/</span></div></li><li class="li1"><div class="de1">    <span class="co1">// adds the basic app skeleton to the page</span></div></li><li class="li1"><div class="de1">    _renderFramework <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// populates the navigation section</span></div></li><li class="li1"><div class="de1">    _renderNav <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// populates the content section</span></div></li><li class="li2"><div class="de2">    _renderContent <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;anim&quot;</span><span class="sy0">,</span> <span class="st0">&quot;async-queue&quot;</span><span class="sy0">,</span><span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+<span class="kw2">var</span> MyApp <span class="sy0">=</span> <span class="br0">&#123;</span>
+    <span class="co1">// the name of the application</span>
+    <span class="kw3">NAME</span> <span class="sy0">:</span> <span class="st0">&quot;AsyncQueue Demo&quot;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co1">// rendering AsyncQueue</span>
+    q <span class="sy0">:</span> <span class="kw2">new</span> Y.<span class="me1">AsyncQueue</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co1">// cache of frequently used nodes in the DOM structure</span>
+    nodes <span class="sy0">:</span> <span class="br0">&#123;</span>
+        root    <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+        <span class="kw3">status</span>  <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+        nav     <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+        content <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+        foot    <span class="sy0">:</span> <span class="kw2">null</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co2">/*** Public API methods ***/</span>
+    <span class="co1">// draws the UI in the specified container</span>
+    render <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>container<span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co1">// update the status bar at the bottom of the app</span>
+    setStatus <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>message<span class="sy0">,</span>working<span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+&nbsp;
+    <span class="co2">/*** private methods ***/</span>
+    <span class="co1">// adds the basic app skeleton to the page</span>
+    _renderFramework <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co1">// populates the navigation section</span>
+    _renderNav <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co1">// populates the content section</span>
+    _renderContent <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-ea4e9ff734e643da9850127c39e5aa97-plain">YUI().use("anim", "async-queue",function (Y) {
+
+var MyApp = {
+    // the name of the application
+    NAME : "AsyncQueue Demo",
+
+    // rendering AsyncQueue
+    q : new Y.AsyncQueue(),
+
+    // cache of frequently used nodes in the DOM structure
+    nodes : {
+        root    : null,
+        status  : null,
+        nav     : null,
+        content : null,
+        foot    : null
+    },
+
+    /*** Public API methods ***/
+    // draws the UI in the specified container
+    render : function (container) { ... },
+
+    // update the status bar at the bottom of the app
+    setStatus : function (message,working) { ... },
+
+
+    /*** private methods ***/
+    // adds the basic app skeleton to the page
+    _renderFramework : function () { ... },
+
+    // populates the navigation section
+    _renderNav : function () { ... },
+
+    // populates the content section
+    _renderContent : function () { ... }
+};
+
+});</textarea></div>
+<p>The <code>MyApp.render</code> function will add the rendering methods to the <code>MyApp.q</code> AsyncQueue and set it in motion.  Each of the methods will be executed in turn, yielding back to the browser between steps.  So as each piece of the UI is assembled, the browser is then given the opportunity to draw it.</p>
+
+<div id="syntax-d9f9a79d7bbc2e14a12ca22e875c8aba" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">    ...</div></li><li class="li1"><div class="de1">    <span class="me1">render</span> <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>container<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// If the application is currently rendered somewhere, destroy it first</span></div></li><li class="li1"><div class="de1">        <span class="co1">// by clearing the queue and adding the destroy method to run before</span></div></li><li class="li2"><div class="de2">        <span class="co1">// the default rendering operations.</span></div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>MyApp.<span class="me1">nodes</span>.<span class="me1">root</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            MyApp.<span class="me1">q</span>.<span class="kw3">stop</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            MyApp.<span class="me1">q</span>.<span class="me1">add</span><span class="br0">&#40;</span></div></li><li class="li2"><div class="de2">                MyApp.<span class="me1">destroy</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Add the rendering operations to the ops.render queue and call run()</span></div></li><li class="li2"><div class="de2">        MyApp.<span class="me1">q</span>.<span class="me1">add</span><span class="br0">&#40;</span></div></li><li class="li1"><div class="de1">            <span class="co1">// pass the container param to the callback using Y.bind</span></div></li><li class="li1"><div class="de1">            Y.<span class="me1">bind</span><span class="br0">&#40;</span>MyApp._renderFramework<span class="sy0">,</span> MyApp<span class="sy0">,</span> container<span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            MyApp._renderNav<span class="sy0">,</span></div></li><li class="li1"><div class="de1">            MyApp._renderContent<span class="br0">&#41;</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    ...</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">    ...
+    <span class="me1">render</span> <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>container<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="co1">// If the application is currently rendered somewhere, destroy it first</span>
+        <span class="co1">// by clearing the queue and adding the destroy method to run before</span>
+        <span class="co1">// the default rendering operations.</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span>MyApp.<span class="me1">nodes</span>.<span class="me1">root</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            MyApp.<span class="me1">q</span>.<span class="kw3">stop</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            MyApp.<span class="me1">q</span>.<span class="me1">add</span><span class="br0">&#40;</span>
+                MyApp.<span class="me1">destroy</span>
+            <span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+        <span class="co1">// Add the rendering operations to the ops.render queue and call run()</span>
+        MyApp.<span class="me1">q</span>.<span class="me1">add</span><span class="br0">&#40;</span>
+            <span class="co1">// pass the container param to the callback using Y.bind</span>
+            Y.<span class="me1">bind</span><span class="br0">&#40;</span>MyApp._renderFramework<span class="sy0">,</span> MyApp<span class="sy0">,</span> container<span class="br0">&#41;</span><span class="sy0">,</span>
+            MyApp._renderNav<span class="sy0">,</span>
+            MyApp._renderContent<span class="br0">&#41;</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+    ...</pre></div><textarea id="syntax-d9f9a79d7bbc2e14a12ca22e875c8aba-plain">    ...
+    render : function (container) {
+        // If the application is currently rendered somewhere, destroy it first
+        // by clearing the queue and adding the destroy method to run before
+        // the default rendering operations.
+        if (MyApp.nodes.root) {
+            MyApp.q.stop();
+
+            MyApp.q.add(
+                MyApp.destroy
+            );
+        }
+
+        // Add the rendering operations to the ops.render queue and call run()
+        MyApp.q.add(
+            // pass the container param to the callback using Y.bind
+            Y.bind(MyApp._renderFramework, MyApp, container),
+            MyApp._renderNav,
+            MyApp._renderContent).run();
+    },
+    ...</textarea></div>
+<p>If there are any process intensive operations in the rendering steps, the UI generated in all <em>previous</em> steps will have been drawn by the browser before the heavy lifting begins.  This way, the user will be shown a part of the UI and can begin to develop an understanding of its structure and operation while the rest of it is being constructed.</p>
+
+<h3>A note on artificial delays and animation</h3>
+<p>In this example, rather than include code that would spike your CPU, delays were simulated by inserting AsyncQueue callbacks with a timeout and a function that does nothing.  There is a distinct difference between a delay caused by code execution and a delay caused by <code>setTimeout</code>.  In the former case, the browser is busy and likely won't respond to user events (such as clicks) until the executing code has completed.  In the latter, any number of JavaScript event threads may execute to completion in the intervening time.</p>
+
+<p>The rendering methods include animations courtesy of <code>Y.Anim</code>.  Anim is similar to AsyncQueue in that it also works by scheduling a callback (the application of the easing calculation) for repeated execution, yielding to the browser between each update.  However, Anim's schedule lives entirely outside the AsyncQueue's schedule.  Stopping or pausing an AsyncQueue will not stop or pause a <code>Y.Anim</code> instance that is <code>run()</code> from an AsyncQueue callback.  Similarly, if a callback starts an animation, AsyncQueue <em>will not</em> wait for the animation to complete before executing the next queued callback.</p>
+
+<h3>Full Script Source</h3>
+<p>The complete code for this example includes the artificial delays added to <code>MyApp.q</code> in the <code>render</code> method.</p>
+
+<div id="syntax-961eaf8d8ef8326a3b9ec4f7017384e2" class="yui-syntax-highlight yui-syntax-highlight-linenumbers"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;anim&quot;</span><span class="sy0">,</span> <span class="st0">&quot;async-queue&quot;</span><span class="sy0">,</span><span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">var</span> MyApp <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw3">NAME</span> <span class="sy0">:</span> <span class="st0">'Asynchronous Queue Demo'</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    q <span class="sy0">:</span> <span class="kw2">new</span> Y.<span class="me1">AsyncQueue</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    nodes <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        root    <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        <span class="kw3">status</span>  <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        nav     <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        content <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        foot    <span class="sy0">:</span> <span class="kw2">null</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    render <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>container<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>MyApp.<span class="me1">nodes</span>.<span class="me1">root</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            MyApp.<span class="me1">q</span>.<span class="kw3">stop</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// artificial delays have been inserted to simulate _renderNav or</span></div></li><li class="li1"><div class="de1">        <span class="co1">// _renderContent being process intensive and taking a while to complete</span></div></li><li class="li1"><div class="de1">        MyApp.<span class="me1">q</span>.<span class="me1">add</span><span class="br0">&#40;</span></div></li><li class="li1"><div class="de1">            <span class="co1">// pass the container param to the callback using Y.bind</span></div></li><li class="li2"><div class="de2">            Y.<span class="me1">bind</span><span class="br0">&#40;</span>MyApp._renderFramework<span class="sy0">,</span> MyApp<span class="sy0">,</span> container<span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#123;</span>fn<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">,</span> timeout<span class="sy0">:</span> <span class="nu0">700</span><span class="br0">&#125;</span><span class="sy0">,</span> <span class="co1">// artificial delay</span></div></li><li class="li1"><div class="de1">            MyApp._renderNav<span class="sy0">,</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#123;</span>fn<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">,</span> timeout<span class="sy0">:</span> <span class="nu0">700</span><span class="br0">&#125;</span><span class="sy0">,</span> <span class="co1">// artificial delay</span></div></li><li class="li1"><div class="de1">            MyApp._renderContent<span class="br0">&#41;</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    setStatus <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>message<span class="sy0">,</span>working<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        MyApp.<span class="me1">nodes</span>.<span class="kw3">status</span>.<span class="me1">setContent</span><span class="br0">&#40;</span>message<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        MyApp.<span class="me1">nodes</span>.<span class="me1">foot</span><span class="br0">&#91;</span>working<span class="sy0">?</span><span class="st0">'addClass'</span><span class="sy0">:</span><span class="st0">'removeClass'</span><span class="br0">&#93;</span><span class="br0">&#40;</span><span class="st0">'working'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    _renderFramework <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>container<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> root <span class="sy0">=</span> MyApp.<span class="me1">nodes</span>.<span class="me1">root</span> <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span>container<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        root.<span class="me1">setContent</span><span class="br0">&#40;</span></div></li><li class="li1"><div class="de1">        <span class="st0">'&lt;div class=&quot;yui3-module&quot;&gt;'</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">            <span class="st0">'&lt;div class=&quot;yui3-hd&quot;&gt;'</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">                <span class="st0">'&lt;h4&gt;'</span><span class="sy0">+</span>MyApp.<span class="kw3">NAME</span><span class="sy0">+</span><span class="st0">'&lt;/h4&gt;'</span><span class="sy0">+</span></div></li><li class="li2"><div class="de2">            <span class="st0">'&lt;/div&gt;'</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">            <span class="st0">'&lt;div class=&quot;yui3-bd&quot;&gt;'</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">                <span class="st0">'&lt;div class=&quot;yui3-nav&quot;&gt;&lt;/div&gt;'</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">                <span class="st0">'&lt;div class=&quot;yui3-content&quot;&gt;&lt;/div&gt;'</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">            <span class="st0">'&lt;/div&gt;'</span><span class="sy0">+</span></div></li><li class="li2"><div class="de2">            <span class="st0">'&lt;div class=&quot;yui3-ft&quot;&gt;'</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">                <span class="st0">'&lt;p class=&quot;yui3-status&quot;&gt;&lt;/p&gt;'</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">            <span class="st0">'&lt;/div&gt;'</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">'&lt;/div&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        MyApp.<span class="me1">nodes</span>.<span class="kw3">status</span>  <span class="sy0">=</span> root.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'p.yui3-status'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        MyApp.<span class="me1">nodes</span>.<span class="me1">nav</span>     <span class="sy0">=</span> root.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'.yui3-nav'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        MyApp.<span class="me1">nodes</span>.<span class="me1">content</span> <span class="sy0">=</span> root.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'.yui3-content'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        MyApp.<span class="me1">nodes</span>.<span class="me1">foot</span>    <span class="sy0">=</span> root.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'.yui3-ft'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        MyApp.<span class="me1">nodes</span>.<span class="me1">nav</span>.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">'top'</span><span class="sy0">,</span><span class="st0">'-30px'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        MyApp.<span class="me1">nodes</span>.<span class="me1">content</span>.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">'opacity'</span><span class="sy0">,</span><span class="nu0">0</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        MyApp.<span class="me1">setStatus</span><span class="br0">&#40;</span><span class="st0">'Loading...'</span><span class="sy0">,</span><span class="kw2">true</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    _renderNav <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> nav <span class="sy0">=</span> MyApp.<span class="me1">nodes</span>.<span class="me1">nav</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        nav.<span class="me1">appendChild</span><span class="br0">&#40;</span>Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span></div></li><li class="li1"><div class="de1">            <span class="st0">'&lt;ul&gt;'</span><span class="sy0">+</span></div></li><li class="li2"><div class="de2">                <span class="st0">'&lt;li&gt;&lt;a href=&quot;#&quot;&gt;Nav Lorem&lt;/a&gt;&lt;/li&gt;'</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">                <span class="st0">'&lt;li&gt;&lt;a href=&quot;#&quot;&gt;Nav Ipsum&lt;/a&gt;&lt;/li&gt;'</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">                <span class="st0">'&lt;li&gt;&lt;a href=&quot;#&quot;&gt;Nav Dolor&lt;/a&gt;&lt;/li&gt;'</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">                <span class="st0">'&lt;li&gt;&lt;a href=&quot;#&quot;&gt;Nav Sit&lt;/a&gt;&lt;/li&gt;'</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">            <span class="st0">'&lt;/ul&gt;'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">new</span> Y.<span class="me1">Anim</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            node <span class="sy0">:</span> nav<span class="sy0">,</span></div></li><li class="li1"><div class="de1">            to <span class="sy0">:</span>   <span class="br0">&#123;</span> top <span class="sy0">:</span> <span class="nu0">0</span> <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            duration <span class="sy0">:</span> .3</div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    _renderContent <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> content <span class="sy0">=</span> MyApp.<span class="me1">nodes</span>.<span class="me1">content</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        content.<span class="me1">appendChild</span><span class="br0">&#40;</span>Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span></div></li><li class="li1"><div class="de1">            <span class="st0">'&lt;p&gt;[ App content here ]&lt;/p&gt;'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">new</span> Y.<span class="me1">Anim</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            node <span class="sy0">:</span> content<span class="sy0">,</span></div></li><li class="li1"><div class="de1">            to <span class="sy0">:</span>   <span class="br0">&#123;</span> opacity <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            duration <span class="sy0">:</span> .8</div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        MyApp.<span class="me1">setStatus</span><span class="br0">&#40;</span><span class="st0">'App initialized'</span><span class="sy0">,</span><span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span><span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'text'</span><span class="sy0">,</span><span class="st0">'Re-initialize Application'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    MyApp.<span class="me1">render</span><span class="br0">&#40;</span><span class="st0">'#demo'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span><span class="st0">'#init'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// expose the example structure</span></div></li><li class="li1"><div class="de1">YUI.<span class="me1">example</span> <span class="sy0">=</span> <span class="br0">&#123;</span> MyApp <span class="sy0">:</span> MyApp <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;anim&quot;</span><span class="sy0">,</span> <span class="st0">&quot;async-queue&quot;</span><span class="sy0">,</span><span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+<span class="kw2">var</span> MyApp <span class="sy0">=</span> <span class="br0">&#123;</span>
+    <span class="kw3">NAME</span> <span class="sy0">:</span> <span class="st0">'Asynchronous Queue Demo'</span><span class="sy0">,</span>
+&nbsp;
+    q <span class="sy0">:</span> <span class="kw2">new</span> Y.<span class="me1">AsyncQueue</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+&nbsp;
+    nodes <span class="sy0">:</span> <span class="br0">&#123;</span>
+        root    <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+        <span class="kw3">status</span>  <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+        nav     <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+        content <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+        foot    <span class="sy0">:</span> <span class="kw2">null</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    render <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>container<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span>MyApp.<span class="me1">nodes</span>.<span class="me1">root</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            MyApp.<span class="me1">q</span>.<span class="kw3">stop</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+        <span class="co1">// artificial delays have been inserted to simulate _renderNav or</span>
+        <span class="co1">// _renderContent being process intensive and taking a while to complete</span>
+        MyApp.<span class="me1">q</span>.<span class="me1">add</span><span class="br0">&#40;</span>
+            <span class="co1">// pass the container param to the callback using Y.bind</span>
+            Y.<span class="me1">bind</span><span class="br0">&#40;</span>MyApp._renderFramework<span class="sy0">,</span> MyApp<span class="sy0">,</span> container<span class="br0">&#41;</span><span class="sy0">,</span>
+            <span class="br0">&#123;</span>fn<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">,</span> timeout<span class="sy0">:</span> <span class="nu0">700</span><span class="br0">&#125;</span><span class="sy0">,</span> <span class="co1">// artificial delay</span>
+            MyApp._renderNav<span class="sy0">,</span>
+            <span class="br0">&#123;</span>fn<span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">,</span> timeout<span class="sy0">:</span> <span class="nu0">700</span><span class="br0">&#125;</span><span class="sy0">,</span> <span class="co1">// artificial delay</span>
+            MyApp._renderContent<span class="br0">&#41;</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    setStatus <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>message<span class="sy0">,</span>working<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        MyApp.<span class="me1">nodes</span>.<span class="kw3">status</span>.<span class="me1">setContent</span><span class="br0">&#40;</span>message<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        MyApp.<span class="me1">nodes</span>.<span class="me1">foot</span><span class="br0">&#91;</span>working<span class="sy0">?</span><span class="st0">'addClass'</span><span class="sy0">:</span><span class="st0">'removeClass'</span><span class="br0">&#93;</span><span class="br0">&#40;</span><span class="st0">'working'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    _renderFramework <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>container<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw2">var</span> root <span class="sy0">=</span> MyApp.<span class="me1">nodes</span>.<span class="me1">root</span> <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span>container<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        root.<span class="me1">setContent</span><span class="br0">&#40;</span>
+        <span class="st0">'&lt;div class=&quot;yui3-module&quot;&gt;'</span><span class="sy0">+</span>
+            <span class="st0">'&lt;div class=&quot;yui3-hd&quot;&gt;'</span><span class="sy0">+</span>
+                <span class="st0">'&lt;h4&gt;'</span><span class="sy0">+</span>MyApp.<span class="kw3">NAME</span><span class="sy0">+</span><span class="st0">'&lt;/h4&gt;'</span><span class="sy0">+</span>
+            <span class="st0">'&lt;/div&gt;'</span><span class="sy0">+</span>
+            <span class="st0">'&lt;div class=&quot;yui3-bd&quot;&gt;'</span><span class="sy0">+</span>
+                <span class="st0">'&lt;div class=&quot;yui3-nav&quot;&gt;&lt;/div&gt;'</span><span class="sy0">+</span>
+                <span class="st0">'&lt;div class=&quot;yui3-content&quot;&gt;&lt;/div&gt;'</span><span class="sy0">+</span>
+            <span class="st0">'&lt;/div&gt;'</span><span class="sy0">+</span>
+            <span class="st0">'&lt;div class=&quot;yui3-ft&quot;&gt;'</span><span class="sy0">+</span>
+                <span class="st0">'&lt;p class=&quot;yui3-status&quot;&gt;&lt;/p&gt;'</span><span class="sy0">+</span>
+            <span class="st0">'&lt;/div&gt;'</span><span class="sy0">+</span>
+        <span class="st0">'&lt;/div&gt;'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        MyApp.<span class="me1">nodes</span>.<span class="kw3">status</span>  <span class="sy0">=</span> root.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'p.yui3-status'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        MyApp.<span class="me1">nodes</span>.<span class="me1">nav</span>     <span class="sy0">=</span> root.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'.yui3-nav'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        MyApp.<span class="me1">nodes</span>.<span class="me1">content</span> <span class="sy0">=</span> root.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'.yui3-content'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        MyApp.<span class="me1">nodes</span>.<span class="me1">foot</span>    <span class="sy0">=</span> root.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'.yui3-ft'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        MyApp.<span class="me1">nodes</span>.<span class="me1">nav</span>.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">'top'</span><span class="sy0">,</span><span class="st0">'-30px'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        MyApp.<span class="me1">nodes</span>.<span class="me1">content</span>.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">'opacity'</span><span class="sy0">,</span><span class="nu0">0</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        MyApp.<span class="me1">setStatus</span><span class="br0">&#40;</span><span class="st0">'Loading...'</span><span class="sy0">,</span><span class="kw2">true</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    _renderNav <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw2">var</span> nav <span class="sy0">=</span> MyApp.<span class="me1">nodes</span>.<span class="me1">nav</span><span class="sy0">;</span>
+        nav.<span class="me1">appendChild</span><span class="br0">&#40;</span>Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span>
+            <span class="st0">'&lt;ul&gt;'</span><span class="sy0">+</span>
+                <span class="st0">'&lt;li&gt;&lt;a href=&quot;#&quot;&gt;Nav Lorem&lt;/a&gt;&lt;/li&gt;'</span><span class="sy0">+</span>
+                <span class="st0">'&lt;li&gt;&lt;a href=&quot;#&quot;&gt;Nav Ipsum&lt;/a&gt;&lt;/li&gt;'</span><span class="sy0">+</span>
+                <span class="st0">'&lt;li&gt;&lt;a href=&quot;#&quot;&gt;Nav Dolor&lt;/a&gt;&lt;/li&gt;'</span><span class="sy0">+</span>
+                <span class="st0">'&lt;li&gt;&lt;a href=&quot;#&quot;&gt;Nav Sit&lt;/a&gt;&lt;/li&gt;'</span><span class="sy0">+</span>
+            <span class="st0">'&lt;/ul&gt;'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw2">new</span> Y.<span class="me1">Anim</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+            node <span class="sy0">:</span> nav<span class="sy0">,</span>
+            to <span class="sy0">:</span>   <span class="br0">&#123;</span> top <span class="sy0">:</span> <span class="nu0">0</span> <span class="br0">&#125;</span><span class="sy0">,</span>
+            duration <span class="sy0">:</span> .3
+        <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    _renderContent <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw2">var</span> content <span class="sy0">=</span> MyApp.<span class="me1">nodes</span>.<span class="me1">content</span><span class="sy0">;</span>
+&nbsp;
+        content.<span class="me1">appendChild</span><span class="br0">&#40;</span>Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span>
+            <span class="st0">'&lt;p&gt;[ App content here ]&lt;/p&gt;'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw2">new</span> Y.<span class="me1">Anim</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+            node <span class="sy0">:</span> content<span class="sy0">,</span>
+            to <span class="sy0">:</span>   <span class="br0">&#123;</span> opacity <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">&#125;</span><span class="sy0">,</span>
+            duration <span class="sy0">:</span> .8
+        <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        MyApp.<span class="me1">setStatus</span><span class="br0">&#40;</span><span class="st0">'App initialized'</span><span class="sy0">,</span><span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span><span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw1">this</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'text'</span><span class="sy0">,</span><span class="st0">'Re-initialize Application'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    MyApp.<span class="me1">render</span><span class="br0">&#40;</span><span class="st0">'#demo'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span><span class="st0">'#init'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// expose the example structure</span>
+YUI.<span class="me1">example</span> <span class="sy0">=</span> <span class="br0">&#123;</span> MyApp <span class="sy0">:</span> MyApp <span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-961eaf8d8ef8326a3b9ec4f7017384e2-plain">YUI().use("anim", "async-queue",function (Y) {
+
+var MyApp = {
+    NAME : 'Asynchronous Queue Demo',
+
+    q : new Y.AsyncQueue(),
+
+    nodes : {
+        root    : null,
+        status  : null,
+        nav     : null,
+        content : null,
+        foot    : null
+    },
+
+    render : function (container) {
+        if (MyApp.nodes.root) {
+            MyApp.q.stop();
+        }
+
+        // artificial delays have been inserted to simulate _renderNav or
+        // _renderContent being process intensive and taking a while to complete
+        MyApp.q.add(
+            // pass the container param to the callback using Y.bind
+            Y.bind(MyApp._renderFramework, MyApp, container),
+            {fn: function () {}, timeout: 700}, // artificial delay
+            MyApp._renderNav,
+            {fn: function () {}, timeout: 700}, // artificial delay
+            MyApp._renderContent).run();
+    },
+
+    setStatus : function (message,working) {
+        MyApp.nodes.status.setContent(message);
+
+        MyApp.nodes.foot[working?'addClass':'removeClass']('working');
+    },
+
+    _renderFramework : function (container) {
+        var root = MyApp.nodes.root = Y.one(container);
+
+        root.setContent(
+        '<div class="yui3-module">'+
+            '<div class="yui3-hd">'+
+                '<h4>'+MyApp.NAME+'</h4>'+
+            '</div>'+
+            '<div class="yui3-bd">'+
+                '<div class="yui3-nav"></div>'+
+                '<div class="yui3-content"></div>'+
+            '</div>'+
+            '<div class="yui3-ft">'+
+                '<p class="yui3-status"></p>'+
+            '</div>'+
+        '</div>');
+
+        MyApp.nodes.status  = root.one('p.yui3-status');
+        MyApp.nodes.nav     = root.one('.yui3-nav');
+        MyApp.nodes.content = root.one('.yui3-content');
+        MyApp.nodes.foot    = root.one('.yui3-ft');
+
+        MyApp.nodes.nav.setStyle('top','-30px');
+        MyApp.nodes.content.setStyle('opacity',0);
+
+        MyApp.setStatus('Loading...',true);
+    },
+
+    _renderNav : function () {
+        var nav = MyApp.nodes.nav;
+        nav.appendChild(Y.Node.create(
+            '<ul>'+
+                '<li><a href="#">Nav Lorem</a></li>'+
+                '<li><a href="#">Nav Ipsum</a></li>'+
+                '<li><a href="#">Nav Dolor</a></li>'+
+                '<li><a href="#">Nav Sit</a></li>'+
+            '</ul>'));
+
+        new Y.Anim({
+            node : nav,
+            to :   { top : 0 },
+            duration : .3
+        }).run();
+    },
+
+    _renderContent : function () {
+        var content = MyApp.nodes.content;
+
+        content.appendChild(Y.Node.create(
+            '<p>[ App content here ]</p>'));
+
+        new Y.Anim({
+            node : content,
+            to :   { opacity : 1 },
+            duration : .8
+        }).run();
+
+        MyApp.setStatus('App initialized',false);
+    }
+};
+
+Y.on('click',function (e) {
+    e.preventDefault();
+    this.set('text','Re-initialize Application');
+
+    MyApp.render('#demo');
+},'#init');
+
+// expose the example structure
+YUI.example = { MyApp : MyApp };
+
+});</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    AsyncQueue Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li class='selected'><a href='../async-queue/queue_app.html'>Building a UI with AsyncQueue</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More AsyncQueue Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/async-queue/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_async-queue.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="selected "><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

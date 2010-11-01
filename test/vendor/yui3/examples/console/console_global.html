@@ -1,0 +1,441 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Console: Creating a universal Console</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+#demo .first button {
+    margin-bottom: 2em;
+}
+
+#demo .yui3-console .yui3-console-title {
+    border: 0 none;
+    color: #000;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 0;
+    text-transform: none;
+}
+#demo .yui3-console .yui3-console-entry-meta {
+    margin: 0;
+}
+
+.clr {
+    clear: both;
+}
+</style>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Console: Creating a universal Console</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Console: Creating a universal Console</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>In this example, three YUI instances are created, each binding a button to call <code>Y.log(...)</code>.  Then an additional, separate YUI instance is created that requests only the <code>console</code> module and creates a Console that listens for log events from all three.</p>
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="console_global_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div id="demo">
+    <div class="yui-g">
+        <div class="yui-u first">
+            <h4>YUI #1</h4>
+            <button type="button" id="yui1">Log from YUI instance #1</button>
+
+            <h4>YUI #2</h4>
+            <button type="button" id="yui2">Log from YUI instance #2</button>
+
+            <h4>YUI #3</h4>
+            <button type="button" id="yui3">Log from YUI instance #3</button>
+        </div>
+        <div class="yui-u" id="yconsole">
+        </div>
+    </div>
+    <div class="clr"></div>
+</div>
+<script type="text/javascript">
+
+// Create the first YUI instance
+YUI().use("node", function (Y) {
+    
+    Y.one( "#yui1" ).on( "click", function () {
+        Y.log( "Message from YUI instance #1" );
+    });
+
+});
+
+// Create the second YUI instance
+YUI().use("node", function (Y) {
+
+    Y.one( "#yui2" ).on( "click", function () {
+        Y.log( "I'm the second YUI instance" );
+    });
+
+});
+
+// Create a third YUI instance
+YUI().use("node", function (Y) {
+
+    Y.one( "#yui3" ).on( "click", function () {
+        Y.log( "And this is #3 YUI" );
+    });
+
+});
+
+// Create a separate YUI instance to listen to all instances' logging
+YUI().use("console", function (Y) {
+
+    // Configure the Console's logSource to Y.Global to make it universal
+    new Y.Console({
+        logSource: Y.Global,
+        style: 'block',
+        newestOnTop: false,
+        width: "250px"
+    }).render( "#yconsole" );
+
+});
+
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3 class="first">Multiple YUI instances</h3>
+<p>Each YUI instance is its own sandbox.  You can create as many YUI instances on a page as you want or need (though typically one is enough).  The variables, module configurations and instances are kept inside that instance unless you expressly expose them via a global variable.</p>
+
+<div id="syntax-b1278974ce6359b023ad2b9c58be127d" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">// Create the first YUI instance</span></div></li><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span> <span class="st0">&quot;#yui1&quot;</span> <span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span> <span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        Y.<span class="me1">log</span><span class="br0">&#40;</span> <span class="st0">&quot;Message from YUI instance #1&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="co1">// Create the second YUI instance</span></div></li><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span> <span class="st0">&quot;#yui2&quot;</span> <span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span> <span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">log</span><span class="br0">&#40;</span> <span class="st0">&quot;I'm the second YUI instance&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// Create a third YUI instance</span></div></li><li class="li2"><div class="de2">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span> <span class="st0">&quot;#yui3&quot;</span> <span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span> <span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">log</span><span class="br0">&#40;</span> <span class="st0">&quot;And this is #3 YUI&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">// Create the first YUI instance</span>
+YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    Y.<span class="me1">one</span><span class="br0">&#40;</span> <span class="st0">&quot;#yui1&quot;</span> <span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span> <span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">log</span><span class="br0">&#40;</span> <span class="st0">&quot;Message from YUI instance #1&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Create the second YUI instance</span>
+YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    Y.<span class="me1">one</span><span class="br0">&#40;</span> <span class="st0">&quot;#yui2&quot;</span> <span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span> <span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">log</span><span class="br0">&#40;</span> <span class="st0">&quot;I'm the second YUI instance&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Create a third YUI instance</span>
+YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    Y.<span class="me1">one</span><span class="br0">&#40;</span> <span class="st0">&quot;#yui3&quot;</span> <span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span> <span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">log</span><span class="br0">&#40;</span> <span class="st0">&quot;And this is #3 YUI&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-b1278974ce6359b023ad2b9c58be127d-plain">// Create the first YUI instance
+YUI().use("node", function (Y) {
+    
+    Y.one( "#yui1" ).on( "click", function () {
+        Y.log( "Message from YUI instance #1" );
+    });
+
+});
+
+// Create the second YUI instance
+YUI().use("node", function (Y) {
+
+    Y.one( "#yui2" ).on( "click", function () {
+        Y.log( "I'm the second YUI instance" );
+    });
+
+});
+
+// Create a third YUI instance
+YUI().use("node", function (Y) {
+
+    Y.one( "#yui3" ).on( "click", function () {
+        Y.log( "And this is #3 YUI" );
+    });
+
+});</textarea></div>
+<h3>Listening to <code>Y.Global</code></h3>
+<p>To address debugging such an environment, Console can be configured to listen for log messages across all YUI instances by setting the Console instance's <code>logSource</code> configuration to <code>Y.Global</code>.</p>
+
+<p>We'll insert the universal Console into another YUI instance.</p>
+
+<div id="syntax-2576f5bd7608900fc9fc5f1ea287fe9a" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">// Create a separate YUI instance to listen to all instances' logging</span></div></li><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;console&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Configure the Console's logSource to Y.Global to make it universal</span></div></li><li class="li2"><div class="de2">    <span class="kw2">new</span> Y.<span class="me1">Console</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        logSource<span class="sy0">:</span> Y.<span class="me1">Global</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        style<span class="sy0">:</span> <span class="st0">'block'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        newestOnTop<span class="sy0">:</span> <span class="kw2">false</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        width<span class="sy0">:</span> <span class="st0">&quot;250px&quot;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">render</span><span class="br0">&#40;</span> <span class="st0">&quot;#yconsole&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">// Create a separate YUI instance to listen to all instances' logging</span>
+YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;console&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">// Configure the Console's logSource to Y.Global to make it universal</span>
+    <span class="kw2">new</span> Y.<span class="me1">Console</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+        logSource<span class="sy0">:</span> Y.<span class="me1">Global</span><span class="sy0">,</span>
+        style<span class="sy0">:</span> <span class="st0">'block'</span><span class="sy0">,</span>
+        newestOnTop<span class="sy0">:</span> <span class="kw2">false</span><span class="sy0">,</span>
+        width<span class="sy0">:</span> <span class="st0">&quot;250px&quot;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">render</span><span class="br0">&#40;</span> <span class="st0">&quot;#yconsole&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-2576f5bd7608900fc9fc5f1ea287fe9a-plain">// Create a separate YUI instance to listen to all instances' logging
+YUI().use("console", function (Y) {
+
+    // Configure the Console's logSource to Y.Global to make it universal
+    new Y.Console({
+        logSource: Y.Global,
+        style: 'block',
+        newestOnTop: false,
+        width: "250px"
+    }).render( "#yconsole" );
+
+});</textarea></div>
+<h3>Full Code Listing</h3>
+
+<h4>Markup</h4>
+<div id="syntax-45ecffc18e48c69619e03767719e1d8f" class="yui-syntax-highlight yui-syntax-highlight-linenumbers"><div class="numbers"><pre class="html4strict" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;demo&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui-g&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui-u first&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>YUI #1<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span></div></li><li class="li2"><div class="de2">            <span class="sc2">&lt;<span class="kw2">button</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;yui1&quot;</span>&gt;</span>Log from YUI instance #1<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">button</span>&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>YUI #2<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">button</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;yui2&quot;</span>&gt;</span>Log from YUI instance #2<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">button</span>&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">            <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>YUI #3<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span></div></li><li class="li1"><div class="de1">            <span class="sc2">&lt;<span class="kw2">button</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;yui3&quot;</span>&gt;</span>Log from YUI instance #3<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">button</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui-u&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;yconsole&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li2"><div class="de2">    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;clr&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="html4strict" style="font-family:monospace;"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;demo&quot;</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui-g&quot;</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui-u first&quot;</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>YUI #1<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">button</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;yui1&quot;</span>&gt;</span>Log from YUI instance #1<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">button</span>&gt;</span>
+&nbsp;
+            <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>YUI #2<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">button</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;yui2&quot;</span>&gt;</span>Log from YUI instance #2<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">button</span>&gt;</span>
+&nbsp;
+            <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>YUI #3<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span>
+            <span class="sc2">&lt;<span class="kw2">button</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;button&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;yui3&quot;</span>&gt;</span>Log from YUI instance #3<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">button</span>&gt;</span>
+        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui-u&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;yconsole&quot;</span>&gt;</span>
+        <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;clr&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></pre></div><textarea id="syntax-45ecffc18e48c69619e03767719e1d8f-plain"><div id="demo">
+    <div class="yui-g">
+        <div class="yui-u first">
+            <h4>YUI #1</h4>
+            <button type="button" id="yui1">Log from YUI instance #1</button>
+
+            <h4>YUI #2</h4>
+            <button type="button" id="yui2">Log from YUI instance #2</button>
+
+            <h4>YUI #3</h4>
+            <button type="button" id="yui3">Log from YUI instance #3</button>
+        </div>
+        <div class="yui-u" id="yconsole">
+        </div>
+    </div>
+    <div class="clr"></div>
+</div></textarea></div>
+<h4>JavaScript</h4>
+<div id="syntax-e75a0fa7b660e55ccda701e3150ddafe" class="yui-syntax-highlight yui-syntax-highlight-linenumbers"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">// Create the first YUI instance</span></div></li><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span> <span class="st0">&quot;#yui1&quot;</span> <span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span> <span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        Y.<span class="me1">log</span><span class="br0">&#40;</span> <span class="st0">&quot;Message from YUI instance #1&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="co1">// Create the second YUI instance</span></div></li><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span> <span class="st0">&quot;#yui2&quot;</span> <span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span> <span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">log</span><span class="br0">&#40;</span> <span class="st0">&quot;I'm the second YUI instance&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// Create a third YUI instance</span></div></li><li class="li2"><div class="de2">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span> <span class="st0">&quot;#yui3&quot;</span> <span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span> <span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">log</span><span class="br0">&#40;</span> <span class="st0">&quot;And this is #3 YUI&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// Create a separate YUI instance to listen to all instances' logging</span></div></li><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;console&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Configure the Console's logSource to Y.Global to make it universal</span></div></li><li class="li1"><div class="de1">    <span class="kw2">new</span> Y.<span class="me1">Console</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        logSource<span class="sy0">:</span> Y.<span class="me1">Global</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        style<span class="sy0">:</span> <span class="st0">'block'</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        newestOnTop<span class="sy0">:</span> <span class="kw2">false</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        width<span class="sy0">:</span> <span class="st0">&quot;250px&quot;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">render</span><span class="br0">&#40;</span> <span class="st0">&quot;#yconsole&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">// Create the first YUI instance</span>
+YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    Y.<span class="me1">one</span><span class="br0">&#40;</span> <span class="st0">&quot;#yui1&quot;</span> <span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span> <span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">log</span><span class="br0">&#40;</span> <span class="st0">&quot;Message from YUI instance #1&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Create the second YUI instance</span>
+YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    Y.<span class="me1">one</span><span class="br0">&#40;</span> <span class="st0">&quot;#yui2&quot;</span> <span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span> <span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">log</span><span class="br0">&#40;</span> <span class="st0">&quot;I'm the second YUI instance&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Create a third YUI instance</span>
+YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    Y.<span class="me1">one</span><span class="br0">&#40;</span> <span class="st0">&quot;#yui3&quot;</span> <span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span> <span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        Y.<span class="me1">log</span><span class="br0">&#40;</span> <span class="st0">&quot;And this is #3 YUI&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Create a separate YUI instance to listen to all instances' logging</span>
+YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;console&quot;</span><span class="sy0">,</span> <span class="kw2">function</span> <span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">// Configure the Console's logSource to Y.Global to make it universal</span>
+    <span class="kw2">new</span> Y.<span class="me1">Console</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+        logSource<span class="sy0">:</span> Y.<span class="me1">Global</span><span class="sy0">,</span>
+        style<span class="sy0">:</span> <span class="st0">'block'</span><span class="sy0">,</span>
+        newestOnTop<span class="sy0">:</span> <span class="kw2">false</span><span class="sy0">,</span>
+        width<span class="sy0">:</span> <span class="st0">&quot;250px&quot;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">render</span><span class="br0">&#40;</span> <span class="st0">&quot;#yconsole&quot;</span> <span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-e75a0fa7b660e55ccda701e3150ddafe-plain">// Create the first YUI instance
+YUI().use("node", function (Y) {
+    
+    Y.one( "#yui1" ).on( "click", function () {
+        Y.log( "Message from YUI instance #1" );
+    });
+
+});
+
+// Create the second YUI instance
+YUI().use("node", function (Y) {
+
+    Y.one( "#yui2" ).on( "click", function () {
+        Y.log( "I'm the second YUI instance" );
+    });
+
+});
+
+// Create a third YUI instance
+YUI().use("node", function (Y) {
+
+    Y.one( "#yui3" ).on( "click", function () {
+        Y.log( "And this is #3 YUI" );
+    });
+
+});
+
+// Create a separate YUI instance to listen to all instances' logging
+YUI().use("console", function (Y) {
+
+    // Configure the Console's logSource to Y.Global to make it universal
+    new Y.Console({
+        logSource: Y.Global,
+        style: 'block',
+        newestOnTop: false,
+        width: "250px"
+    }).render( "#yconsole" );
+
+});</textarea></div>
+<h4>CSS</h4>
+<div id="syntax-4468c0c429d1f3b87261e2add1c903fe" class="yui-syntax-highlight yui-syntax-highlight-linenumbers"><div class="numbers"><pre class="css" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="re0">#demo</span> <span class="re1">.first</span> button <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">margin-bottom</span><span class="sy0">:</span> <span class="re3">2em</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="re0">#demo</span> <span class="re1">.yui3-console</span> <span class="re1">.yui3-console-title</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">border</span><span class="sy0">:</span> <span class="nu0">0</span> <span class="kw2">none</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">color</span><span class="sy0">:</span> <span class="re0">#000</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">font-size</span><span class="sy0">:</span> <span class="re3">13px</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">font-weight</span><span class="sy0">:</span> <span class="kw2">bold</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">text-transform</span><span class="sy0">:</span> <span class="kw2">none</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="re0">#demo</span> <span class="re1">.yui3-console</span> <span class="re1">.yui3-console-entry-meta</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="css" style="font-family:monospace;"><span class="re0">#demo</span> <span class="re1">.first</span> button <span class="br0">&#123;</span>
+    <span class="kw1">margin-bottom</span><span class="sy0">:</span> <span class="re3">2em</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="re0">#demo</span> <span class="re1">.yui3-console</span> <span class="re1">.yui3-console-title</span> <span class="br0">&#123;</span>
+    <span class="kw1">border</span><span class="sy0">:</span> <span class="nu0">0</span> <span class="kw2">none</span><span class="sy0">;</span>
+    <span class="kw1">color</span><span class="sy0">:</span> <span class="re0">#000</span><span class="sy0">;</span>
+    <span class="kw1">font-size</span><span class="sy0">:</span> <span class="re3">13px</span><span class="sy0">;</span>
+    <span class="kw1">font-weight</span><span class="sy0">:</span> <span class="kw2">bold</span><span class="sy0">;</span>
+    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span>
+    <span class="kw1">text-transform</span><span class="sy0">:</span> <span class="kw2">none</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="re0">#demo</span> <span class="re1">.yui3-console</span> <span class="re1">.yui3-console-entry-meta</span> <span class="br0">&#123;</span>
+    <span class="kw1">margin</span><span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-4468c0c429d1f3b87261e2add1c903fe-plain">#demo .first button {
+    margin-bottom: 2em;
+}
+
+#demo .yui3-console .yui3-console-title {
+    border: 0 none;
+    color: #000;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 0;
+    text-transform: none;
+}
+#demo .yui3-console .yui3-console-entry-meta {
+    margin: 0;
+}</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Console Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../console/console_basic.html'>Creating a Console for debugging</a></li><li><a href='../console/console_yui_config.html'>YUI configuration to filter log messages</a></li><li class='selected'><a href='../console/console_global.html'>Creating a universal Console</a></li><li><a href='../console-filters/console-filters_intro.html'>Using the ConsoleFilters plugin (included with examples for Plugin.ConsoleFilters)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Console Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/console/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_console.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="selected "><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

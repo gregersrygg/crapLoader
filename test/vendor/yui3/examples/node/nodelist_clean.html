@@ -1,0 +1,65 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>NodeList</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<link href="assets//node.css" rel="stylesheet" type="text/css">
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>NodeList</h1>
+
+<div class="exampleIntro">
+	<p>This example demonstrates how to use a NodeList instance to work with multiple nodes.</p>
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<ul id="demo">
+    <li>lorem</li>
+    <li>ispum</li>
+    <li>dolor</li>
+    <li>sit</li>
+</ul>
+
+<script type="text/javascript">
+YUI().use("node", function(Y) {
+    var nodes = Y.all('#demo li');
+
+    var onClick = function(e) {
+        this.setContent('thanks from all of us!'); // this === nodes
+        e.currentTarget.setStyle('backgroundColor', 'green'); // e.currentTarget === #demo li
+    };
+
+    nodes.on('click', onClick);
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

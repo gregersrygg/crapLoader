@@ -1,0 +1,687 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: IO: GET Transaction</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+#container li {margin-left:2em;}
+#container { background-color:#FFFFFF; border:1px dotted #666666; padding:1em; margin-bottom:1em;}
+</style>
+
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: IO: GET Transaction</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>IO: GET Transaction</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example demonstrates how to send HTTP GET requests using <a href="http://developer.yahoo.com/yui/3/io/" title="YUI 3: IO">YUI 3's IO module</a>.  One transaction uses global event listeners to handle the transaction's lifecycle and response.  The other transaction uses both global and transaction-level events.</p>	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="io-get_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div id="container">
+	<ul>
+    	<li>IO GET response data will appear here.</li>
+    </ul>
+</div>
+<form>
+	<input id="get1" type="button" value="GET with Global Listeners. " />
+	<input id="get2" type="button" value="GET with Global and Transaction Listeners" />
+</form>
+
+<script>
+YUI().use("io",
+
+	function(Y) {
+
+		//Get a reference to the DIV that we are using
+		//to report results.
+		var d = document.getElementById('container');
+
+		/* global listener object */
+		var gH = {
+			write: function(str, args) {
+					 d.innerHTML += "ID: " + str;
+					 if (args) {
+					 	d.innerHTML += " " + "The arguments are: " + args;
+					 }
+					 d.innerHTML += "<br>";
+				   },
+			start: function(id, args) {
+					 this.write(id + ": Global Event Start.", args);
+				   },
+			complete: function(id, o, args) {
+						this.write(id + ": Global Event Complete.  The status code is: " + o.status + ".", args);
+				   },
+			success: function(id, o, args) {
+					   this.write(id + ": Global Event Success.  The response is: " + o.responseText + ".", args);
+					 },
+			failure: function(id, o, args) {
+					   this.write(o + ": Global Event Failure.  The status text is: " + o.statusText + ".", args);
+					 },
+			end: function(id, args) {
+					 this.write(id + ": Global Event End.", args);
+			}
+		}
+		/* end global listener object */
+
+		/* transaction event object */
+		var tH = {
+			write: function(str, args) {
+					 d.innerHTML += "ID: " + str;
+					 if (args) {
+					 	d.innerHTML += " " + "The arguments are: " + args;
+					 }
+					 d.innerHTML += "<br>";
+				   },
+			start: function(id, args) {
+					 this.write(id + ": Transaction Event Start.", args.start);
+				   },
+			complete: function(id, o, args) {
+						this.write(id + ": Transaction Event Complete.  The status code is: " + o.status + ".", args.complete);
+				   },
+			success: function(id, o, args) {
+					   this.write(id + ": Transaction Event Success.  The response is: " + o.responseText + ".", args.success);
+					 },
+			failure: function(id, o, args) {
+					   this.write(id + ": Transaction Event Failure.  The status text is: " + o.statusText + ".", args.failure);
+					 },
+			end: function(id, args) {
+					 this.write(id + ": Transaction Event End.", args.end);
+			}
+		}
+		/* end transaction event object */
+
+		/* attach global listeners */
+		Y.on('io:start', gH.start, gH, 'global foo');
+		Y.on('io:complete', gH.complete, gH, 'global bar');
+		Y.on('io:success', gH.success, gH, 'global baz');
+		Y.on('io:failure', gH.failure, gH);
+		Y.on('io:end', gH.end, gH, 'global boo');
+		/* end global listener binding */
+
+		/* configuration object for transactions */
+		var cfg = {
+			on: {
+				start: tH.start,
+				complete: tH.complete,
+				success: tH.success,
+				failure: tH.failure,
+				end: tH.end
+			},
+			context: tH,
+			headers: { 'X-Transaction': 'GET Example'},
+			arguments: {
+					   start: 'foo',
+					   complete: 'bar',
+					   success: 'baz',
+					   failure: 'Oh no!',
+					   end: 'boo'
+					   }
+		};
+		/* end configuration object */
+
+		function call(e, b) {
+			if (b) {
+				Y.io('assets/get.php?user=YDN&allListeners=1', cfg);
+			}
+			else {
+				Y.io('assets/get.php?user=YDN&globalListeners=1');
+			}
+		}
+
+		Y.on('click', call, "#get1", this, false);
+		Y.on('click', call, "#get2", this, true);
+	});
+</script>	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h2 class="first">Using IO for HTTP GET Requests, and Handling the Response via Event Listeners.</h2>
+
+<h3>Create a YUI Instance</h3>
+<p>Create a YUI instance, using IO, for this example:</p>
+
+<div id="syntax-cbf611a42471c554f5b655422cdd6919" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">//Create a YUI instance including support for IO:</span></div></li><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>base<span class="sy0">:</span><span class="st0">&quot;../../build/&quot;</span><span class="sy0">,</span> timeout<span class="sy0">:</span> <span class="nu0">10000</span><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;io-base&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">	<span class="co1">// Y is the YUI instance.</span></div></li><li class="li1"><div class="de1">	<span class="co1">// The rest of the following code is encapsulated in this</span></div></li><li class="li2"><div class="de2">	<span class="co1">// anonymous function.</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span> <span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">//Create a YUI instance including support for IO:</span>
+YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>base<span class="sy0">:</span><span class="st0">&quot;../../build/&quot;</span><span class="sy0">,</span> timeout<span class="sy0">:</span> <span class="nu0">10000</span><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;io-base&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+	<span class="co1">// Y is the YUI instance.</span>
+	<span class="co1">// The rest of the following code is encapsulated in this</span>
+	<span class="co1">// anonymous function.</span>
+<span class="br0">&#125;</span> <span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-cbf611a42471c554f5b655422cdd6919-plain">//Create a YUI instance including support for IO:
+YUI({base:"../../build/", timeout: 10000}).use("io-base", function(Y) {
+	// Y is the YUI instance.
+	// The rest of the following code is encapsulated in this
+	// anonymous function.
+} );</textarea></div>
+<h3>Create Handlers for Global and Transaction Events.</h3>
+
+<p>
+We will create one object to handle the Global Events, and one object to handle Transaction Events.  Each object defines methods to handle the events in a transction's lifecycles.
+The results are logged to <code>&lt;div id="container"&gt;</code>.
+</p>
+
+<div id="syntax-c85fced87c17e998a1a407817475d263" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">//Get a reference to the DIV we are using</span></div></li><li class="li1"><div class="de1"><span class="co1">//to report results.</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> d <span class="sy0">=</span> document.<span class="me1">getElementById</span><span class="br0">&#40;</span><span class="st0">'container'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="co2">/* global listener object */</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> gH <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">	<span class="kw1">write</span><span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>str<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;ID: &quot;</span> <span class="sy0">+</span> str<span class="sy0">;</span></div></li><li class="li1"><div class="de1">			 <span class="kw1">if</span> <span class="br0">&#40;</span>args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">			 	d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot; &quot;</span> <span class="sy0">+</span> <span class="st0">&quot;The arguments are: &quot;</span> <span class="sy0">+</span> args<span class="sy0">;</span></div></li><li class="li1"><div class="de1">			 <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">			 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;&lt;br&gt;&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">	start<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">			 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event Start.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">	complete<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">				<span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event Complete.  The status code is: &quot;</span> <span class="sy0">+</span> o.<span class="kw3">status</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">	success<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event Success.  The response is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">responseText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">	failure<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>o <span class="sy0">+</span> <span class="st0">&quot;: Global Event Failure.  The status text is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">statusText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">	end<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event End.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li2"><div class="de2"><span class="co2">/* end global listener object */</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co2">/* transaction event object */</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> tH <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">	<span class="kw1">write</span><span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>str<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">			 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;ID: &quot;</span> <span class="sy0">+</span> str<span class="sy0">;</span></div></li><li class="li1"><div class="de1">			 <span class="kw1">if</span> <span class="br0">&#40;</span>args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			   d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot; &quot;</span> <span class="sy0">+</span> <span class="st0">&quot;The arguments are: &quot;</span> <span class="sy0">+</span> args<span class="sy0">;</span></div></li><li class="li1"><div class="de1">			 <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">			 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;&lt;br&gt;&quot;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">	<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">	start<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Start.&quot;</span><span class="sy0">,</span> args.<span class="me1">start</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">	complete<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">				<span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Complete.  The status code is: &quot;</span> <span class="sy0">+</span> o.<span class="kw3">status</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args.<span class="me1">complete</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">	success<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Success.  The response is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">responseText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args.<span class="me1">success</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">	failure<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Failure.  The status text is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">statusText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args.<span class="me1">failure</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">	end<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event End.&quot;</span><span class="sy0">,</span> args.<span class="me1">end</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">	<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">/* end transaction event object */</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">//Get a reference to the DIV we are using</span>
+<span class="co1">//to report results.</span>
+<span class="kw2">var</span> d <span class="sy0">=</span> document.<span class="me1">getElementById</span><span class="br0">&#40;</span><span class="st0">'container'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co2">/* global listener object */</span>
+<span class="kw2">var</span> gH <span class="sy0">=</span> <span class="br0">&#123;</span>
+	<span class="kw1">write</span><span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>str<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;ID: &quot;</span> <span class="sy0">+</span> str<span class="sy0">;</span>
+			 <span class="kw1">if</span> <span class="br0">&#40;</span>args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			 	d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot; &quot;</span> <span class="sy0">+</span> <span class="st0">&quot;The arguments are: &quot;</span> <span class="sy0">+</span> args<span class="sy0">;</span>
+			 <span class="br0">&#125;</span>
+			 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;&lt;br&gt;&quot;</span><span class="sy0">;</span>
+	<span class="br0">&#125;</span><span class="sy0">,</span>
+	start<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event Start.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span>
+	<span class="br0">&#125;</span><span class="sy0">,</span>
+	complete<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+				<span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event Complete.  The status code is: &quot;</span> <span class="sy0">+</span> o.<span class="kw3">status</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+	success<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event Success.  The response is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">responseText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+	failure<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>o <span class="sy0">+</span> <span class="st0">&quot;: Global Event Failure.  The status text is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">statusText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+	end<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event End.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span>
+	<span class="br0">&#125;</span>
+<span class="br0">&#125;</span>
+<span class="co2">/* end global listener object */</span>
+&nbsp;
+<span class="co2">/* transaction event object */</span>
+<span class="kw2">var</span> tH <span class="sy0">=</span> <span class="br0">&#123;</span>
+	<span class="kw1">write</span><span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>str<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;ID: &quot;</span> <span class="sy0">+</span> str<span class="sy0">;</span>
+			 <span class="kw1">if</span> <span class="br0">&#40;</span>args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			   d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot; &quot;</span> <span class="sy0">+</span> <span class="st0">&quot;The arguments are: &quot;</span> <span class="sy0">+</span> args<span class="sy0">;</span>
+			 <span class="br0">&#125;</span>
+			 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;&lt;br&gt;&quot;</span><span class="sy0">;</span>
+	<span class="br0">&#125;</span><span class="sy0">,</span>
+	start<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Start.&quot;</span><span class="sy0">,</span> args.<span class="me1">start</span><span class="br0">&#41;</span><span class="sy0">;</span>
+	<span class="br0">&#125;</span><span class="sy0">,</span>
+	complete<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+				<span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Complete.  The status code is: &quot;</span> <span class="sy0">+</span> o.<span class="kw3">status</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args.<span class="me1">complete</span><span class="br0">&#41;</span><span class="sy0">;</span>
+	<span class="br0">&#125;</span><span class="sy0">,</span>
+	success<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Success.  The response is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">responseText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args.<span class="me1">success</span><span class="br0">&#41;</span><span class="sy0">;</span>
+	<span class="br0">&#125;</span><span class="sy0">,</span>
+	failure<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Failure.  The status text is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">statusText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args.<span class="me1">failure</span><span class="br0">&#41;</span><span class="sy0">;</span>
+	<span class="br0">&#125;</span><span class="sy0">,</span>
+	end<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event End.&quot;</span><span class="sy0">,</span> args.<span class="me1">end</span><span class="br0">&#41;</span><span class="sy0">;</span>
+	<span class="br0">&#125;</span>
+<span class="br0">&#125;</span>
+<span class="coMULTI">/* end transaction event object */</span></pre></div><textarea id="syntax-c85fced87c17e998a1a407817475d263-plain">//Get a reference to the DIV we are using
+//to report results.
+var d = document.getElementById('container');
+
+/* global listener object */
+var gH = {
+	write: function(str, args) {
+			 d.innerHTML += "ID: " + str;
+			 if (args) {
+			 	d.innerHTML += " " + "The arguments are: " + args;
+			 }
+			 d.innerHTML += "<br>";
+	},
+	start: function(id, args) {
+			 this.write(id + ": Global Event Start.", args);
+	},
+	complete: function(id, o, args) {
+				this.write(id + ": Global Event Complete.  The status code is: " + o.status + ".", args);
+    },
+	success: function(id, o, args) {
+			   this.write(id + ": Global Event Success.  The response is: " + o.responseText + ".", args);
+    },
+	failure: function(id, o, args) {
+			   this.write(o + ": Global Event Failure.  The status text is: " + o.statusText + ".", args);
+    },
+	end: function(id, args) {
+			 this.write(id + ": Global Event End.", args);
+	}
+}
+/* end global listener object */
+
+/* transaction event object */
+var tH = {
+	write: function(str, args) {
+			 d.innerHTML += "ID: " + str;
+			 if (args) {
+			   d.innerHTML += " " + "The arguments are: " + args;
+			 }
+			 d.innerHTML += "<br>";
+	},
+	start: function(id, args) {
+			 this.write(id + ": Transaction Event Start.", args.start);
+	},
+	complete: function(id, o, args) {
+				this.write(id + ": Transaction Event Complete.  The status code is: " + o.status + ".", args.complete);
+	},
+	success: function(id, o, args) {
+			   this.write(id + ": Transaction Event Success.  The response is: " + o.responseText + ".", args.success);
+	},
+	failure: function(id, o, args) {
+			   this.write(id + ": Transaction Event Failure.  The status text is: " + o.statusText + ".", args.failure);
+	},
+	end: function(id, args) {
+			 this.write(id + ": Transaction Event End.", args.end);
+	}
+}
+/* end transaction event object */</textarea></div>
+<h3>Subscribe to the Global events</h3>
+<p>With the handler object <code>gH</code defined, we can now subscribe to the Global events.</p>
+<div id="syntax-69f11947eb86c067c68c216a8094a0aa" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">// Notice the object context of &quot;gH&quot; is provided as the</span></div></li><li class="li1"><div class="de1"><span class="co1">// third argument of &lt;code&gt;Y.on()&lt;/code&gt;, to preserve the proper</span></div></li><li class="li1"><div class="de1"><span class="co1">// context of 'this' as used in &lt;code&gt;gH's&lt;/code&gt; methods.</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="co2">/* Subscribe to the global events */</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:start'</span><span class="sy0">,</span> gH.<span class="me1">start</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global foo'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:complete'</span><span class="sy0">,</span> gH.<span class="me1">complete</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global bar'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:success'</span><span class="sy0">,</span> gH.<span class="me1">success</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global baz'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:failure'</span><span class="sy0">,</span> gH.<span class="me1">failure</span><span class="sy0">,</span> gH<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:end'</span><span class="sy0">,</span> gH.<span class="me1">end</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global boo'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">/* End event subscription */</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">// Notice the object context of &quot;gH&quot; is provided as the</span>
+<span class="co1">// third argument of &lt;code&gt;Y.on()&lt;/code&gt;, to preserve the proper</span>
+<span class="co1">// context of 'this' as used in &lt;code&gt;gH's&lt;/code&gt; methods.</span>
+&nbsp;
+<span class="co2">/* Subscribe to the global events */</span>
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:start'</span><span class="sy0">,</span> gH.<span class="me1">start</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global foo'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:complete'</span><span class="sy0">,</span> gH.<span class="me1">complete</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global bar'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:success'</span><span class="sy0">,</span> gH.<span class="me1">success</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global baz'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:failure'</span><span class="sy0">,</span> gH.<span class="me1">failure</span><span class="sy0">,</span> gH<span class="br0">&#41;</span><span class="sy0">;</span>
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:end'</span><span class="sy0">,</span> gH.<span class="me1">end</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global boo'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="coMULTI">/* End event subscription */</span></pre></div><textarea id="syntax-69f11947eb86c067c68c216a8094a0aa-plain">// Notice the object context of "gH" is provided as the
+// third argument of <code>Y.on()</code>, to preserve the proper
+// context of 'this' as used in <code>gH's</code> methods.
+
+/* Subscribe to the global events */
+Y.on('io:start', gH.start, gH, 'global foo');
+Y.on('io:complete', gH.complete, gH, 'global bar');
+Y.on('io:success', gH.success, gH, 'global baz');
+Y.on('io:failure', gH.failure, gH);
+Y.on('io:end', gH.end, gH, 'global boo');
+/* End event subscription */</textarea></div>
+<h3>Assemble a Configuration Object to set Transaction Event Listeners</h3>
+<p>Use a configuration object to define which Transaction Events you wish to handle, for the specific transaction.</p>
+
+<div id="syntax-e537bd899d924d8bbf510693a7fac997" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="coMULTI">/* Configuration object for setting Transaction Events */</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> cfg <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">	on<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">		start<span class="sy0">:</span> tH.<span class="me1">start</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">		complete<span class="sy0">:</span> tH.<span class="me1">complete</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">		success<span class="sy0">:</span> tH.<span class="me1">success</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">		failure<span class="sy0">:</span> tH.<span class="me1">failure</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">		end<span class="sy0">:</span> tH.<span class="me1">end</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">	context<span class="sy0">:</span> tH<span class="sy0">,</span></div></li><li class="li1"><div class="de1">	headers<span class="sy0">:</span> <span class="br0">&#123;</span> <span class="st0">'X-Transaction'</span><span class="sy0">:</span> <span class="st0">'GET Example'</span><span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">	arguments<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			   start<span class="sy0">:</span> <span class="st0">'foo'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">			   complete<span class="sy0">:</span> <span class="st0">'bar'</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">			   success<span class="sy0">:</span> <span class="st0">'baz'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">			   failure<span class="sy0">:</span> <span class="st0">'Oh no!'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">			   end<span class="sy0">:</span> <span class="st0">'boo'</span></div></li><li class="li1"><div class="de1">			   <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="coMULTI">/* Configuration object for setting Transaction Events */</span>
+<span class="kw2">var</span> cfg <span class="sy0">=</span> <span class="br0">&#123;</span>
+	on<span class="sy0">:</span> <span class="br0">&#123;</span>
+		start<span class="sy0">:</span> tH.<span class="me1">start</span><span class="sy0">,</span>
+		complete<span class="sy0">:</span> tH.<span class="me1">complete</span><span class="sy0">,</span>
+		success<span class="sy0">:</span> tH.<span class="me1">success</span><span class="sy0">,</span>
+		failure<span class="sy0">:</span> tH.<span class="me1">failure</span><span class="sy0">,</span>
+		end<span class="sy0">:</span> tH.<span class="me1">end</span>
+	<span class="br0">&#125;</span><span class="sy0">,</span>
+	context<span class="sy0">:</span> tH<span class="sy0">,</span>
+	headers<span class="sy0">:</span> <span class="br0">&#123;</span> <span class="st0">'X-Transaction'</span><span class="sy0">:</span> <span class="st0">'GET Example'</span><span class="br0">&#125;</span><span class="sy0">,</span>
+	arguments<span class="sy0">:</span> <span class="br0">&#123;</span>
+			   start<span class="sy0">:</span> <span class="st0">'foo'</span><span class="sy0">,</span>
+			   complete<span class="sy0">:</span> <span class="st0">'bar'</span><span class="sy0">,</span>
+			   success<span class="sy0">:</span> <span class="st0">'baz'</span><span class="sy0">,</span>
+			   failure<span class="sy0">:</span> <span class="st0">'Oh no!'</span><span class="sy0">,</span>
+			   end<span class="sy0">:</span> <span class="st0">'boo'</span>
+			   <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span></pre></div><textarea id="syntax-e537bd899d924d8bbf510693a7fac997-plain">/* Configuration object for setting Transaction Events */
+var cfg = {
+	on: {
+		start: tH.start,
+		complete: tH.complete,
+		success: tH.success,
+		failure: tH.failure,
+		end: tH.end
+	},
+	context: tH,
+	headers: { 'X-Transaction': 'GET Example'},
+	arguments: {
+			   start: 'foo',
+			   complete: 'bar',
+			   success: 'baz',
+			   failure: 'Oh no!',
+			   end: 'boo'
+			   }
+};</textarea></div>
+<h3>Initiate the Transaction</h3>
+<p>
+Finally, we set up two buttons -- one for each type of transaction -- and add a "click" listener to each of them.  The handler -- function <code>call()</code> -- make an
+IO request, based on which button was clicked.
+</p>
+
+<div id="syntax-2edbe31ca06d5f33d86e5ab422922d85" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">function</span> call<span class="br0">&#40;</span>e<span class="sy0">,</span> b<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">	<span class="kw1">if</span> <span class="br0">&#40;</span>b<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">		Y.<span class="me1">io</span><span class="br0">&#40;</span><span class="st0">'(assets/)get.php?user=YDN&amp;allListeners=1'</span><span class="sy0">,</span> cfg<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">	<span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">		Y.<span class="me1">io</span><span class="br0">&#40;</span><span class="st0">'(assets/)get.php?user=YDN&amp;globalListeners=1'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> call<span class="sy0">,</span> <span class="st0">&quot;#get1&quot;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> call<span class="sy0">,</span> <span class="st0">&quot;#get2&quot;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw2">true</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">function</span> call<span class="br0">&#40;</span>e<span class="sy0">,</span> b<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+	<span class="kw1">if</span> <span class="br0">&#40;</span>b<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+		Y.<span class="me1">io</span><span class="br0">&#40;</span><span class="st0">'(assets/)get.php?user=YDN&amp;allListeners=1'</span><span class="sy0">,</span> cfg<span class="br0">&#41;</span><span class="sy0">;</span>
+	<span class="br0">&#125;</span>
+	<span class="kw1">else</span> <span class="br0">&#123;</span>
+		Y.<span class="me1">io</span><span class="br0">&#40;</span><span class="st0">'(assets/)get.php?user=YDN&amp;globalListeners=1'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+	<span class="br0">&#125;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> call<span class="sy0">,</span> <span class="st0">&quot;#get1&quot;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span>
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> call<span class="sy0">,</span> <span class="st0">&quot;#get2&quot;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw2">true</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-2edbe31ca06d5f33d86e5ab422922d85-plain">function call(e, b) {
+	if (b) {
+		Y.io('(assets/)get.php?user=YDN&allListeners=1', cfg);
+	}
+	else {
+		Y.io('(assets/)get.php?user=YDN&globalListeners=1');
+	}
+}
+
+Y.on('click', call, "#get1", this, false);
+Y.on('click', call, "#get2", this, true);</textarea></div>
+<h3>Full Code</h3>
+
+<p>The full JavaScript code for this example follows:</p>
+
+<div id="syntax-159a3846d80a48c65adf3574e1669975" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="br0">&#40;</span><span class="st0">&quot;io&quot;</span><span class="br0">&#41;</span><span class="sy0">&gt;,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">	<span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">		<span class="co1">//Get a reference to the DIV that we are using</span></div></li><li class="li1"><div class="de1">		<span class="co1">//to report results.</span></div></li><li class="li1"><div class="de1">		<span class="kw2">var</span> d <span class="sy0">=</span> document.<span class="me1">getElementById</span><span class="br0">&#40;</span><span class="st0">'container'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">		<span class="co2">/* global listener object */</span></div></li><li class="li2"><div class="de2">		<span class="kw2">var</span> gH <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			<span class="kw1">write</span><span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>str<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">					 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;ID: &quot;</span> <span class="sy0">+</span> str<span class="sy0">;</span></div></li><li class="li1"><div class="de1">					 <span class="kw1">if</span> <span class="br0">&#40;</span>args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">					 	d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot; &quot;</span> <span class="sy0">+</span> <span class="st0">&quot;The arguments are: &quot;</span> <span class="sy0">+</span> args<span class="sy0">;</span></div></li><li class="li2"><div class="de2">					 <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">					 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;&lt;br&gt;&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">				   <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">			start<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">					 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event Start.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">				   <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">			complete<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">						<span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event Complete.  The status code is: &quot;</span> <span class="sy0">+</span> o.<span class="kw3">status</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">				   <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">			success<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">					   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event Success.  The response is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">responseText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">					 <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">			failure<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">					   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>o <span class="sy0">+</span> <span class="st0">&quot;: Global Event Failure.  The status text is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">statusText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">					 <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">			end<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">					 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event End.&quot;</span><span class="sy0">,</span> args.<span class="me1">end</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">			<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">		<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">		<span class="co2">/* end global listener object */</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">		<span class="co2">/* transaction event object */</span></div></li><li class="li1"><div class="de1">		<span class="kw2">var</span> tH <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			<span class="kw1">write</span><span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>str<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">					 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;ID: &quot;</span> <span class="sy0">+</span> str<span class="sy0">;</span></div></li><li class="li2"><div class="de2">					 <span class="kw1">if</span> <span class="br0">&#40;</span>args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">					 	d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot; &quot;</span> <span class="sy0">+</span> <span class="st0">&quot;The arguments are: &quot;</span> <span class="sy0">+</span> args<span class="sy0">;</span></div></li><li class="li1"><div class="de1">					 <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">					 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;&lt;br&gt;&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">				   <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">			start<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">					 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Start.&quot;</span><span class="sy0">,</span> args.<span class="me1">start</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">				   <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">			complete<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">						<span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Complete.  The status code is: &quot;</span> <span class="sy0">+</span> o.<span class="kw3">status</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args.<span class="me1">complete</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">				   <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">			success<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">					   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Success.  The response is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">responseText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args.<span class="me1">success</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">					 <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">			failure<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">					   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Failure.  The status text is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">statusText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args.<span class="me1">failure</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">					 <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">			end<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">					 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event End.&quot;</span><span class="sy0">,</span> args.<span class="me1">end</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">			<span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">		<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">		<span class="co2">/* end transaction event object */</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">		<span class="co2">/* attach global listeners */</span></div></li><li class="li1"><div class="de1">		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:start'</span><span class="sy0">,</span> gH.<span class="me1">start</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global foo'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:complete'</span><span class="sy0">,</span> gH.<span class="me1">complete</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global bar'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:success'</span><span class="sy0">,</span> gH.<span class="me1">success</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global baz'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:failure'</span><span class="sy0">,</span> gH.<span class="me1">failure</span><span class="sy0">,</span> gH<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:end'</span><span class="sy0">,</span> gH.<span class="me1">abort</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global boo'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">		<span class="co2">/* end global listener binding */</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">		<span class="co2">/* configuration object for transactions */</span></div></li><li class="li1"><div class="de1">		<span class="kw2">var</span> cfg <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			on<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">				start<span class="sy0">:</span> tH.<span class="me1">start</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">				complete<span class="sy0">:</span> tH.<span class="me1">complete</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">				success<span class="sy0">:</span> tH.<span class="me1">success</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">				failure<span class="sy0">:</span> tH.<span class="me1">failure</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">				end<span class="sy0">:</span> tH.<span class="me1">end</span></div></li><li class="li1"><div class="de1">			<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">			context<span class="sy0">:</span> tH<span class="sy0">,</span></div></li><li class="li1"><div class="de1">			headers<span class="sy0">:</span> <span class="br0">&#123;</span> <span class="st0">'X-Transaction'</span><span class="sy0">:</span> <span class="st0">'GET Example'</span><span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">			arguments<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">					   start<span class="sy0">:</span> <span class="st0">'foo'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">					   complete<span class="sy0">:</span> <span class="st0">'bar'</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">					   success<span class="sy0">:</span> <span class="st0">'baz'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">					   failure<span class="sy0">:</span> <span class="st0">'Oh no!'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">					   end<span class="sy0">:</span> <span class="st0">'boo'</span></div></li><li class="li1"><div class="de1">					   <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">		<span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">		<span class="co2">/* end configuration object */</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">		<span class="kw2">function</span> call<span class="br0">&#40;</span>e<span class="sy0">,</span> b<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			<span class="kw1">if</span> <span class="br0">&#40;</span>b<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">				Y.<span class="me1">io</span><span class="br0">&#40;</span><span class="st0">'(assets/)get.php?user=YDN&amp;allListeners=1'</span><span class="sy0">,</span> cfg<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">			<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">			<span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">				Y.<span class="me1">io</span><span class="br0">&#40;</span><span class="st0">'(assets/)get.php?user=YDN&amp;globalListeners=1'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">			<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">		<span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> call<span class="sy0">,</span> <span class="st0">&quot;#get1&quot;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> call<span class="sy0">,</span> <span class="st0">&quot;#get2&quot;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw2">true</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">	<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="br0">&#40;</span><span class="st0">&quot;io&quot;</span><span class="br0">&#41;</span><span class="sy0">&gt;,</span>
+&nbsp;
+	<span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+		<span class="co1">//Get a reference to the DIV that we are using</span>
+		<span class="co1">//to report results.</span>
+		<span class="kw2">var</span> d <span class="sy0">=</span> document.<span class="me1">getElementById</span><span class="br0">&#40;</span><span class="st0">'container'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+		<span class="co2">/* global listener object */</span>
+		<span class="kw2">var</span> gH <span class="sy0">=</span> <span class="br0">&#123;</span>
+			<span class="kw1">write</span><span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>str<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+					 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;ID: &quot;</span> <span class="sy0">+</span> str<span class="sy0">;</span>
+					 <span class="kw1">if</span> <span class="br0">&#40;</span>args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+					 	d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot; &quot;</span> <span class="sy0">+</span> <span class="st0">&quot;The arguments are: &quot;</span> <span class="sy0">+</span> args<span class="sy0">;</span>
+					 <span class="br0">&#125;</span>
+					 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;&lt;br&gt;&quot;</span><span class="sy0">;</span>
+				   <span class="br0">&#125;</span><span class="sy0">,</span>
+			start<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+					 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event Start.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span>
+				   <span class="br0">&#125;</span><span class="sy0">,</span>
+			complete<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+						<span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event Complete.  The status code is: &quot;</span> <span class="sy0">+</span> o.<span class="kw3">status</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span>
+				   <span class="br0">&#125;</span><span class="sy0">,</span>
+			success<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+					   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event Success.  The response is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">responseText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span>
+					 <span class="br0">&#125;</span><span class="sy0">,</span>
+			failure<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+					   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>o <span class="sy0">+</span> <span class="st0">&quot;: Global Event Failure.  The status text is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">statusText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args<span class="br0">&#41;</span><span class="sy0">;</span>
+					 <span class="br0">&#125;</span><span class="sy0">,</span>
+			end<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+					 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Global Event End.&quot;</span><span class="sy0">,</span> args.<span class="me1">end</span><span class="br0">&#41;</span><span class="sy0">;</span>
+			<span class="br0">&#125;</span>
+		<span class="br0">&#125;</span>
+		<span class="co2">/* end global listener object */</span>
+&nbsp;
+		<span class="co2">/* transaction event object */</span>
+		<span class="kw2">var</span> tH <span class="sy0">=</span> <span class="br0">&#123;</span>
+			<span class="kw1">write</span><span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>str<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+					 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;ID: &quot;</span> <span class="sy0">+</span> str<span class="sy0">;</span>
+					 <span class="kw1">if</span> <span class="br0">&#40;</span>args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+					 	d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot; &quot;</span> <span class="sy0">+</span> <span class="st0">&quot;The arguments are: &quot;</span> <span class="sy0">+</span> args<span class="sy0">;</span>
+					 <span class="br0">&#125;</span>
+					 d.<span class="me1">innerHTML</span> <span class="sy0">+=</span> <span class="st0">&quot;&lt;br&gt;&quot;</span><span class="sy0">;</span>
+				   <span class="br0">&#125;</span><span class="sy0">,</span>
+			start<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+					 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Start.&quot;</span><span class="sy0">,</span> args.<span class="me1">start</span><span class="br0">&#41;</span><span class="sy0">;</span>
+				   <span class="br0">&#125;</span><span class="sy0">,</span>
+			complete<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+						<span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Complete.  The status code is: &quot;</span> <span class="sy0">+</span> o.<span class="kw3">status</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args.<span class="me1">complete</span><span class="br0">&#41;</span><span class="sy0">;</span>
+				   <span class="br0">&#125;</span><span class="sy0">,</span>
+			success<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+					   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Success.  The response is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">responseText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args.<span class="me1">success</span><span class="br0">&#41;</span><span class="sy0">;</span>
+					 <span class="br0">&#125;</span><span class="sy0">,</span>
+			failure<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+					   <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event Failure.  The status text is: &quot;</span> <span class="sy0">+</span> o.<span class="me1">statusText</span> <span class="sy0">+</span> <span class="st0">&quot;.&quot;</span><span class="sy0">,</span> args.<span class="me1">failure</span><span class="br0">&#41;</span><span class="sy0">;</span>
+					 <span class="br0">&#125;</span><span class="sy0">,</span>
+			end<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> args<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+					 <span class="kw1">this</span>.<span class="kw1">write</span><span class="br0">&#40;</span>id <span class="sy0">+</span> <span class="st0">&quot;: Transaction Event End.&quot;</span><span class="sy0">,</span> args.<span class="me1">end</span><span class="br0">&#41;</span><span class="sy0">;</span>
+			<span class="br0">&#125;</span>
+		<span class="br0">&#125;</span>
+		<span class="co2">/* end transaction event object */</span>
+&nbsp;
+		<span class="co2">/* attach global listeners */</span>
+		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:start'</span><span class="sy0">,</span> gH.<span class="me1">start</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global foo'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:complete'</span><span class="sy0">,</span> gH.<span class="me1">complete</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global bar'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:success'</span><span class="sy0">,</span> gH.<span class="me1">success</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global baz'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:failure'</span><span class="sy0">,</span> gH.<span class="me1">failure</span><span class="sy0">,</span> gH<span class="br0">&#41;</span><span class="sy0">;</span>
+		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:end'</span><span class="sy0">,</span> gH.<span class="me1">abort</span><span class="sy0">,</span> gH<span class="sy0">,</span> <span class="st0">'global boo'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+		<span class="co2">/* end global listener binding */</span>
+&nbsp;
+		<span class="co2">/* configuration object for transactions */</span>
+		<span class="kw2">var</span> cfg <span class="sy0">=</span> <span class="br0">&#123;</span>
+			on<span class="sy0">:</span> <span class="br0">&#123;</span>
+				start<span class="sy0">:</span> tH.<span class="me1">start</span><span class="sy0">,</span>
+				complete<span class="sy0">:</span> tH.<span class="me1">complete</span><span class="sy0">,</span>
+				success<span class="sy0">:</span> tH.<span class="me1">success</span><span class="sy0">,</span>
+				failure<span class="sy0">:</span> tH.<span class="me1">failure</span><span class="sy0">,</span>
+				end<span class="sy0">:</span> tH.<span class="me1">end</span>
+			<span class="br0">&#125;</span><span class="sy0">,</span>
+			context<span class="sy0">:</span> tH<span class="sy0">,</span>
+			headers<span class="sy0">:</span> <span class="br0">&#123;</span> <span class="st0">'X-Transaction'</span><span class="sy0">:</span> <span class="st0">'GET Example'</span><span class="br0">&#125;</span><span class="sy0">,</span>
+			arguments<span class="sy0">:</span> <span class="br0">&#123;</span>
+					   start<span class="sy0">:</span> <span class="st0">'foo'</span><span class="sy0">,</span>
+					   complete<span class="sy0">:</span> <span class="st0">'bar'</span><span class="sy0">,</span>
+					   success<span class="sy0">:</span> <span class="st0">'baz'</span><span class="sy0">,</span>
+					   failure<span class="sy0">:</span> <span class="st0">'Oh no!'</span><span class="sy0">,</span>
+					   end<span class="sy0">:</span> <span class="st0">'boo'</span>
+					   <span class="br0">&#125;</span>
+		<span class="br0">&#125;</span><span class="sy0">;</span>
+		<span class="co2">/* end configuration object */</span>
+&nbsp;
+		<span class="kw2">function</span> call<span class="br0">&#40;</span>e<span class="sy0">,</span> b<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			<span class="kw1">if</span> <span class="br0">&#40;</span>b<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+				Y.<span class="me1">io</span><span class="br0">&#40;</span><span class="st0">'(assets/)get.php?user=YDN&amp;allListeners=1'</span><span class="sy0">,</span> cfg<span class="br0">&#41;</span><span class="sy0">;</span>
+			<span class="br0">&#125;</span>
+			<span class="kw1">else</span> <span class="br0">&#123;</span>
+				Y.<span class="me1">io</span><span class="br0">&#40;</span><span class="st0">'(assets/)get.php?user=YDN&amp;globalListeners=1'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+			<span class="br0">&#125;</span>
+		<span class="br0">&#125;</span>
+&nbsp;
+		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> call<span class="sy0">,</span> <span class="st0">&quot;#get1&quot;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span>
+		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> call<span class="sy0">,</span> <span class="st0">&quot;#get2&quot;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="sy0">,</span> <span class="kw2">true</span><span class="br0">&#41;</span><span class="sy0">;</span>
+	<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-159a3846d80a48c65adf3574e1669975-plain">YUI().use(("io")>,
+
+	function(Y) {
+
+		//Get a reference to the DIV that we are using
+		//to report results.
+		var d = document.getElementById('container');
+
+		/* global listener object */
+		var gH = {
+			write: function(str, args) {
+					 d.innerHTML += "ID: " + str;
+					 if (args) {
+					 	d.innerHTML += " " + "The arguments are: " + args;
+					 }
+					 d.innerHTML += "<br>";
+				   },
+			start: function(id, args) {
+					 this.write(id + ": Global Event Start.", args);
+				   },
+			complete: function(id, o, args) {
+						this.write(id + ": Global Event Complete.  The status code is: " + o.status + ".", args);
+				   },
+			success: function(id, o, args) {
+					   this.write(id + ": Global Event Success.  The response is: " + o.responseText + ".", args);
+					 },
+			failure: function(id, o, args) {
+					   this.write(o + ": Global Event Failure.  The status text is: " + o.statusText + ".", args);
+					 },
+			end: function(id, args) {
+					 this.write(id + ": Global Event End.", args.end);
+			}
+		}
+		/* end global listener object */
+
+		/* transaction event object */
+		var tH = {
+			write: function(str, args) {
+					 d.innerHTML += "ID: " + str;
+					 if (args) {
+					 	d.innerHTML += " " + "The arguments are: " + args;
+					 }
+					 d.innerHTML += "<br>";
+				   },
+			start: function(id, args) {
+					 this.write(id + ": Transaction Event Start.", args.start);
+				   },
+			complete: function(id, o, args) {
+						this.write(id + ": Transaction Event Complete.  The status code is: " + o.status + ".", args.complete);
+				   },
+			success: function(id, o, args) {
+					   this.write(id + ": Transaction Event Success.  The response is: " + o.responseText + ".", args.success);
+					 },
+			failure: function(id, o, args) {
+					   this.write(id + ": Transaction Event Failure.  The status text is: " + o.statusText + ".", args.failure);
+					 },
+			end: function(id, args) {
+					 this.write(id + ": Transaction Event End.", args.end);
+			}
+		}
+		/* end transaction event object */
+
+		/* attach global listeners */
+		Y.on('io:start', gH.start, gH, 'global foo');
+		Y.on('io:complete', gH.complete, gH, 'global bar');
+		Y.on('io:success', gH.success, gH, 'global baz');
+		Y.on('io:failure', gH.failure, gH);
+		Y.on('io:end', gH.abort, gH, 'global boo');
+		/* end global listener binding */
+
+		/* configuration object for transactions */
+		var cfg = {
+			on: {
+				start: tH.start,
+				complete: tH.complete,
+				success: tH.success,
+				failure: tH.failure,
+				end: tH.end
+			},
+			context: tH,
+			headers: { 'X-Transaction': 'GET Example'},
+			arguments: {
+					   start: 'foo',
+					   complete: 'bar',
+					   success: 'baz',
+					   failure: 'Oh no!',
+					   end: 'boo'
+					   }
+		};
+		/* end configuration object */
+
+		function call(e, b) {
+			if (b) {
+				Y.io('(assets/)get.php?user=YDN&allListeners=1', cfg);
+			}
+			else {
+				Y.io('(assets/)get.php?user=YDN&globalListeners=1');
+			}
+		}
+
+		Y.on('click', call, "#get1", this, false);
+		Y.on('click', call, "#get2", this, true);
+	});</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    IO Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li class='selected'><a href='../io/io-get.html'>GET Transaction</a></li><li><a href='../io/io-post.html'>POST Transaction</a></li><li><a href='../io/io-weather.html'>XML Transaction &mdash; Retrieving a Yahoo! Weather RSS (XML) Feed via a Server-Side Proxy</a></li><li><a href='../io/io-xdr.html'>Cross-Domain JSON Transaction &mdash; Retrieving a News Feed from Yahoo! Pipes</a></li><li><a href='../node-menunav/node-menunav-8.html'>Adding Submenus On The Fly (included with examples for MenuNav Node Plugin)</a></li><li><a href='../overlay/overlay-io-plugin.html'>IO Plugin (included with examples for Overlay)</a></li><li><a href='../dd/portal-drag.html'>Portal Style Example (included with examples for Drag &amp; Drop)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More IO Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/io/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_io.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="selected "><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

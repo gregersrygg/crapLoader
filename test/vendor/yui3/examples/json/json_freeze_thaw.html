@@ -1,0 +1,599 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: JSON: Rebuilding class instances from JSON data</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+#demo pre {
+    background: #fff;
+    border: 1px solid #ccc;
+    margin: 1em;
+    padding: 1em;
+    white-space: pre-wrap; /* css-3 */
+    word-wrap: break-word; /* Internet Explorer 5.5+ */
+}
+</style>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: JSON: Rebuilding class instances from JSON data</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>JSON: Rebuilding class instances from JSON data</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example illustrates one method of serializing and recreating class instances by using the <code>replacer</code> and <code>reviver</code> parameters to <code>JSON.stringify</code> and <code>JSON.parse</code> respectively.</p>
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="json_freeze_thaw_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div id="demo">
+    <input type="button" id="demo_freeze" value="Freeze">
+    <input type="button" id="demo_thaw" disabled="disabled" value="Thaw">
+    <pre id="demo_frozen">(stringify results here)</pre>
+    <div id="demo_thawed"></div>
+</div>
+
+<script type="text/javascript">
+YUI().use("node", "json", function(Y) {
+
+var example = {
+    data       : null,
+    jsonString : null,
+
+    dateRE : /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?Z$/,
+
+    cryo : function (k,o) {
+        return (o instanceof CaveMan) ? CaveMan.freeze(o) : o;
+    },
+    revive : function (k,v) {
+        // Turn anything that looks like a UTC date string into a Date instance
+        var match = Y.Lang.isString(v) ? v.match(example.dateRE) : null,
+            d;
+
+        if (match) {
+            d = new Date();
+            d.setUTCFullYear(match[1], (match[2] - 1), match[3]);
+            d.setUTCHours(match[4], match[5], match[6]);
+            return d;
+        }
+        // Check for cavemen by the _class key
+        if (v instanceof Object && v._class == 'CaveMan') {
+            return CaveMan.thaw(v);
+        }
+        // default to returning the value unaltered
+        return v;
+    }
+};
+
+function CaveMan(name,discovered) {
+    this.name       = name;
+    this.discovered = discovered;
+};
+CaveMan.prototype.getName = function () {
+    return this.name + ", the cave man";
+}
+
+// Static methods to convert to and from a basic object structure
+CaveMan.thaw = function (o) {
+    return new CaveMan(o.n, o.d);
+};
+// Convert to a basic object structure including a class identifier
+CaveMan.freeze = function (cm) {
+    return {
+        _class : 'CaveMan',
+        n : cm.name,
+        d : cm.discovered // remains a Date for standard JSON serialization
+    };
+};
+
+example.data    = {
+    count : 1,
+    type  : 'Hominid',
+    specimen : [
+        new CaveMan('Ed',new Date(1946,6,6))
+    ]
+};
+
+Y.one('#demo_freeze').on('click',function (e) {
+    // Format the string with 4 space indentation
+    example.jsonString = Y.JSON.stringify(example.data, example.cryo, 4);
+
+    Y.one('#demo_frozen').set('text', example.jsonString);
+    Y.one('#demo_thaw').set('disabled',false);
+});
+
+Y.one('#demo_thaw').on('click',function (e) {
+    var parsedData = Y.JSON.parse(example.jsonString, example.revive);
+        cm = parsedData.specimen[0];
+
+    Y.one('#demo_thawed').set('innerHTML',
+        "<p>Specimen count: " + parsedData.count + "</p>"+
+        "<p>Specimen type: " + parsedData.type + "</p>"+
+        "<p>Instanceof CaveMan: " + (cm instanceof CaveMan) + "</p>"+
+        "<p>Name: " + cm.getName() + "</p>"+
+        "<p>Discovered: " + cm.discovered + "</p>");
+});
+
+// Expose the example objects for inspection
+example.CaveMan = CaveMan;
+YUI.example = example;
+
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>The CaveMan class</h3>
+<p>For this example, we'll use a class CaveMan, with a property <code>discovered</code> that holds a <code>Date</code> instance, and a method <code>getName</code>.</p>
+<div id="syntax-1c0e8621189b6c6c800adbb594b9d65e" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="st0">&quot;json&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">function</span> CaveMan<span class="br0">&#40;</span><span class="kw3">name</span><span class="sy0">,</span>discovered<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="kw3">name</span>       <span class="sy0">=</span> <span class="kw3">name</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw1">this</span>.<span class="me1">discovered</span> <span class="sy0">=</span> discovered<span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">CaveMan.<span class="me1">prototype</span>.<span class="me1">getName</span> <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">return</span> <span class="kw1">this</span>.<span class="kw3">name</span> <span class="sy0">+</span> <span class="st0">&quot;, the cave man&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">...</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="st0">&quot;json&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+<span class="kw2">function</span> CaveMan<span class="br0">&#40;</span><span class="kw3">name</span><span class="sy0">,</span>discovered<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>.<span class="kw3">name</span>       <span class="sy0">=</span> <span class="kw3">name</span><span class="sy0">;</span>
+    <span class="kw1">this</span>.<span class="me1">discovered</span> <span class="sy0">=</span> discovered<span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+CaveMan.<span class="me1">prototype</span>.<span class="me1">getName</span> <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">return</span> <span class="kw1">this</span>.<span class="kw3">name</span> <span class="sy0">+</span> <span class="st0">&quot;, the cave man&quot;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+...</pre></div><textarea id="syntax-1c0e8621189b6c6c800adbb594b9d65e-plain">YUI().use("node", "json", function(Y) {
+
+function CaveMan(name,discovered) {
+    this.name       = name;
+    this.discovered = discovered;
+};
+CaveMan.prototype.getName = function () {
+    return this.name + ", the cave man";
+}
+
+...</textarea></div>
+<h3>Add <code>freeze</code> and <code>thaw</code> static methods</h3>
+<p>We'll add the methods responsible for serializing and reconstituting instances to the CaveMan class as static methods.</p>
+<div id="syntax-fefc584d14e602cbeb4e93a1c62d17c5" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">// Static method to convert to a basic structure with a class identifier</span></div></li><li class="li1"><div class="de1">CaveMan.<span class="me1">freeze</span> <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>cm<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">return</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        _class <span class="sy0">:</span> <span class="st0">'CaveMan'</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        n <span class="sy0">:</span> cm.<span class="kw3">name</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        d <span class="sy0">:</span> cm.<span class="me1">discovered</span> <span class="co1">// remains a Date for standard JSON serialization</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="co1">// Static method to reconstitute a CaveMan from the basic structure</span></div></li><li class="li1"><div class="de1">CaveMan.<span class="me1">thaw</span> <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">return</span> <span class="kw2">new</span> CaveMan<span class="br0">&#40;</span>o.<span class="me1">n</span><span class="sy0">,</span> o.<span class="me1">d</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">// Static method to convert to a basic structure with a class identifier</span>
+CaveMan.<span class="me1">freeze</span> <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>cm<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">return</span> <span class="br0">&#123;</span>
+        _class <span class="sy0">:</span> <span class="st0">'CaveMan'</span><span class="sy0">,</span>
+        n <span class="sy0">:</span> cm.<span class="kw3">name</span><span class="sy0">,</span>
+        d <span class="sy0">:</span> cm.<span class="me1">discovered</span> <span class="co1">// remains a Date for standard JSON serialization</span>
+    <span class="br0">&#125;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Static method to reconstitute a CaveMan from the basic structure</span>
+CaveMan.<span class="me1">thaw</span> <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">return</span> <span class="kw2">new</span> CaveMan<span class="br0">&#40;</span>o.<span class="me1">n</span><span class="sy0">,</span> o.<span class="me1">d</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span></pre></div><textarea id="syntax-fefc584d14e602cbeb4e93a1c62d17c5-plain">// Static method to convert to a basic structure with a class identifier
+CaveMan.freeze = function (cm) {
+    return {
+        _class : 'CaveMan',
+        n : cm.name,
+        d : cm.discovered // remains a Date for standard JSON serialization
+    };
+};
+
+// Static method to reconstitute a CaveMan from the basic structure
+CaveMan.thaw = function (o) {
+    return new CaveMan(o.n, o.d);
+};</textarea></div>
+<h3>Reference the methods in replacer and reviver functions</h3>
+<p>We'll create an <code>example</code> namespace to hold our moving parts.  In it, we'll add a method to pass to <code>JSON.stringify</code> that calls our custom serializer, and another method to pass to <code>JSON.parse</code> that detects the serialized structure and calls our thawing method.</p>
+<div id="syntax-376a8520b4b629b6fdea747ca20e5223" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> example <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    cryo <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>k<span class="sy0">,</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">return</span> <span class="br0">&#40;</span>o <span class="kw1">instanceof</span> CaveMan<span class="br0">&#41;</span> <span class="sy0">?</span> CaveMan.<span class="me1">freeze</span><span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="sy0">:</span> o<span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    revive <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>k<span class="sy0">,</span>v<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// Check for cavemen by the _class key</span></div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>v <span class="kw1">instanceof</span> Object <span class="sy0">&amp;&amp;</span> v._class <span class="sy0">==</span> <span class="st0">'CaveMan'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">return</span> CaveMan.<span class="me1">thaw</span><span class="br0">&#40;</span>v<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// default to returning the value unaltered</span></div></li><li class="li1"><div class="de1">        <span class="kw1">return</span> v<span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> example <span class="sy0">=</span> <span class="br0">&#123;</span>
+    cryo <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>k<span class="sy0">,</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">return</span> <span class="br0">&#40;</span>o <span class="kw1">instanceof</span> CaveMan<span class="br0">&#41;</span> <span class="sy0">?</span> CaveMan.<span class="me1">freeze</span><span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="sy0">:</span> o<span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    revive <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>k<span class="sy0">,</span>v<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="co1">// Check for cavemen by the _class key</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span>v <span class="kw1">instanceof</span> Object <span class="sy0">&amp;&amp;</span> v._class <span class="sy0">==</span> <span class="st0">'CaveMan'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">return</span> CaveMan.<span class="me1">thaw</span><span class="br0">&#40;</span>v<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+        <span class="co1">// default to returning the value unaltered</span>
+        <span class="kw1">return</span> v<span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span></pre></div><textarea id="syntax-376a8520b4b629b6fdea747ca20e5223-plain">var example = {
+    cryo : function (k,o) {
+        return (o instanceof CaveMan) ? CaveMan.freeze(o) : o;
+    },
+
+    revive : function (k,v) {
+        // Check for cavemen by the _class key
+        if (v instanceof Object && v._class == 'CaveMan') {
+            return CaveMan.thaw(v);
+        }
+        // default to returning the value unaltered
+        return v;
+    }
+};</textarea></div>
+<h3>The data to be serialized</h3>
+<p>We'll create a CaveMan instance and nest it in another object structure to illustrate how the thawing process still operates normally for all other data.</p>
+<div id="syntax-2298d825168eac3b19394467a639d54b" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">example.<span class="me1">data</span> <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    count <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    type  <span class="sy0">:</span> <span class="st0">'Hominid'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    specimen <span class="sy0">:</span> <span class="br0">&#91;</span></div></li><li class="li2"><div class="de2">        <span class="kw2">new</span> CaveMan<span class="br0">&#40;</span><span class="st0">'Ed'</span><span class="sy0">,</span><span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="nu0">1946</span><span class="sy0">,</span><span class="nu0">6</span><span class="sy0">,</span><span class="nu0">6</span><span class="br0">&#41;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#93;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">example.<span class="me1">data</span> <span class="sy0">=</span> <span class="br0">&#123;</span>
+    count <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span>
+    type  <span class="sy0">:</span> <span class="st0">'Hominid'</span><span class="sy0">,</span>
+    specimen <span class="sy0">:</span> <span class="br0">&#91;</span>
+        <span class="kw2">new</span> CaveMan<span class="br0">&#40;</span><span class="st0">'Ed'</span><span class="sy0">,</span><span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="nu0">1946</span><span class="sy0">,</span><span class="nu0">6</span><span class="sy0">,</span><span class="nu0">6</span><span class="br0">&#41;</span><span class="br0">&#41;</span>
+    <span class="br0">&#93;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span></pre></div><textarea id="syntax-2298d825168eac3b19394467a639d54b-plain">example.data = {
+    count : 1,
+    type  : 'Hominid',
+    specimen : [
+        new CaveMan('Ed',new Date(1946,6,6))
+    ]
+};</textarea></div>
+<h3>Thawing from the inside out and the <code>Date</code> instance</h3>
+<p>The reviver function passed to <code>JSON.parse</code> is applied to all key:value pairs in the raw parsed object from the deepest keys to the highest level.  In our case, this means that the <code>name</code> and <code>discovered</code> properties will be passed through the reviver, and <em>then</em> the object containing those keys will be passed through.</p>
+<p>We'll take advantage of this by watching for UTC formatted date strings (the default JSON serialization for Dates) and reviving them into proper <code>Date</code> instances before the containing object gets its turn in the reviver.</p>
+<div id="syntax-dc93b64dfa018baaadb0aac471e8fdc5" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> example <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    dateRE <span class="sy0">:</span> <span class="co2">/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?Z$/</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    cryo <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>k<span class="sy0">,</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="kw1">return</span> <span class="br0">&#40;</span>o <span class="kw1">instanceof</span> CaveMan<span class="br0">&#41;</span> <span class="sy0">?</span> CaveMan.<span class="me1">freeze</span><span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="sy0">:</span> o<span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    revive <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>k<span class="sy0">,</span>v<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// Turn anything that looks like a UTC date string into a Date instance</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> match <span class="sy0">=</span> Y.<span class="me1">Lang</span>.<span class="me1">isString</span><span class="br0">&#40;</span>v<span class="br0">&#41;</span> <span class="sy0">?</span> v.<span class="me1">match</span><span class="br0">&#40;</span>example.<span class="me1">dateRE</span><span class="br0">&#41;</span> <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            d<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>match<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            d <span class="sy0">=</span> <span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            d.<span class="me1">setUTCFullYear</span><span class="br0">&#40;</span>match<span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span><span class="sy0">,</span> <span class="br0">&#40;</span>match<span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span> <span class="sy0">-</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">,</span> match<span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">            d.<span class="me1">setUTCHours</span><span class="br0">&#40;</span>match<span class="br0">&#91;</span><span class="nu0">4</span><span class="br0">&#93;</span><span class="sy0">,</span> match<span class="br0">&#91;</span><span class="nu0">5</span><span class="br0">&#93;</span><span class="sy0">,</span> match<span class="br0">&#91;</span><span class="nu0">6</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">return</span> d<span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// Check for cavemen by the _class key</span></div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>v <span class="kw1">instanceof</span> Object <span class="sy0">&amp;&amp;</span> v._class <span class="sy0">==</span> <span class="st0">'CaveMan'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            <span class="kw1">return</span> CaveMan.<span class="me1">thaw</span><span class="br0">&#40;</span>v<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// default to returning the value unaltered</span></div></li><li class="li1"><div class="de1">        <span class="kw1">return</span> v<span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> example <span class="sy0">=</span> <span class="br0">&#123;</span>
+    dateRE <span class="sy0">:</span> <span class="co2">/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?Z$/</span><span class="sy0">,</span>
+&nbsp;
+    cryo <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>k<span class="sy0">,</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">return</span> <span class="br0">&#40;</span>o <span class="kw1">instanceof</span> CaveMan<span class="br0">&#41;</span> <span class="sy0">?</span> CaveMan.<span class="me1">freeze</span><span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="sy0">:</span> o<span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+    revive <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>k<span class="sy0">,</span>v<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="co1">// Turn anything that looks like a UTC date string into a Date instance</span>
+        <span class="kw2">var</span> match <span class="sy0">=</span> Y.<span class="me1">Lang</span>.<span class="me1">isString</span><span class="br0">&#40;</span>v<span class="br0">&#41;</span> <span class="sy0">?</span> v.<span class="me1">match</span><span class="br0">&#40;</span>example.<span class="me1">dateRE</span><span class="br0">&#41;</span> <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+            d<span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span>match<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            d <span class="sy0">=</span> <span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            d.<span class="me1">setUTCFullYear</span><span class="br0">&#40;</span>match<span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span><span class="sy0">,</span> <span class="br0">&#40;</span>match<span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span> <span class="sy0">-</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">,</span> match<span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            d.<span class="me1">setUTCHours</span><span class="br0">&#40;</span>match<span class="br0">&#91;</span><span class="nu0">4</span><span class="br0">&#93;</span><span class="sy0">,</span> match<span class="br0">&#91;</span><span class="nu0">5</span><span class="br0">&#93;</span><span class="sy0">,</span> match<span class="br0">&#91;</span><span class="nu0">6</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="kw1">return</span> d<span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+        <span class="co1">// Check for cavemen by the _class key</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span>v <span class="kw1">instanceof</span> Object <span class="sy0">&amp;&amp;</span> v._class <span class="sy0">==</span> <span class="st0">'CaveMan'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">return</span> CaveMan.<span class="me1">thaw</span><span class="br0">&#40;</span>v<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+        <span class="co1">// default to returning the value unaltered</span>
+        <span class="kw1">return</span> v<span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span></pre></div><textarea id="syntax-dc93b64dfa018baaadb0aac471e8fdc5-plain">var example = {
+    dateRE : /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?Z$/,
+
+    cryo : function (k,o) {
+        return (o instanceof CaveMan) ? CaveMan.freeze(o) : o;
+    },
+    revive : function (k,v) {
+        // Turn anything that looks like a UTC date string into a Date instance
+        var match = Y.Lang.isString(v) ? v.match(example.dateRE) : null,
+            d;
+
+        if (match) {
+            d = new Date();
+            d.setUTCFullYear(match[1], (match[2] - 1), match[3]);
+            d.setUTCHours(match[4], match[5], match[6]);
+            return d;
+        }
+        // Check for cavemen by the _class key
+        if (v instanceof Object && v._class == 'CaveMan') {
+            return CaveMan.thaw(v);
+        }
+        // default to returning the value unaltered
+        return v;
+    }
+};</textarea></div>
+<p>Now when the reviver function is evaluating the object it determines to be a CaveMan, the <code>discovered</code> property is correctly containing a <code>Date</code> instance.</p>
+
+<h3>Choose your serialization</h3>
+<p>You'll note there are two freeze and thaw operations going on in this example.  One for our CaveMan class and one for <code>Date</code> instances.  Their respective serialization and recreation techniques are very different.  You are free to decide the serialized format of your objects.  Choose whatever makes sense for your application.</p>
+<p><em>Note</em>: There is no explicit <code>Date</code> serialization method listed inline because <code>JSON</code> natively supports <code>Date</code> serialization.   However, it is outside the scope of the parser's duty to create Date instances, so it's up to you to recreate them in the <code>parse</code> phase.  Feel free to use the method included here.</p>
+
+<h3>Show and Tell</h3>
+<p>Now we add the event handlers to the example buttons to call <code>JSON.stringify</code> and <code>parse</code> with our <code>example.cryo</code> and <code>example.revive</code> methods, respectively.</p>
+<div id="syntax-fb1fd8ba228642103c3165dea07ed8a8" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_freeze'</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span><span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    example.<span class="me1">jsonString</span> <span class="sy0">=</span> Y.<span class="me1">JSON</span>.<span class="me1">stringify</span><span class="br0">&#40;</span>example.<span class="me1">data</span><span class="sy0">,</span> example.<span class="me1">cryo</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_frozen'</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span> example.<span class="me1">jsonString</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_thaw'</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'disabled'</span><span class="sy0">,</span><span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_thaw'</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span><span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> x  <span class="sy0">=</span> Y.<span class="me1">JSON</span>.<span class="me1">parse</span><span class="br0">&#40;</span>example.<span class="me1">jsonString</span><span class="sy0">,</span> example.<span class="me1">revive</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        cm <span class="sy0">=</span> x.<span class="me1">specimen</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_thawed'</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&lt;p&gt;Specimen count: &quot;</span> <span class="sy0">+</span> x.<span class="me1">count</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&lt;p&gt;Specimen type: &quot;</span> <span class="sy0">+</span> x.<span class="me1">type</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span></div></li><li class="li2"><div class="de2">        <span class="st0">&quot;&lt;p&gt;Instanceof CaveMan: &quot;</span> <span class="sy0">+</span> <span class="br0">&#40;</span>cm <span class="kw1">instanceof</span> CaveMan<span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&lt;p&gt;Name: &quot;</span> <span class="sy0">+</span> cm.<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&lt;p&gt;Discovered: &quot;</span> <span class="sy0">+</span> cm.<span class="me1">discovered</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// end of YUI(..).use(.., function (Y) {</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_freeze'</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span><span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    example.<span class="me1">jsonString</span> <span class="sy0">=</span> Y.<span class="me1">JSON</span>.<span class="me1">stringify</span><span class="br0">&#40;</span>example.<span class="me1">data</span><span class="sy0">,</span> example.<span class="me1">cryo</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_frozen'</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span> example.<span class="me1">jsonString</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_thaw'</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'disabled'</span><span class="sy0">,</span><span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_thaw'</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span><span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> x  <span class="sy0">=</span> Y.<span class="me1">JSON</span>.<span class="me1">parse</span><span class="br0">&#40;</span>example.<span class="me1">jsonString</span><span class="sy0">,</span> example.<span class="me1">revive</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        cm <span class="sy0">=</span> x.<span class="me1">specimen</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="sy0">;</span>
+&nbsp;
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_thawed'</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span>
+        <span class="st0">&quot;&lt;p&gt;Specimen count: &quot;</span> <span class="sy0">+</span> x.<span class="me1">count</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span>
+        <span class="st0">&quot;&lt;p&gt;Specimen type: &quot;</span> <span class="sy0">+</span> x.<span class="me1">type</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span>
+        <span class="st0">&quot;&lt;p&gt;Instanceof CaveMan: &quot;</span> <span class="sy0">+</span> <span class="br0">&#40;</span>cm <span class="kw1">instanceof</span> CaveMan<span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span>
+        <span class="st0">&quot;&lt;p&gt;Name: &quot;</span> <span class="sy0">+</span> cm.<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span>
+        <span class="st0">&quot;&lt;p&gt;Discovered: &quot;</span> <span class="sy0">+</span> cm.<span class="me1">discovered</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// end of YUI(..).use(.., function (Y) {</span></pre></div><textarea id="syntax-fb1fd8ba228642103c3165dea07ed8a8-plain">Y.one('#demo_freeze').on('click',function (e) {
+    example.jsonString = Y.JSON.stringify(example.data, example.cryo);
+
+    Y.one('#demo_frozen').set('innerHTML', example.jsonString);
+    Y.one('#demo_thaw').set('disabled',false);
+});
+
+Y.one('#demo_thaw').on('click',function (e) {
+    var x  = Y.JSON.parse(example.jsonString, example.revive);
+        cm = x.specimen[0];
+
+    Y.one('#demo_thawed').set('innerHTML',
+        "<p>Specimen count: " + x.count + "</p>"+
+        "<p>Specimen type: " + x.type + "</p>"+
+        "<p>Instanceof CaveMan: " + (cm instanceof CaveMan) + "</p>"+
+        "<p>Name: " + cm.getName() + "</p>"+
+        "<p>Discovered: " + cm.discovered + "</p>");
+});
+
+}); // end of YUI(..).use(.., function (Y) {</textarea></div>
+<h3>Full Code Listing</h3>
+<div id="syntax-d1026985634f69f43f5f33d21c1cea7d" class="yui-syntax-highlight yui-syntax-highlight-linenumbers"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="st0">&quot;json&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">var</span> example <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    data       <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">    jsonString <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    dateRE <span class="sy0">:</span> <span class="co2">/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?Z$/</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    cryo <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>k<span class="sy0">,</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="kw1">return</span> <span class="br0">&#40;</span>o <span class="kw1">instanceof</span> CaveMan<span class="br0">&#41;</span> <span class="sy0">?</span> CaveMan.<span class="me1">freeze</span><span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="sy0">:</span> o<span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    revive <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>k<span class="sy0">,</span>v<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// Turn anything that looks like a UTC date string into a Date instance</span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> match <span class="sy0">=</span> Y.<span class="me1">Lang</span>.<span class="me1">isString</span><span class="br0">&#40;</span>v<span class="br0">&#41;</span> <span class="sy0">?</span> v.<span class="me1">match</span><span class="br0">&#40;</span>example.<span class="me1">dateRE</span><span class="br0">&#41;</span> <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            d<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>match<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            d <span class="sy0">=</span> <span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            d.<span class="me1">setUTCFullYear</span><span class="br0">&#40;</span>match<span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span><span class="sy0">,</span> <span class="br0">&#40;</span>match<span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span> <span class="sy0">-</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">,</span> match<span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">            d.<span class="me1">setUTCHours</span><span class="br0">&#40;</span>match<span class="br0">&#91;</span><span class="nu0">4</span><span class="br0">&#93;</span><span class="sy0">,</span> match<span class="br0">&#91;</span><span class="nu0">5</span><span class="br0">&#93;</span><span class="sy0">,</span> match<span class="br0">&#91;</span><span class="nu0">6</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">return</span> d<span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// Check for cavemen by the _class key</span></div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>v <span class="kw1">instanceof</span> Object <span class="sy0">&amp;&amp;</span> v._class <span class="sy0">==</span> <span class="st0">'CaveMan'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            <span class="kw1">return</span> CaveMan.<span class="me1">thaw</span><span class="br0">&#40;</span>v<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// default to returning the value unaltered</span></div></li><li class="li1"><div class="de1">        <span class="kw1">return</span> v<span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">function</span> CaveMan<span class="br0">&#40;</span><span class="kw3">name</span><span class="sy0">,</span>discovered<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="kw3">name</span>       <span class="sy0">=</span> <span class="kw3">name</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">discovered</span> <span class="sy0">=</span> discovered<span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">CaveMan.<span class="me1">prototype</span>.<span class="me1">getName</span> <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">return</span> <span class="kw1">this</span>.<span class="kw3">name</span> <span class="sy0">+</span> <span class="st0">&quot;, the cave man&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="co1">// Static methods to convert to and from a basic object structure</span></div></li><li class="li1"><div class="de1">CaveMan.<span class="me1">thaw</span> <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">return</span> <span class="kw2">new</span> CaveMan<span class="br0">&#40;</span>o.<span class="me1">n</span><span class="sy0">,</span> o.<span class="me1">d</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="co1">// Convert to a basic object structure including a class identifier</span></div></li><li class="li2"><div class="de2">CaveMan.<span class="me1">freeze</span> <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>cm<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">return</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        _class <span class="sy0">:</span> <span class="st0">'CaveMan'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        n <span class="sy0">:</span> cm.<span class="kw3">name</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        d <span class="sy0">:</span> cm.<span class="me1">discovered</span> <span class="co1">// remains a Date for standard JSON serialization</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">example.<span class="me1">data</span>    <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    count <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">    type  <span class="sy0">:</span> <span class="st0">'Hominid'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    specimen <span class="sy0">:</span> <span class="br0">&#91;</span></div></li><li class="li1"><div class="de1">        <span class="kw2">new</span> CaveMan<span class="br0">&#40;</span><span class="st0">'Ed'</span><span class="sy0">,</span><span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="nu0">1946</span><span class="sy0">,</span><span class="nu0">6</span><span class="sy0">,</span><span class="nu0">6</span><span class="br0">&#41;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#93;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_freeze'</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span><span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    example.<span class="me1">jsonString</span> <span class="sy0">=</span> Y.<span class="me1">JSON</span>.<span class="me1">stringify</span><span class="br0">&#40;</span>example.<span class="me1">data</span><span class="sy0">,</span> example.<span class="me1">cryo</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_frozen'</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span> example.<span class="me1">jsonString</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_thaw'</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'disabled'</span><span class="sy0">,</span><span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_thaw'</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span><span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> parsedData <span class="sy0">=</span> Y.<span class="me1">JSON</span>.<span class="me1">parse</span><span class="br0">&#40;</span>example.<span class="me1">jsonString</span><span class="sy0">,</span> example.<span class="me1">revive</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        cm <span class="sy0">=</span> parsedData.<span class="me1">specimen</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_thawed'</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&lt;p&gt;Specimen count: &quot;</span> <span class="sy0">+</span> parsedData.<span class="me1">count</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&lt;p&gt;Specimen type: &quot;</span> <span class="sy0">+</span> parsedData.<span class="me1">type</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span></div></li><li class="li2"><div class="de2">        <span class="st0">&quot;&lt;p&gt;Instanceof CaveMan: &quot;</span> <span class="sy0">+</span> <span class="br0">&#40;</span>cm <span class="kw1">instanceof</span> CaveMan<span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&lt;p&gt;Name: &quot;</span> <span class="sy0">+</span> cm.<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&lt;p&gt;Discovered: &quot;</span> <span class="sy0">+</span> cm.<span class="me1">discovered</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="co1">// Expose the example objects for inspection</span></div></li><li class="li1"><div class="de1">example.<span class="me1">CaveMan</span> <span class="sy0">=</span> CaveMan<span class="sy0">;</span></div></li><li class="li1"><div class="de1">YUI.<span class="me1">example</span> <span class="sy0">=</span> example<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="sy0">,</span> <span class="st0">&quot;json&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+<span class="kw2">var</span> example <span class="sy0">=</span> <span class="br0">&#123;</span>
+    data       <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+    jsonString <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+&nbsp;
+    dateRE <span class="sy0">:</span> <span class="co2">/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?Z$/</span><span class="sy0">,</span>
+&nbsp;
+    cryo <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>k<span class="sy0">,</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">return</span> <span class="br0">&#40;</span>o <span class="kw1">instanceof</span> CaveMan<span class="br0">&#41;</span> <span class="sy0">?</span> CaveMan.<span class="me1">freeze</span><span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="sy0">:</span> o<span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+    revive <span class="sy0">:</span> <span class="kw2">function</span> <span class="br0">&#40;</span>k<span class="sy0">,</span>v<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="co1">// Turn anything that looks like a UTC date string into a Date instance</span>
+        <span class="kw2">var</span> match <span class="sy0">=</span> Y.<span class="me1">Lang</span>.<span class="me1">isString</span><span class="br0">&#40;</span>v<span class="br0">&#41;</span> <span class="sy0">?</span> v.<span class="me1">match</span><span class="br0">&#40;</span>example.<span class="me1">dateRE</span><span class="br0">&#41;</span> <span class="sy0">:</span> <span class="kw2">null</span><span class="sy0">,</span>
+            d<span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span>match<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            d <span class="sy0">=</span> <span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            d.<span class="me1">setUTCFullYear</span><span class="br0">&#40;</span>match<span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span><span class="sy0">,</span> <span class="br0">&#40;</span>match<span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span> <span class="sy0">-</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">,</span> match<span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            d.<span class="me1">setUTCHours</span><span class="br0">&#40;</span>match<span class="br0">&#91;</span><span class="nu0">4</span><span class="br0">&#93;</span><span class="sy0">,</span> match<span class="br0">&#91;</span><span class="nu0">5</span><span class="br0">&#93;</span><span class="sy0">,</span> match<span class="br0">&#91;</span><span class="nu0">6</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="kw1">return</span> d<span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+        <span class="co1">// Check for cavemen by the _class key</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span>v <span class="kw1">instanceof</span> Object <span class="sy0">&amp;&amp;</span> v._class <span class="sy0">==</span> <span class="st0">'CaveMan'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">return</span> CaveMan.<span class="me1">thaw</span><span class="br0">&#40;</span>v<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+        <span class="co1">// default to returning the value unaltered</span>
+        <span class="kw1">return</span> v<span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw2">function</span> CaveMan<span class="br0">&#40;</span><span class="kw3">name</span><span class="sy0">,</span>discovered<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>.<span class="kw3">name</span>       <span class="sy0">=</span> <span class="kw3">name</span><span class="sy0">;</span>
+    <span class="kw1">this</span>.<span class="me1">discovered</span> <span class="sy0">=</span> discovered<span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+CaveMan.<span class="me1">prototype</span>.<span class="me1">getName</span> <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">return</span> <span class="kw1">this</span>.<span class="kw3">name</span> <span class="sy0">+</span> <span class="st0">&quot;, the cave man&quot;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="co1">// Static methods to convert to and from a basic object structure</span>
+CaveMan.<span class="me1">thaw</span> <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">return</span> <span class="kw2">new</span> CaveMan<span class="br0">&#40;</span>o.<span class="me1">n</span><span class="sy0">,</span> o.<span class="me1">d</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+<span class="co1">// Convert to a basic object structure including a class identifier</span>
+CaveMan.<span class="me1">freeze</span> <span class="sy0">=</span> <span class="kw2">function</span> <span class="br0">&#40;</span>cm<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">return</span> <span class="br0">&#123;</span>
+        _class <span class="sy0">:</span> <span class="st0">'CaveMan'</span><span class="sy0">,</span>
+        n <span class="sy0">:</span> cm.<span class="kw3">name</span><span class="sy0">,</span>
+        d <span class="sy0">:</span> cm.<span class="me1">discovered</span> <span class="co1">// remains a Date for standard JSON serialization</span>
+    <span class="br0">&#125;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+example.<span class="me1">data</span>    <span class="sy0">=</span> <span class="br0">&#123;</span>
+    count <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span>
+    type  <span class="sy0">:</span> <span class="st0">'Hominid'</span><span class="sy0">,</span>
+    specimen <span class="sy0">:</span> <span class="br0">&#91;</span>
+        <span class="kw2">new</span> CaveMan<span class="br0">&#40;</span><span class="st0">'Ed'</span><span class="sy0">,</span><span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="nu0">1946</span><span class="sy0">,</span><span class="nu0">6</span><span class="sy0">,</span><span class="nu0">6</span><span class="br0">&#41;</span><span class="br0">&#41;</span>
+    <span class="br0">&#93;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_freeze'</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span><span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    example.<span class="me1">jsonString</span> <span class="sy0">=</span> Y.<span class="me1">JSON</span>.<span class="me1">stringify</span><span class="br0">&#40;</span>example.<span class="me1">data</span><span class="sy0">,</span> example.<span class="me1">cryo</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_frozen'</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span> example.<span class="me1">jsonString</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_thaw'</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'disabled'</span><span class="sy0">,</span><span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_thaw'</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span><span class="kw2">function</span> <span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> parsedData <span class="sy0">=</span> Y.<span class="me1">JSON</span>.<span class="me1">parse</span><span class="br0">&#40;</span>example.<span class="me1">jsonString</span><span class="sy0">,</span> example.<span class="me1">revive</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        cm <span class="sy0">=</span> parsedData.<span class="me1">specimen</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="sy0">;</span>
+&nbsp;
+    Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo_thawed'</span><span class="br0">&#41;</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span>
+        <span class="st0">&quot;&lt;p&gt;Specimen count: &quot;</span> <span class="sy0">+</span> parsedData.<span class="me1">count</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span>
+        <span class="st0">&quot;&lt;p&gt;Specimen type: &quot;</span> <span class="sy0">+</span> parsedData.<span class="me1">type</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span>
+        <span class="st0">&quot;&lt;p&gt;Instanceof CaveMan: &quot;</span> <span class="sy0">+</span> <span class="br0">&#40;</span>cm <span class="kw1">instanceof</span> CaveMan<span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span>
+        <span class="st0">&quot;&lt;p&gt;Name: &quot;</span> <span class="sy0">+</span> cm.<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="sy0">+</span>
+        <span class="st0">&quot;&lt;p&gt;Discovered: &quot;</span> <span class="sy0">+</span> cm.<span class="me1">discovered</span> <span class="sy0">+</span> <span class="st0">&quot;&lt;/p&gt;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Expose the example objects for inspection</span>
+example.<span class="me1">CaveMan</span> <span class="sy0">=</span> CaveMan<span class="sy0">;</span>
+YUI.<span class="me1">example</span> <span class="sy0">=</span> example<span class="sy0">;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-d1026985634f69f43f5f33d21c1cea7d-plain">YUI().use("node", "json", function(Y) {
+
+var example = {
+    data       : null,
+    jsonString : null,
+
+    dateRE : /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?Z$/,
+
+    cryo : function (k,o) {
+        return (o instanceof CaveMan) ? CaveMan.freeze(o) : o;
+    },
+    revive : function (k,v) {
+        // Turn anything that looks like a UTC date string into a Date instance
+        var match = Y.Lang.isString(v) ? v.match(example.dateRE) : null,
+            d;
+
+        if (match) {
+            d = new Date();
+            d.setUTCFullYear(match[1], (match[2] - 1), match[3]);
+            d.setUTCHours(match[4], match[5], match[6]);
+            return d;
+        }
+        // Check for cavemen by the _class key
+        if (v instanceof Object && v._class == 'CaveMan') {
+            return CaveMan.thaw(v);
+        }
+        // default to returning the value unaltered
+        return v;
+    }
+};
+
+function CaveMan(name,discovered) {
+    this.name       = name;
+    this.discovered = discovered;
+};
+CaveMan.prototype.getName = function () {
+    return this.name + ", the cave man";
+}
+
+// Static methods to convert to and from a basic object structure
+CaveMan.thaw = function (o) {
+    return new CaveMan(o.n, o.d);
+};
+// Convert to a basic object structure including a class identifier
+CaveMan.freeze = function (cm) {
+    return {
+        _class : 'CaveMan',
+        n : cm.name,
+        d : cm.discovered // remains a Date for standard JSON serialization
+    };
+};
+
+example.data    = {
+    count : 1,
+    type  : 'Hominid',
+    specimen : [
+        new CaveMan('Ed',new Date(1946,6,6))
+    ]
+};
+
+Y.one('#demo_freeze').on('click',function (e) {
+    example.jsonString = Y.JSON.stringify(example.data, example.cryo);
+
+    Y.one('#demo_frozen').set('innerHTML', example.jsonString);
+    Y.one('#demo_thaw').set('disabled',false);
+});
+
+Y.one('#demo_thaw').on('click',function (e) {
+    var parsedData = Y.JSON.parse(example.jsonString, example.revive);
+        cm = parsedData.specimen[0];
+
+    Y.one('#demo_thawed').set('innerHTML',
+        "<p>Specimen count: " + parsedData.count + "</p>"+
+        "<p>Specimen type: " + parsedData.type + "</p>"+
+        "<p>Instanceof CaveMan: " + (cm instanceof CaveMan) + "</p>"+
+        "<p>Name: " + cm.getName() + "</p>"+
+        "<p>Discovered: " + cm.discovered + "</p>");
+});
+
+// Expose the example objects for inspection
+example.CaveMan = CaveMan;
+YUI.example = example;
+
+});</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    JSON Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../json/json_connect.html'>JSON with Y.io</a></li><li class='selected'><a href='../json/json_freeze_thaw.html'>Rebuilding class instances from JSON data</a></li><li><a href='../json/json_convert_values.html'>Adding new object members during parsing</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More JSON Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/json/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_json.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="selected "><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

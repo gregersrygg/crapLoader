@@ -1,0 +1,509 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: IO: Cross-Domain JSON Transaction &mdash; Retrieving a News Feed from Yahoo! Pipes</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+#output li {margin-left:2em;}
+#output { background-color:#FFFFFF; border:1px dotted #666666; padding:1em; margin-top:1em;}
+</style>
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: IO: Cross-Domain JSON Transaction &mdash; Retrieving a News Feed from Yahoo! Pipes</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>IO: Cross-Domain JSON Transaction &mdash; Retrieving a News Feed from Yahoo! Pipes</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>In the example below, IO is employed to make a cross-domain request to <a href="http://pipes.yahoo.com">Yahoo! Pipes</a>.  The output of the Pipe is an RSS-style feed formatted as JSON.  We pass that output to the JSON Utility's <code>parse</code> method for sanitization and then display the contents of the Pipe in a list.</p>
+
+<p>The cross-domain approach obviates the need for a server-side proxy, making it faster. And the use of IO in place of a script node allows us to retrieve the JSON data as a string and execute <code>JSON.parse</code> against it, making it safer to use; a script node would evaluate immediately in the global scope as soon as it was loaded.</p>	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="io-xdr_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<button id="fetch" disabled="disabled">Load JSON RSS news feed from Yahoo! Pipes.</button>
+
+<div id="output">
+	<ul>
+		<li>Content from Yahoo! Pipes feed will display here.</li>
+    </ul>
+</div>
+
+<script language="javascript">
+
+YUI().use("io", "substitute", "json-parse",
+
+	function(Y) {
+
+		//Data fetched will be displayed in a UL in the
+		//element #output:
+		var output = Y.Node.get("#output ul");
+
+		//Configure the cross-domain protocol:
+		var xdrConfig = {
+			id:'flash', //We'll reference this id in the xdr configuration of our transaction.
+			src:'../../build/io/io.swf?stamp=' + new Date().valueOf().toString() //Relative path to the .swf file from the current page.
+		};
+		Y.io.transport(xdrConfig);
+
+		//Event handler called when the transaction begins:
+		var handleStart = function(id, a) {
+			Y.log("io:start firing.", "info", "example");
+			output.set("innerHTML", "<li>Loading news stories via Yahoo! Pipes feed...</li>");
+		}
+
+		//Event handler for the success event -- use this handler to write the fetched
+		//RSS items to the page.
+		var handleSuccess = function(id, o, a) {
+
+			//We use JSON.parse to sanitize the JSON (as opposed to simply eval'ing
+			//it into the page):
+			var oRSS = Y.JSON.parse(o.responseText);
+
+			//From here, we simply access the JSON data from where it's provided
+			//in the Yahoo! Pipes output:
+			if (oRSS && oRSS.count) {
+
+				var s = "<!--begin news stories fetched via Yahoo! Pipes-->",
+					//t in this case is our simple template; this is fed to
+					//Y.Lang.substitute as we loop through RSS items:
+					t = "<li><a href='{link}'>{title}</a>, {pubDate}</li>";
+
+				for (var i=0; i<oRSS.count; i++) {
+					s += Y.Lang.substitute(t, oRSS.value.items[i]);
+				}
+
+				//Output the string to the page:
+				output.set("innerHTML", s);
+				output.addClass("yui-null");
+
+			} else {
+				//No news stories were found in the feed.
+				var s = "<li>The RSS feed did not return any items.</li>";
+			}
+		}
+
+		//In the event that the HTTP status returned is > 399, a
+		//failure is reported and this function is called:
+		var handleFailure = function(id, o, a) {
+			Y.log("ERROR " + id + " " + a, "info", "example");
+		}
+
+		//With all the aparatus in place, we can now configure our
+		//io call.
+		var cfg = {
+			method: "GET",
+			xdr: {
+				use:'flash' //This is the xdrConfig id we referenced above.
+			},
+			on: {
+				//Our event handlers previously defined:
+				start: handleStart,
+				success: handleSuccess,
+				failure: handleFailure
+			}
+		};
+
+		//Wire the buttton to a click handler to fire our request each
+		//time the button is clicked:
+		var handleClick = function(o) {
+			Y.log("Click detected; beginning io request to Yahoo! Pipes.", "info", "example");
+			var obj = Y.io(
+				//this is a specific Pipes feed, populated with cycling news:
+				"http://pipes.yahooapis.com/pipes/pipe.run?_id=giWz8Vc33BG6rQEQo_NLYQ&_render=json",
+				cfg
+			);
+		}
+
+		//add the clickHandler as soon as the xdr Flash module has
+		//loaded:
+		Y.on('io:xdrReady', function() {
+			var fetch = Y.Node.get("#fetch");
+			fetch.set("disabled", false);
+			Y.on("click", handleClick, fetch);
+		});
+
+	}
+);
+</script>	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h2 class="first">Implementing a Simple Cross-Domain Request for JSON Data</h2>
+
+<p>In this example, we begin with a YUI instance that loads the IO and JSON modules:</p>
+
+<div id="syntax-526b2befa31e3a4c9a9a1a0ac6cdb2c8" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">//Create a YUI instance including support for IO and JSON modules:</span></div></li><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>base<span class="sy0">:</span><span class="st0">&quot;../../build/&quot;</span><span class="sy0">,</span> timeout<span class="sy0">:</span> <span class="nu0">10000</span><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;io-xdr&quot;</span><span class="sy0">,</span> <span class="st0">&quot;substitute&quot;</span><span class="sy0">,</span> <span class="st0">&quot;json-parse&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">	<span class="co1">// Y is the YUI instance.</span></div></li><li class="li1"><div class="de1">	<span class="co1">// The rest of the following code is encapsulated in this</span></div></li><li class="li2"><div class="de2">	<span class="co1">// anonymous function.</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">//Create a YUI instance including support for IO and JSON modules:</span>
+YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>base<span class="sy0">:</span><span class="st0">&quot;../../build/&quot;</span><span class="sy0">,</span> timeout<span class="sy0">:</span> <span class="nu0">10000</span><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;io-xdr&quot;</span><span class="sy0">,</span> <span class="st0">&quot;substitute&quot;</span><span class="sy0">,</span> <span class="st0">&quot;json-parse&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+	<span class="co1">// Y is the YUI instance.</span>
+	<span class="co1">// The rest of the following code is encapsulated in this</span>
+	<span class="co1">// anonymous function.</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-526b2befa31e3a4c9a9a1a0ac6cdb2c8-plain">//Create a YUI instance including support for IO and JSON modules:
+YUI({base:"../../build/", timeout: 10000}).use("io-xdr", "substitute", "json-parse", function(Y) {
+	// Y is the YUI instance.
+	// The rest of the following code is encapsulated in this
+	// anonymous function.
+});</textarea></div><p>We'll also get a Node reference to the container we'll be using to output the data we retrieve:</p>
+
+<div id="syntax-bcd7fd4c93d8eb602211ee7c568aa9c8" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">//element #output:</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> output <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;#output ul&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">//element #output:</span>
+<span class="kw2">var</span> output <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;#output ul&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-bcd7fd4c93d8eb602211ee7c568aa9c8-plain">//element #output:
+var output = Y.Node.get("#output ul");</textarea></div>
+<p>Next, we configure IO's cross-domain interface for this YUI instance.  Flash is the underlying mechansim used here.  Be sure to configure the <code>src</code> property to point to your <code>IO.swf</code> file.</p>
+
+<div id="syntax-cb27aea76829ccbb43e45794dd9b236d" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">//Configure the cross-domain protocol:</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> xdrConfig <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    id<span class="sy0">:</span><span class="st0">'flash'</span><span class="sy0">,</span> <span class="co1">//We'll reference this id in the xdr configuration of our transaction.</span></div></li><li class="li1"><div class="de1">    src<span class="sy0">:</span><span class="st0">'../../build/io/io.swf?stamp='</span> <span class="sy0">+</span> <span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="me1">valueOf</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="me1">toString</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="co1">//Relative path to the .swf file from the current page.</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">io</span>.<span class="me1">transport</span><span class="br0">&#40;</span>xdrConfig<span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">//Configure the cross-domain protocol:</span>
+<span class="kw2">var</span> xdrConfig <span class="sy0">=</span> <span class="br0">&#123;</span>
+    id<span class="sy0">:</span><span class="st0">'flash'</span><span class="sy0">,</span> <span class="co1">//We'll reference this id in the xdr configuration of our transaction.</span>
+    src<span class="sy0">:</span><span class="st0">'../../build/io/io.swf?stamp='</span> <span class="sy0">+</span> <span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="me1">valueOf</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="me1">toString</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="co1">//Relative path to the .swf file from the current page.</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+Y.<span class="me1">io</span>.<span class="me1">transport</span><span class="br0">&#40;</span>xdrConfig<span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-cb27aea76829ccbb43e45794dd9b236d-plain">//Configure the cross-domain protocol:
+var xdrConfig = {
+    id:'flash', //We'll reference this id in the xdr configuration of our transaction.
+    src:'../../build/io/io.swf?stamp=' + new Date().valueOf().toString() //Relative path to the .swf file from the current page.
+};
+Y.io.transport(xdrConfig);</textarea></div>
+<p>The configuration for our specific IO transaction contains a reference to the <code>xdr</code> configuration we created above and specifies that there will not be a need to process the response as XML (we're getting JSON instead):</p>
+
+<div id="syntax-b0dd102074a0f7bbce3f236c9bf4cf5c" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> cfg <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    method<span class="sy0">:</span> <span class="st0">&quot;GET&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    xdr<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw2">use</span><span class="sy0">:</span><span class="st0">'flash'</span><span class="sy0">,</span> <span class="co1">//This is the xdrConfig id we referenced above.</span></div></li><li class="li2"><div class="de2">        responseXML<span class="sy0">:</span><span class="kw2">false</span> <span class="co1">//we're using JSON -- marginally faster, and</span></div></li><li class="li1"><div class="de1">                          <span class="co1">//supported by the Pipes API</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    on<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">//Our event handlers previously defined:</span></div></li><li class="li2"><div class="de2">        start<span class="sy0">:</span> handleStart<span class="sy0">,</span></div></li><li class="li1"><div class="de1">        success<span class="sy0">:</span> handleSuccess<span class="sy0">,</span></div></li><li class="li1"><div class="de1">        failure<span class="sy0">:</span> handleFailure</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> cfg <span class="sy0">=</span> <span class="br0">&#123;</span>
+    method<span class="sy0">:</span> <span class="st0">&quot;GET&quot;</span><span class="sy0">,</span>
+    xdr<span class="sy0">:</span> <span class="br0">&#123;</span>
+        <span class="kw2">use</span><span class="sy0">:</span><span class="st0">'flash'</span><span class="sy0">,</span> <span class="co1">//This is the xdrConfig id we referenced above.</span>
+        responseXML<span class="sy0">:</span><span class="kw2">false</span> <span class="co1">//we're using JSON -- marginally faster, and</span>
+                          <span class="co1">//supported by the Pipes API</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+    on<span class="sy0">:</span> <span class="br0">&#123;</span>
+        <span class="co1">//Our event handlers previously defined:</span>
+        start<span class="sy0">:</span> handleStart<span class="sy0">,</span>
+        success<span class="sy0">:</span> handleSuccess<span class="sy0">,</span>
+        failure<span class="sy0">:</span> handleFailure
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span></pre></div><textarea id="syntax-b0dd102074a0f7bbce3f236c9bf4cf5c-plain">var cfg = {
+    method: "GET",
+    xdr: {
+        use:'flash', //This is the xdrConfig id we referenced above.
+        responseXML:false //we're using JSON -- marginally faster, and
+                          //supported by the Pipes API
+    },
+    on: {
+        //Our event handlers previously defined:
+        start: handleStart,
+        success: handleSuccess,
+        failure: handleFailure
+    }
+};</textarea></div>
+<p>The final step is to make the request:</p>
+
+<div id="syntax-23c8f0b3b2c326f3f1f65ab5390dfc84" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> obj <span class="sy0">=</span> Y.<span class="me1">io</span><span class="br0">&#40;</span></div></li><li class="li1"><div class="de1">    <span class="co1">//this is a specific Pipes feed, populated with cycling news:</span></div></li><li class="li1"><div class="de1">    <span class="st0">&quot;http://pipes.yahooapis.com/pipes/pipe.run?_id=giWz8Vc33BG6rQEQo_NLYQ&amp;_render=json&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    cfg</div></li><li class="li2"><div class="de2"><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> obj <span class="sy0">=</span> Y.<span class="me1">io</span><span class="br0">&#40;</span>
+    <span class="co1">//this is a specific Pipes feed, populated with cycling news:</span>
+    <span class="st0">&quot;http://pipes.yahooapis.com/pipes/pipe.run?_id=giWz8Vc33BG6rQEQo_NLYQ&amp;_render=json&quot;</span><span class="sy0">,</span>
+    cfg
+<span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-23c8f0b3b2c326f3f1f65ab5390dfc84-plain">var obj = Y.io(
+    //this is a specific Pipes feed, populated with cycling news:
+    "http://pipes.yahooapis.com/pipes/pipe.run?_id=giWz8Vc33BG6rQEQo_NLYQ&_render=json",
+    cfg
+);</textarea></div>
+<h3>Full Script</h3>
+
+<p>The full script source for this example is as follows:</p>
+
+<div id="syntax-943fe89afc010dabe33aef5d80dc083f" class="yui-syntax-highlight yui-syntax-highlight-linenumbers"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>base<span class="sy0">:</span><span class="st0">&quot;../../build/&quot;</span><span class="sy0">,</span> timeout<span class="sy0">:</span> <span class="nu0">10000</span><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;io-xdr&quot;</span><span class="sy0">,</span> <span class="st0">&quot;substitute&quot;</span><span class="sy0">,</span> <span class="st0">&quot;json-parse&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">	<span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">		<span class="co1">//Data fetched will be displayed in a UL in the</span></div></li><li class="li1"><div class="de1">		<span class="co1">//element #output:</span></div></li><li class="li1"><div class="de1">		<span class="kw2">var</span> output <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;#output ul&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">		<span class="co1">//Configure the cross-domain protocol:</span></div></li><li class="li2"><div class="de2">		<span class="kw2">var</span> xdrConfig <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			id<span class="sy0">:</span><span class="st0">'flash'</span><span class="sy0">,</span> <span class="co1">//We'll reference this id in the xdr configuration of our transaction.</span></div></li><li class="li1"><div class="de1">			yid<span class="sy0">:</span> Y.<span class="me1">id</span><span class="sy0">,</span>  <span class="co1">//The yid provides a link from the Flash-based XDR engine</span></div></li><li class="li1"><div class="de1">						<span class="co1">//and the YUI instance.</span></div></li><li class="li1"><div class="de1">			src<span class="sy0">:</span><span class="st0">'../../build/io/io.swf'</span> <span class="co1">//Relative path to the .swf file from the current page.</span></div></li><li class="li2"><div class="de2">		<span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">		Y.<span class="me1">io</span>.<span class="me1">transport</span><span class="br0">&#40;</span>xdrConfig<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">		<span class="co1">//Event handler called when the transaction begins:</span></div></li><li class="li1"><div class="de1">		<span class="kw2">var</span> handleStart <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> a<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">			Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;io:start firing.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">			output.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&lt;li&gt;Loading news stories via Yahoo! Pipes feed...&lt;/li&gt;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">		<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">		<span class="co1">//Event handler for the success event -- use this handler to write the fetched</span></div></li><li class="li2"><div class="de2">		<span class="co1">//RSS items to the page.</span></div></li><li class="li1"><div class="de1">		<span class="kw2">var</span> handleSuccess <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> a<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">			<span class="co1">//We use JSON.parse to sanitize the JSON (as opposed to simply eval'ing</span></div></li><li class="li1"><div class="de1">			<span class="co1">//it into the page):</span></div></li><li class="li2"><div class="de2">			<span class="kw2">var</span> oRSS <span class="sy0">=</span> Y.<span class="me1">JSON</span>.<span class="me1">parse</span><span class="br0">&#40;</span>o.<span class="me1">responseText</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">			<span class="co1">//From here, we simply access the JSON data from where it's provided</span></div></li><li class="li1"><div class="de1">			<span class="co1">//in the Yahoo! Pipes output:</span></div></li><li class="li1"><div class="de1">			<span class="kw1">if</span> <span class="br0">&#40;</span>oRSS <span class="sy0">&amp;&amp;</span> oRSS.<span class="me1">count</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">				<span class="kw2">var</span> s <span class="sy0">=</span> <span class="st0">&quot;&lt;!--begin news stories fetched via Yahoo! Pipes--&gt;&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">					<span class="co1">//t in this case is our simple template; this is fed to</span></div></li><li class="li1"><div class="de1">					<span class="co1">//Y.Lang.substitute as we loop through RSS items:</span></div></li><li class="li1"><div class="de1">					t <span class="sy0">=</span> <span class="st0">&quot;&lt;li&gt;&lt;a href='{link}'&gt;{title}&lt;/a&gt;, {pubDate}&lt;/li&gt;&quot;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">				<span class="kw1">for</span> <span class="br0">&#40;</span><span class="kw2">var</span> i<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> i<span class="sy0">&lt;</span>oRSS.<span class="me1">count</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">					s <span class="sy0">+=</span> Y.<span class="me1">Lang</span>.<span class="me1">substitute</span><span class="br0">&#40;</span>t<span class="sy0">,</span> oRSS.<span class="me1">value</span>.<span class="me1">items</span><span class="br0">&#91;</span>i<span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">				<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">				<span class="co1">//Output the string to the page:</span></div></li><li class="li1"><div class="de1">				output.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> s<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">			<span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">				<span class="co1">//No news stories were found in the feed.</span></div></li><li class="li2"><div class="de2">				<span class="kw2">var</span> s <span class="sy0">=</span> <span class="st0">&quot;&lt;li&gt;The RSS feed did not return any items.&lt;/li&gt;&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">			<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">		<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">		<span class="co1">//In the event that the HTTP status returned is &gt; 399, a</span></div></li><li class="li2"><div class="de2">		<span class="co1">//failure is reported and this function is called:</span></div></li><li class="li1"><div class="de1">		<span class="kw2">var</span> handleFailure <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> a<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;ERROR &quot;</span> <span class="sy0">+</span> id <span class="sy0">+</span> <span class="st0">&quot; &quot;</span> <span class="sy0">+</span> a<span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">		<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">		<span class="co1">//With all the aparatus in place, we can now configure our</span></div></li><li class="li1"><div class="de1">		<span class="co1">//io call.</span></div></li><li class="li1"><div class="de1">		<span class="kw2">var</span> cfg <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			method<span class="sy0">:</span> <span class="st0">&quot;GET&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">			xdr<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">				<span class="kw2">use</span><span class="sy0">:</span><span class="st0">'flash'</span><span class="sy0">,</span> <span class="co1">//This is the xdrConfig id we referenced above.</span></div></li><li class="li1"><div class="de1">				<span class="co1">//Set property &quot;dataType&quot; with a value of &quot;xml&quot; if the response</span></div></li><li class="li1"><div class="de1">				<span class="co1">//type is an XML document, when using the Flash transport.</span></div></li><li class="li1"><div class="de1">			<span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">			on<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">				<span class="co1">//Our event handlers previously defined:</span></div></li><li class="li1"><div class="de1">				start<span class="sy0">:</span> handleStart<span class="sy0">,</span></div></li><li class="li1"><div class="de1">				success<span class="sy0">:</span> handleSuccess<span class="sy0">,</span></div></li><li class="li1"><div class="de1">				failure<span class="sy0">:</span> handleFailure</div></li><li class="li1"><div class="de1">			<span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">		<span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">		<span class="co1">//Wire the buttton to a click handler to fire our request each</span></div></li><li class="li1"><div class="de1">		<span class="co1">//time the button is clicked:</span></div></li><li class="li1"><div class="de1">		<span class="kw2">var</span> handleClick <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">			Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Click detected; beginning io request to Yahoo! Pipes.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">			<span class="kw2">var</span> obj <span class="sy0">=</span> Y.<span class="me1">io</span><span class="br0">&#40;</span></div></li><li class="li1"><div class="de1">				<span class="co1">//this is a specific Pipes feed, populated with cycling news:</span></div></li><li class="li1"><div class="de1">				<span class="st0">&quot;http://pipes.yahooapis.com/pipes/pipe.run?_id=giWz8Vc33BG6rQEQo_NLYQ&amp;_render=json&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">				cfg</div></li><li class="li2"><div class="de2">			<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">		<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">		<span class="co1">//add the clickHandler as soon as the xdr Flash module has</span></div></li><li class="li1"><div class="de1">		<span class="co1">//loaded:</span></div></li><li class="li2"><div class="de2">		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:xdrReady'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">			<span class="kw2">var</span> fetch <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;#fetch&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">			fetch.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;disabled&quot;</span><span class="sy0">,</span> <span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">			Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> handleClick<span class="sy0">,</span> fetch<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">		<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">	<span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>base<span class="sy0">:</span><span class="st0">&quot;../../build/&quot;</span><span class="sy0">,</span> timeout<span class="sy0">:</span> <span class="nu0">10000</span><span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;io-xdr&quot;</span><span class="sy0">,</span> <span class="st0">&quot;substitute&quot;</span><span class="sy0">,</span> <span class="st0">&quot;json-parse&quot;</span><span class="sy0">,</span>
+&nbsp;
+	<span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+		<span class="co1">//Data fetched will be displayed in a UL in the</span>
+		<span class="co1">//element #output:</span>
+		<span class="kw2">var</span> output <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;#output ul&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+		<span class="co1">//Configure the cross-domain protocol:</span>
+		<span class="kw2">var</span> xdrConfig <span class="sy0">=</span> <span class="br0">&#123;</span>
+			id<span class="sy0">:</span><span class="st0">'flash'</span><span class="sy0">,</span> <span class="co1">//We'll reference this id in the xdr configuration of our transaction.</span>
+			yid<span class="sy0">:</span> Y.<span class="me1">id</span><span class="sy0">,</span>  <span class="co1">//The yid provides a link from the Flash-based XDR engine</span>
+						<span class="co1">//and the YUI instance.</span>
+			src<span class="sy0">:</span><span class="st0">'../../build/io/io.swf'</span> <span class="co1">//Relative path to the .swf file from the current page.</span>
+		<span class="br0">&#125;</span><span class="sy0">;</span>
+		Y.<span class="me1">io</span>.<span class="me1">transport</span><span class="br0">&#40;</span>xdrConfig<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+		<span class="co1">//Event handler called when the transaction begins:</span>
+		<span class="kw2">var</span> handleStart <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> a<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;io:start firing.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+			output.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&lt;li&gt;Loading news stories via Yahoo! Pipes feed...&lt;/li&gt;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+		<span class="br0">&#125;</span>
+&nbsp;
+		<span class="co1">//Event handler for the success event -- use this handler to write the fetched</span>
+		<span class="co1">//RSS items to the page.</span>
+		<span class="kw2">var</span> handleSuccess <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> a<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+			<span class="co1">//We use JSON.parse to sanitize the JSON (as opposed to simply eval'ing</span>
+			<span class="co1">//it into the page):</span>
+			<span class="kw2">var</span> oRSS <span class="sy0">=</span> Y.<span class="me1">JSON</span>.<span class="me1">parse</span><span class="br0">&#40;</span>o.<span class="me1">responseText</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+			<span class="co1">//From here, we simply access the JSON data from where it's provided</span>
+			<span class="co1">//in the Yahoo! Pipes output:</span>
+			<span class="kw1">if</span> <span class="br0">&#40;</span>oRSS <span class="sy0">&amp;&amp;</span> oRSS.<span class="me1">count</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+				<span class="kw2">var</span> s <span class="sy0">=</span> <span class="st0">&quot;&lt;!--begin news stories fetched via Yahoo! Pipes--&gt;&quot;</span><span class="sy0">,</span>
+					<span class="co1">//t in this case is our simple template; this is fed to</span>
+					<span class="co1">//Y.Lang.substitute as we loop through RSS items:</span>
+					t <span class="sy0">=</span> <span class="st0">&quot;&lt;li&gt;&lt;a href='{link}'&gt;{title}&lt;/a&gt;, {pubDate}&lt;/li&gt;&quot;</span><span class="sy0">;</span>
+&nbsp;
+				<span class="kw1">for</span> <span class="br0">&#40;</span><span class="kw2">var</span> i<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> i<span class="sy0">&lt;</span>oRSS.<span class="me1">count</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+					s <span class="sy0">+=</span> Y.<span class="me1">Lang</span>.<span class="me1">substitute</span><span class="br0">&#40;</span>t<span class="sy0">,</span> oRSS.<span class="me1">value</span>.<span class="me1">items</span><span class="br0">&#91;</span>i<span class="br0">&#93;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+				<span class="br0">&#125;</span>
+&nbsp;
+				<span class="co1">//Output the string to the page:</span>
+				output.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> s<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+			<span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+				<span class="co1">//No news stories were found in the feed.</span>
+				<span class="kw2">var</span> s <span class="sy0">=</span> <span class="st0">&quot;&lt;li&gt;The RSS feed did not return any items.&lt;/li&gt;&quot;</span><span class="sy0">;</span>
+			<span class="br0">&#125;</span>
+		<span class="br0">&#125;</span>
+&nbsp;
+		<span class="co1">//In the event that the HTTP status returned is &gt; 399, a</span>
+		<span class="co1">//failure is reported and this function is called:</span>
+		<span class="kw2">var</span> handleFailure <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>id<span class="sy0">,</span> o<span class="sy0">,</span> a<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;ERROR &quot;</span> <span class="sy0">+</span> id <span class="sy0">+</span> <span class="st0">&quot; &quot;</span> <span class="sy0">+</span> a<span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+		<span class="br0">&#125;</span>
+&nbsp;
+		<span class="co1">//With all the aparatus in place, we can now configure our</span>
+		<span class="co1">//io call.</span>
+		<span class="kw2">var</span> cfg <span class="sy0">=</span> <span class="br0">&#123;</span>
+			method<span class="sy0">:</span> <span class="st0">&quot;GET&quot;</span><span class="sy0">,</span>
+			xdr<span class="sy0">:</span> <span class="br0">&#123;</span>
+				<span class="kw2">use</span><span class="sy0">:</span><span class="st0">'flash'</span><span class="sy0">,</span> <span class="co1">//This is the xdrConfig id we referenced above.</span>
+				<span class="co1">//Set property &quot;dataType&quot; with a value of &quot;xml&quot; if the response</span>
+				<span class="co1">//type is an XML document, when using the Flash transport.</span>
+			<span class="br0">&#125;</span><span class="sy0">,</span>
+			on<span class="sy0">:</span> <span class="br0">&#123;</span>
+				<span class="co1">//Our event handlers previously defined:</span>
+				start<span class="sy0">:</span> handleStart<span class="sy0">,</span>
+				success<span class="sy0">:</span> handleSuccess<span class="sy0">,</span>
+				failure<span class="sy0">:</span> handleFailure
+			<span class="br0">&#125;</span>
+		<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+		<span class="co1">//Wire the buttton to a click handler to fire our request each</span>
+		<span class="co1">//time the button is clicked:</span>
+		<span class="kw2">var</span> handleClick <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Click detected; beginning io request to Yahoo! Pipes.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+			<span class="kw2">var</span> obj <span class="sy0">=</span> Y.<span class="me1">io</span><span class="br0">&#40;</span>
+				<span class="co1">//this is a specific Pipes feed, populated with cycling news:</span>
+				<span class="st0">&quot;http://pipes.yahooapis.com/pipes/pipe.run?_id=giWz8Vc33BG6rQEQo_NLYQ&amp;_render=json&quot;</span><span class="sy0">,</span>
+				cfg
+			<span class="br0">&#41;</span><span class="sy0">;</span>
+		<span class="br0">&#125;</span>
+&nbsp;
+		<span class="co1">//add the clickHandler as soon as the xdr Flash module has</span>
+		<span class="co1">//loaded:</span>
+		Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:xdrReady'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+			<span class="kw2">var</span> fetch <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;#fetch&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+			fetch.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;disabled&quot;</span><span class="sy0">,</span> <span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span>
+			Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> handleClick<span class="sy0">,</span> fetch<span class="br0">&#41;</span><span class="sy0">;</span>
+		<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+	<span class="br0">&#125;</span>
+<span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-943fe89afc010dabe33aef5d80dc083f-plain">YUI({base:"../../build/", timeout: 10000}).use("io-xdr", "substitute", "json-parse",
+
+	function(Y) {
+
+		//Data fetched will be displayed in a UL in the
+		//element #output:
+		var output = Y.Node.get("#output ul");
+
+		//Configure the cross-domain protocol:
+		var xdrConfig = {
+			id:'flash', //We'll reference this id in the xdr configuration of our transaction.
+			yid: Y.id,  //The yid provides a link from the Flash-based XDR engine
+						//and the YUI instance.
+			src:'../../build/io/io.swf' //Relative path to the .swf file from the current page.
+		};
+		Y.io.transport(xdrConfig);
+
+		//Event handler called when the transaction begins:
+		var handleStart = function(id, a) {
+			Y.log("io:start firing.", "info", "example");
+			output.set("innerHTML", "<li>Loading news stories via Yahoo! Pipes feed...</li>");
+		}
+
+		//Event handler for the success event -- use this handler to write the fetched
+		//RSS items to the page.
+		var handleSuccess = function(id, o, a) {
+
+			//We use JSON.parse to sanitize the JSON (as opposed to simply eval'ing
+			//it into the page):
+			var oRSS = Y.JSON.parse(o.responseText);
+
+			//From here, we simply access the JSON data from where it's provided
+			//in the Yahoo! Pipes output:
+			if (oRSS && oRSS.count) {
+
+				var s = "<!--begin news stories fetched via Yahoo! Pipes-->",
+					//t in this case is our simple template; this is fed to
+					//Y.Lang.substitute as we loop through RSS items:
+					t = "<li><a href='{link}'>{title}</a>, {pubDate}</li>";
+
+				for (var i=0; i<oRSS.count; i++) {
+					s += Y.Lang.substitute(t, oRSS.value.items[i]);
+				}
+
+				//Output the string to the page:
+				output.set("innerHTML", s);
+
+			} else {
+				//No news stories were found in the feed.
+				var s = "<li>The RSS feed did not return any items.</li>";
+			}
+		}
+
+		//In the event that the HTTP status returned is > 399, a
+		//failure is reported and this function is called:
+		var handleFailure = function(id, o, a) {
+			Y.log("ERROR " + id + " " + a, "info", "example");
+		}
+
+		//With all the aparatus in place, we can now configure our
+		//io call.
+		var cfg = {
+			method: "GET",
+			xdr: {
+				use:'flash', //This is the xdrConfig id we referenced above.
+				//Set property "dataType" with a value of "xml" if the response
+				//type is an XML document, when using the Flash transport.
+			},
+			on: {
+				//Our event handlers previously defined:
+				start: handleStart,
+				success: handleSuccess,
+				failure: handleFailure
+			}
+		};
+
+		//Wire the buttton to a click handler to fire our request each
+		//time the button is clicked:
+		var handleClick = function(o) {
+			Y.log("Click detected; beginning io request to Yahoo! Pipes.", "info", "example");
+			var obj = Y.io(
+				//this is a specific Pipes feed, populated with cycling news:
+				"http://pipes.yahooapis.com/pipes/pipe.run?_id=giWz8Vc33BG6rQEQo_NLYQ&_render=json",
+				cfg
+			);
+		}
+
+		//add the clickHandler as soon as the xdr Flash module has
+		//loaded:
+		Y.on('io:xdrReady', function() {
+			var fetch = Y.Node.get("#fetch");
+			fetch.set("disabled", false);
+			Y.on("click", handleClick, fetch);
+		});
+	}
+);</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    IO Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../io/io-get.html'>GET Transaction</a></li><li><a href='../io/io-post.html'>POST Transaction</a></li><li><a href='../io/io-weather.html'>XML Transaction &mdash; Retrieving a Yahoo! Weather RSS (XML) Feed via a Server-Side Proxy</a></li><li class='selected'><a href='../io/io-xdr.html'>Cross-Domain JSON Transaction &mdash; Retrieving a News Feed from Yahoo! Pipes</a></li><li><a href='../node-menunav/node-menunav-8.html'>Adding Submenus On The Fly (included with examples for MenuNav Node Plugin)</a></li><li><a href='../overlay/overlay-io-plugin.html'>IO Plugin (included with examples for Overlay)</a></li><li><a href='../dd/portal-drag.html'>Portal Style Example (included with examples for Drag &amp; Drop)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More IO Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/io/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_io.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="selected "><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

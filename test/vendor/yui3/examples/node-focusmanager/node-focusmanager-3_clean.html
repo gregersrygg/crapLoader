@@ -1,0 +1,131 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Accessible Menu Button</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+
+	/*	The following two styles are necessary to override style rules in the 
+		YUI CSS file. */
+
+	#example ul {
+		margin: 0;
+	}
+
+	#example a:hover {
+		text-decoration: none;
+	}
+
+
+	/*	Hide the list while it is being transformed into a menu.	*/
+
+	.yui3-loading #menu-1,
+	.yui3-loading #button-1 {
+		display: none;
+	}
+	
+</style>
+
+<script type="text/javascript">
+
+	//	Add a class to the documentElement to prevent the user from seeing 
+	//	the unstyled menu while the necessary CSS and JavaScript 
+	//	dependancies are being fetched.
+
+	document.documentElement.className = "yui3-loading";
+
+</script>
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Accessible Menu Button</h1>
+
+<div class="exampleIntro">
+	<p>
+This example illustrates how to use the Focus Manager Node Plugin, 
+Event's <a href="../../api/YUI.html#event_delegate">delegation support</a> and 
+<a href="../../api/YUI.html#event_mouseenter">mouseenter</a> event, along with 
+the <a href="../../overlay/">Overlay widget</a> and Node's support for the 
+<a href="http://www.w3.org/TR/wai-aria/">WAI-ARIA Roles and States</a> to
+create an accessible menu button.
+</p>			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<a id="button-1" href="#menu-1"><span><span>Move To</span></span></a>
+<div id="menu-1">
+	<ul>
+		<li><input type="button" name="button-1" value="Inbox"></li>
+		<li><input type="button" name="button-2" value="Archive"></li>
+		<li><input type="button" name="button-3" value="Trash"></li>
+	</ul>        	
+</div>
+
+<script type="text/javascript">
+
+	YUI({	
+		base:"../../build/", 
+		timeout: 10000,
+		modules: {
+			"menubuttoncss": {
+				type: "css",
+				fullpath: "assets/menubutton.css"
+			},
+			"menubuttonjs": {
+				type: "js",
+				fullpath: "assets/menubutton.js",
+				requires: ["menubuttoncss", "node-focusmanager", "node-event-simulate", "overlay"]
+			}			
+		}
+
+	}).use("menubuttonjs", function(Y, result) {
+
+	    //	The callback supplied to use() will be executed regardless of
+	    //	whether the operation was successful or not.  The second parameter
+	    //	is a result object that has the status of the operation.  We can
+	    //	use this to try to recover from failures or timeouts.
+
+	    if (!result.success) {
+
+	        Y.log("Load failure: " + result.msg, "warn", "Example");
+
+			//	Show the menu button HTML if loading the JavaScript resources
+			//	failed, that way the original unskinned menu button 
+			//	will be visible so that the user can interact with the menu 
+			//	either way.
+
+			document.documentElement.className = "";
+
+	    }
+
+	});
+
+</script>
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

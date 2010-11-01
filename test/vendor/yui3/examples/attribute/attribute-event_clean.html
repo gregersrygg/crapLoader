@@ -1,0 +1,254 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Attribute Change Events</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+    #example-out .event {
+        padding:2px 2px 2px 5px;
+    }
+    
+    #example-out .event-props {
+        font-family:courier;
+        margin-top:2px;
+    }
+
+    #example-out .event-title {
+        font-weight:bold;
+        font-family:arial;
+        color:#8dd5e7;
+        margin-top:5px;
+        margin-bottom:3px;
+    }
+
+    #example-out {
+        margin:5px;
+        border:1px solid #000;
+        color:#ffffff;
+        background-color:#004c6d;
+        overflow:auto;
+        height:20em;
+    }
+
+    .attrs {
+        border:1px solid #000;
+        background-color:#cdcdcd;
+        margin:5px;
+    }
+
+    .attrs .header {
+        font-weight:bold;
+        background-color:#aaa;
+        padding:5px;
+    }
+
+    .attrs .body {
+        padding:10px;
+    }
+
+    .attrs .footer {
+        padding:5px;
+    }
+
+    .attrs label {
+        display:block;
+        float:left;
+        clear:left;
+        font-weight:bold;
+        width:8em;
+    }
+
+    .attrs #preventFoobar.hidden {
+        display:none;
+    }
+
+    .attrs #preventFoobar {
+        margin-left:5px;
+        display:inline;
+        float:none;
+        clear:none;
+    }
+</style>
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Attribute Change Events</h1>
+
+<div class="exampleIntro">
+	Attribute change events are one of the key benefits of using attributes to maintain state for your objects, instead of regular object properties. This example shows how you can listen for attribute change events and work with the event payload they receive. 
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<div class="attrs">
+    <div class="header">Enter a new value and click the "Change Value" button:</div>
+    <div class="body">
+        <p>
+            <label for="attrSel">Attribute</label>: 
+            <select id="attrSel">
+                <option value="foo">foo</option>
+                <option value="bar">bar</option>
+                <option value="foobar">foobar</option>
+            </select>
+            <label id="preventFoobar" class="hidden"><input type="checkbox" checked="true"> Prevent change</label>
+        </p>
+        <p><label for="currentVal">Current Value</label>: <span id="currentVal"></span></p>
+        <p><label for="newVal">New Value</label>: <input type="text" id="newVal" /></p>
+    </div>
+    <div class="footer">
+        <button type="button" id="changeValue">Change Value</button>
+    </div>
+</div>
+
+<div id="example-out"></div>
+
+<script type="text/javascript">
+// Get a new YUI instance 
+YUI().use("node", "attribute", function(Y) {
+
+    // Setup a custom class with attribute support
+    function MyClass(cfg) {
+
+        // Setup attribute configuration
+        var attrs = {
+            "foo" : {
+                value:5
+            },
+     
+            "bar" : {
+                value:"Hello World!"
+            },
+    
+            "foobar" : {
+                value:true
+            }
+        };
+
+        this.addAttrs(attrs, cfg);
+    }
+
+    Y.augment(MyClass, Y.Attribute);
+
+    var o1 = new MyClass();
+
+    function displayEvent(e, title) {
+        var str = '<div class="event"><div class="event-title">' + title + '</div>';
+
+        if (e) {
+            str += 
+            '<ul class="event-props"><li>e.attrName: ' 
+            + e.attrName 
+            + '</li><li>e.prevVal: '
+            + e.prevVal
+            + '</li><li>e.newVal: '
+            + e.newVal
+            + '</li></ul></div>';
+        }
+
+        str += '</div>';
+ 
+        Y.one("#example-out").prepend(str);
+    }
+
+    // Start Example Form Handling
+    var attrSel = Y.one("#attrSel");
+    var newValTxt = Y.one("#newVal");
+    var currentValSpan = Y.one("#currentVal");
+    var preventFoobarChk = Y.one("#preventFoobar input[type=checkbox]");
+    var preventFoobarLbl = Y.one("#preventFoobar");
+
+    var attrOpts = attrSel.get("options");
+
+    function updateVal() {
+        var selIndex = attrSel.get("selectedIndex");
+        var attr = attrOpts.item(selIndex).get("value");
+        o1.set(attr, newValTxt.get("value"));
+    }
+
+    Y.on("click", updateVal, "#changeValue");
+
+    function populateCurrentValue() {
+        var selIndex = attrSel.get("selectedIndex");
+        var attr = attrOpts.item(selIndex).get("value");
+
+        currentValSpan.set("innerHTML", o1.get(attr));
+        newValTxt.set("value", "");
+
+        if (attr === "foobar") {
+            preventFoobarLbl.removeClass("hidden");
+        } else {
+            preventFoobarLbl.addClass("hidden");
+        }
+    }
+
+    populateCurrentValue();
+
+    Y.on("change", populateCurrentValue, attrSel);
+    // End Example Form Handling
+
+    // Attribute Change Event Listners
+
+    o1.after("fooChange", function(e) {
+        displayEvent(e, "After fooChange");
+        currentValSpan.set("innerHTML", e.newVal);
+    });
+
+    o1.after("barChange", function(e) {
+        displayEvent(e, "After barChange");
+        currentValSpan.set("innerHTML", e.newVal);
+    });
+
+    o1.on("foobarChange", function(e) {
+
+        if (preventFoobarChk.get("checked")) {
+
+            // Calling preventDefault, in an "on" listener
+            // will prevent the attribute change from occuring
+            // and the after listener being called.
+
+            e.preventDefault();
+            displayEvent(null, "On foobarChange (prevented)");
+        }
+
+    });
+
+    o1.after("foobarChange", function(e) {
+
+        // This foobar after listener will not get called, 
+        // if we end up preventing default in the "on" 
+        // listener above.
+
+        displayEvent(e, "After foobarChange");
+        currentValSpan.set("innerHTML", e.newVal);
+    });
+
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

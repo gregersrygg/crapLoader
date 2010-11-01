@@ -1,0 +1,398 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Event: Supporting A Swipe Left Gesture</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Event: Supporting A Swipe Left Gesture</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Event: Supporting A Swipe Left Gesture</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example shows how you can support a "swipeleft" gesture, built on top of the synthetic "gesturemove" events, which work not only on touch devices, but also on mouse based input devices.</p>	</div>	
+
+	<div class="module example-container  newWindow">
+			<div id="example-canvas" class="bd">
+
+		<p class="newWindowButton yui-skin-sam">
+        <span id="newWindowLink">
+            <span class="first-child">
+                <a href="swipe-gesture_source.html" target="_blank">View example in new window.</a>
+            </span>
+        </span>	
+    </p>
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h2>Supporting A Swipe Gesture</h2>
+
+<p>In this example, we'll show you can support a simple "swipeleft" gesture, which works across both touch and mouse based input devices, and leverages cross-browser transition support.</p>
+
+<h3>Modules Used</h3>
+
+<p>For the example, the two core modules we'll use are:</p>
+
+<dl>
+    <dt>The <code>event-move</code> module</dt> 
+    <dd>Provides the <code>gesturemovestart</code>, <code>gesturemove</code> and <code>gesturemoveend</code> low-level gesture events. These events are fired whenever the user performs a move gesture (mouse button/finger down, mouse/finger move, mouse button/finger up) with the mouse or their finger.</dd>
+    <dt>The <code>transitions</code> module</dt>
+    <dd>Provides transitions support, leveraging CSS transitions under the hood, where supported.</dd>
+</dl>
+
+<p>If you were interested in limiting support only to environments which support CSS transitions, you could pull in the <code>transition-native</code> module instead of the <code>transition</code> mode, which extends transition support to the A-Grade browser list.</p>
+
+<p>The YUI use statement for the example is shown below:</p>
+
+<div id="syntax-3d99c2014d448ed6d9f3bd31c3e552ac" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node-base&quot;</span><span class="sy0">,</span> <span class="st0">&quot;node-event-delegate&quot;</span><span class="sy0">,</span> <span class="st0">&quot;transition&quot;</span><span class="sy0">,</span> <span class="st0">&quot;event-move&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    ...</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node-base&quot;</span><span class="sy0">,</span> <span class="st0">&quot;node-event-delegate&quot;</span><span class="sy0">,</span> <span class="st0">&quot;transition&quot;</span><span class="sy0">,</span> <span class="st0">&quot;event-move&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    ...
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-3d99c2014d448ed6d9f3bd31c3e552ac-plain">YUI().use("node-base", "node-event-delegate", "transition", "event-move", function(Y) {
+    ...
+});</textarea></div>
+<h3>Delegating Gesture Move Events</h3>
+
+<p>The basic idea for the example is to listen for a gesturemovestart on a list item, and when we get one, store it's position, and then listen for a gesturemoveend. If the gesturemoveend occurs more than X pixels to the left of the start, then we've identified a "swipeleft" gesture. Future versions of the library will package such logic into a higher level gesture event (ala event-flick).</p>
+
+<p>
+    For this example, since we're dealing with a list of items, rather than attach individual listeners to each &#60;li&#62; in the list, we use <code>delegate</code> on the parent &#60;ul&#62; element, which leads to better performance and avoids having to add/remove listeners each time the contents of the list change.
+    The gesturemovestart, gesturemove and gesturemoveend are synthetic events, and can all be used with <code>delegate</code>, just like any DOM event. 
+</p>
+
+<p>We set up a delegate listener on the &#60;ul&#62; which listens for the <code>gesturemovestart</code> event (gesturemovestart abstracts mousedown/touchstart events under the hood). The delegate listener is set up to be notified when the target of the <code>gesturemovestart</code> is an &#60;li&#62;.</p>
+
+<div id="syntax-4a703cd39efe0fc64c2331412ccfde96" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">Y.<span class="me1">Node</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#swipe&quot;</span><span class="br0">&#41;</span>.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;gesturemovestart&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    ...</div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;li&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span>  <span class="co1">// filter for &quot;li&quot;</span></div></li><li class="li1"><div class="de1">    preventDefault<span class="sy0">:</span><span class="kw2">true</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">&nbsp;
+Y.<span class="me1">Node</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#swipe&quot;</span><span class="br0">&#41;</span>.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;gesturemovestart&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    ...
+&nbsp;
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;li&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span>  <span class="co1">// filter for &quot;li&quot;</span>
+    preventDefault<span class="sy0">:</span><span class="kw2">true</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;</pre></div><textarea id="syntax-4a703cd39efe0fc64c2331412ccfde96-plain">
+Y.Node.one("#swipe").delegate("gesturemovestart", function(e) {
+
+    ...
+
+}, "li", {  // filter for "li"
+    preventDefault:true
+});
+</textarea></div>
+<p>The gesturemovestart event supports a configuration object passed as the 3rd argument, which can be used to set minimum distance and minimum time thresholds at which to fire the start event. The configuration also supports the ability to prevent the default behavior before the minimum time or distance thresholds kick in, which is what we do above by passing <code>preventDefault:true</code>.</p>
+
+<p>The advantage of the gesture synthetic events is that the developer can use the same API without having to worry about whether or not the browser platform is touch based or mouse based.</p>
+
+<h3>Gesture Move End</h3>
+
+<p>As mentioned above, the gesturemovestart listener is notified whenever a mousedown or touchstart is received on a list item. The listener has access to:
+
+<dl>
+    <dt><code>e.currentTarget</code></dt><dd>The list item targeted.</dd>
+    <dt><code>e.target</code></dt><dd>The element clicked on (it maybe an element inside the targeted list item, the span for example).</dd>
+    <dt><code>e.container</code></dt><dd>The element to which the delegate listener is attached (the ul in this case).</dd>
+</dl>
+
+<p>
+The event facade also has the page coordinates for the mousedown or touchstart event. We use the list item's <code>setData</code> method, to store the <code>pageX</code> position for the start event, 
+so we can compare it when we get the gesturemoveend event. This way it's stored on the node instance, and we don't need to pass it along separately to the gesturemoveend event, or store it globally.
+</p> 
+
+<p><code>getData</code>, <code>setData</code> and <code>clearData</code> are useful methods to store ad-hoc node centric data.</p>
+
+<div id="syntax-7ff487568e0164ff4a6141fd787f7c4e" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">Y.<span class="me1">Node</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#swipe&quot;</span><span class="br0">&#41;</span>.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;gesturemovestart&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> <span class="kw1">item</span> <span class="sy0">=</span> e.<span class="me1">currentTarget</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        target <span class="sy0">=</span> e.<span class="me1">target</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        container <span class="sy0">=</span> e.<span class="me1">container</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    ...</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="kw1">item</span>.<span class="me1">setData</span><span class="br0">&#40;</span><span class="st0">&quot;swipeStart&quot;</span><span class="sy0">,</span> e.<span class="me1">pageX</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">item</span>.<span class="me1">once</span><span class="br0">&#40;</span><span class="st0">&quot;gesturemoveend&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> swipeStart <span class="sy0">=</span> <span class="kw1">item</span>.<span class="me1">getData</span><span class="br0">&#40;</span><span class="st0">&quot;swipeStart&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            swipeEnd <span class="sy0">=</span> e.<span class="me1">pageX</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            isSwipeLeft <span class="sy0">=</span> <span class="br0">&#40;</span>swipeStart <span class="sy0">-</span> swipeEnd<span class="br0">&#41;</span> <span class="sy0">&gt;</span> MIN_SWIPE<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>isSwipeLeft<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">item</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;.&quot;</span> <span class="sy0">+</span> <span class="kw1">DELETE</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span>HIDDEN<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    ...</div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">&nbsp;
+Y.<span class="me1">Node</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#swipe&quot;</span><span class="br0">&#41;</span>.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;gesturemovestart&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="kw2">var</span> <span class="kw1">item</span> <span class="sy0">=</span> e.<span class="me1">currentTarget</span><span class="sy0">,</span>
+        target <span class="sy0">=</span> e.<span class="me1">target</span><span class="sy0">,</span>
+        container <span class="sy0">=</span> e.<span class="me1">container</span><span class="sy0">,</span>
+&nbsp;
+    ...
+&nbsp;
+    <span class="kw1">item</span>.<span class="me1">setData</span><span class="br0">&#40;</span><span class="st0">&quot;swipeStart&quot;</span><span class="sy0">,</span> e.<span class="me1">pageX</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">item</span>.<span class="me1">once</span><span class="br0">&#40;</span><span class="st0">&quot;gesturemoveend&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="kw2">var</span> swipeStart <span class="sy0">=</span> <span class="kw1">item</span>.<span class="me1">getData</span><span class="br0">&#40;</span><span class="st0">&quot;swipeStart&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+            swipeEnd <span class="sy0">=</span> e.<span class="me1">pageX</span><span class="sy0">,</span>
+            isSwipeLeft <span class="sy0">=</span> <span class="br0">&#40;</span>swipeStart <span class="sy0">-</span> swipeEnd<span class="br0">&#41;</span> <span class="sy0">&gt;</span> MIN_SWIPE<span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span>isSwipeLeft<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">item</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;.&quot;</span> <span class="sy0">+</span> <span class="kw1">DELETE</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span>HIDDEN<span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    ...
+&nbsp;
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-7ff487568e0164ff4a6141fd787f7c4e-plain">
+Y.Node.one("#swipe").delegate("gesturemovestart", function(e) {
+
+    var item = e.currentTarget,
+        target = e.target,
+        container = e.container,
+
+    ...
+
+    item.setData("swipeStart", e.pageX);
+
+    item.once("gesturemoveend", function(e) {
+
+        var swipeStart = item.getData("swipeStart"),
+            swipeEnd = e.pageX,
+            isSwipeLeft = (swipeStart - swipeEnd) > MIN_SWIPE;
+
+        if (isSwipeLeft) {
+            item.one("." + DELETE).removeClass(HIDDEN);
+        }
+
+    });
+
+    ...
+
+});</textarea></div>
+<p>When we get the <code>gesturemovestart</code> event, we set up a listener for the <code>gesturemoveend</code> event, so we can determine the end of the gesture, and figure out if the user swiped left. Since we don't want to set up a new listener every time we get a <code>gesturemovestart</code> we use 
+<code>once</code> to set up the <code>gesturemoveend</code> listener. <code>once</code> will detach the listener after it's been invoked. Again, since <code>gesturemoveend</code> is a synthetic event, it works with <code>once</code> just like any other DOM event.</p>
+
+<p>In the <code>gesturemoveend</code> listener we check the page position of the event, and if it's greater than a certain number of pixels <em>less than</em> the start position which we stored on the item node (swipe left), we display the "Delete" button by removing the hidden class which it contains.</p>
+
+<h3>Transitions</h3>
+
+<p>To hide and remove the item when the delete button is pressed, we use the <code>transition</code> method, to animate it's opacity and height down to 0. Under the hood transition will use CSS transition support where available (WebKit) and set up timer based animation where not (IE). As with the gesture event support, the developer gets to use the same API without having to worry about the browser environment.</p>
+
+<div id="syntax-a0d05edcc602f7cd53211bc65f1815b9" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw1">item</span> <span class="sy0">=</span> target.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw1">item</span>.<span class="me1">transition</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    duration<span class="sy0">:</span><span class="nu0">0.3</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    opacity<span class="sy0">:</span><span class="nu0">0</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    height<span class="sy0">:</span><span class="nu0">0</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">remove</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">&nbsp;
+<span class="kw1">item</span> <span class="sy0">=</span> target.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw1">item</span>.<span class="me1">transition</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+    duration<span class="sy0">:</span><span class="nu0">0.3</span><span class="sy0">,</span>
+    opacity<span class="sy0">:</span><span class="nu0">0</span><span class="sy0">,</span>
+    height<span class="sy0">:</span><span class="nu0">0</span>
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>.<span class="me1">remove</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;</pre></div><textarea id="syntax-a0d05edcc602f7cd53211bc65f1815b9-plain">
+item = target.get("parentNode");
+
+item.transition({
+    duration:0.3,
+    opacity:0,
+    height:0
+}, function() {
+    this.remove();
+});
+</textarea></div>
+<p>The second argument to transition above is a callback function, which is invoked when the transition is complete. We use this support to remove the item from the DOM.</p>
+
+<h3>Full Code Listing</h3>
+
+<div id="syntax-3df1a4c5615d95535adb57fa8bbc9aab" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node-base&quot;</span><span class="sy0">,</span> <span class="st0">&quot;node-event-delegate&quot;</span><span class="sy0">,</span> <span class="st0">&quot;transition&quot;</span><span class="sy0">,</span> <span class="st0">&quot;event-move&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> <span class="kw1">DELETE</span> <span class="sy0">=</span> <span class="st0">&quot;myapp-delete&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        HIDDEN <span class="sy0">=</span> <span class="st0">&quot;myapp-hidden&quot;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        MIN_SWIPE <span class="sy0">=</span> <span class="nu0">10</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">Node</span>.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;.myexample-hidden&quot;</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">&quot;myexample-hidden&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">Node</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#swipe&quot;</span><span class="br0">&#41;</span>.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;gesturemovestart&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> <span class="kw1">item</span> <span class="sy0">=</span> e.<span class="me1">currentTarget</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            target <span class="sy0">=</span> e.<span class="me1">target</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            container <span class="sy0">=</span> e.<span class="me1">container</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            isDeleteButton <span class="sy0">=</span> target.<span class="me1">hasClass</span><span class="br0">&#40;</span><span class="kw1">DELETE</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Prevent Text Selection in IE</span></div></li><li class="li1"><div class="de1">        <span class="kw1">item</span>.<span class="me1">once</span><span class="br0">&#40;</span><span class="st0">&quot;selectstart&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>isDeleteButton<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            container.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;.&quot;</span> <span class="sy0">+</span> <span class="kw1">DELETE</span><span class="br0">&#41;</span>.<span class="me1">addClass</span><span class="br0">&#40;</span>HIDDEN<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">            <span class="kw1">item</span>.<span class="me1">setData</span><span class="br0">&#40;</span><span class="st0">&quot;swipeStart&quot;</span><span class="sy0">,</span> e.<span class="me1">pageX</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw1">item</span>.<span class="me1">once</span><span class="br0">&#40;</span><span class="st0">&quot;gesturemoveend&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="kw2">var</span> swipeStart <span class="sy0">=</span> <span class="kw1">item</span>.<span class="me1">getData</span><span class="br0">&#40;</span><span class="st0">&quot;swipeStart&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                    swipeEnd <span class="sy0">=</span> e.<span class="me1">pageX</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                    isSwipeLeft <span class="sy0">=</span> <span class="br0">&#40;</span>swipeStart <span class="sy0">-</span> swipeEnd<span class="br0">&#41;</span> <span class="sy0">&gt;</span> MIN_SWIPE<span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">                <span class="kw1">if</span> <span class="br0">&#40;</span>isSwipeLeft<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    <span class="kw1">item</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;.&quot;</span> <span class="sy0">+</span> <span class="kw1">DELETE</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span>HIDDEN<span class="br0">&#41;</span><span class="sy0">;</span>    </div></li><li class="li2"><div class="de2">                <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">item</span> <span class="sy0">=</span> target.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">            <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">item</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span> <span class="sy0">!=</span> <span class="st0">&quot;kitkat&quot;</span> <span class="sy0">||</span> <span class="kw3">confirm</span><span class="br0">&#40;</span><span class="st0">&quot;Seriously? The KitKats?&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw1">item</span>.<span class="me1">transition</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    duration<span class="sy0">:</span><span class="nu0">0.3</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">                    opacity<span class="sy0">:</span><span class="nu0">0</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">                    height<span class="sy0">:</span><span class="nu0">0</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                    <span class="kw1">this</span>.<span class="me1">remove</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">                <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;li&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        preventDefault<span class="sy0">:</span><span class="kw2">true</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;node-base&quot;</span><span class="sy0">,</span> <span class="st0">&quot;node-event-delegate&quot;</span><span class="sy0">,</span> <span class="st0">&quot;transition&quot;</span><span class="sy0">,</span> <span class="st0">&quot;event-move&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="kw2">var</span> <span class="kw1">DELETE</span> <span class="sy0">=</span> <span class="st0">&quot;myapp-delete&quot;</span><span class="sy0">,</span>
+        HIDDEN <span class="sy0">=</span> <span class="st0">&quot;myapp-hidden&quot;</span><span class="sy0">,</span>
+        MIN_SWIPE <span class="sy0">=</span> <span class="nu0">10</span><span class="sy0">;</span>
+&nbsp;
+    Y.<span class="me1">Node</span>.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;.myexample-hidden&quot;</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">&quot;myexample-hidden&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    Y.<span class="me1">Node</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#swipe&quot;</span><span class="br0">&#41;</span>.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;gesturemovestart&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="kw2">var</span> <span class="kw1">item</span> <span class="sy0">=</span> e.<span class="me1">currentTarget</span><span class="sy0">,</span>
+            target <span class="sy0">=</span> e.<span class="me1">target</span><span class="sy0">,</span>
+            container <span class="sy0">=</span> e.<span class="me1">container</span><span class="sy0">,</span>
+            isDeleteButton <span class="sy0">=</span> target.<span class="me1">hasClass</span><span class="br0">&#40;</span><span class="kw1">DELETE</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">// Prevent Text Selection in IE</span>
+        <span class="kw1">item</span>.<span class="me1">once</span><span class="br0">&#40;</span><span class="st0">&quot;selectstart&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>isDeleteButton<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+            container.<span class="me1">all</span><span class="br0">&#40;</span><span class="st0">&quot;.&quot;</span> <span class="sy0">+</span> <span class="kw1">DELETE</span><span class="br0">&#41;</span>.<span class="me1">addClass</span><span class="br0">&#40;</span>HIDDEN<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            <span class="kw1">item</span>.<span class="me1">setData</span><span class="br0">&#40;</span><span class="st0">&quot;swipeStart&quot;</span><span class="sy0">,</span> e.<span class="me1">pageX</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            <span class="kw1">item</span>.<span class="me1">once</span><span class="br0">&#40;</span><span class="st0">&quot;gesturemoveend&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+                <span class="kw2">var</span> swipeStart <span class="sy0">=</span> <span class="kw1">item</span>.<span class="me1">getData</span><span class="br0">&#40;</span><span class="st0">&quot;swipeStart&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+                    swipeEnd <span class="sy0">=</span> e.<span class="me1">pageX</span><span class="sy0">,</span>
+                    isSwipeLeft <span class="sy0">=</span> <span class="br0">&#40;</span>swipeStart <span class="sy0">-</span> swipeEnd<span class="br0">&#41;</span> <span class="sy0">&gt;</span> MIN_SWIPE<span class="sy0">;</span>
+&nbsp;
+                <span class="kw1">if</span> <span class="br0">&#40;</span>isSwipeLeft<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    <span class="kw1">item</span>.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;.&quot;</span> <span class="sy0">+</span> <span class="kw1">DELETE</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span>HIDDEN<span class="br0">&#41;</span><span class="sy0">;</span>    
+                <span class="br0">&#125;</span>
+&nbsp;
+            <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+            <span class="kw1">item</span> <span class="sy0">=</span> target.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;parentNode&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+            <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">item</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;id&quot;</span><span class="br0">&#41;</span> <span class="sy0">!=</span> <span class="st0">&quot;kitkat&quot;</span> <span class="sy0">||</span> <span class="kw3">confirm</span><span class="br0">&#40;</span><span class="st0">&quot;Seriously? The KitKats?&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="kw1">item</span>.<span class="me1">transition</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+                    duration<span class="sy0">:</span><span class="nu0">0.3</span><span class="sy0">,</span>
+                    opacity<span class="sy0">:</span><span class="nu0">0</span><span class="sy0">,</span>
+                    height<span class="sy0">:</span><span class="nu0">0</span>
+                <span class="br0">&#125;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                    <span class="kw1">this</span>.<span class="me1">remove</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+                <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;li&quot;</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+        preventDefault<span class="sy0">:</span><span class="kw2">true</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-3df1a4c5615d95535adb57fa8bbc9aab-plain">YUI().use("node-base", "node-event-delegate", "transition", "event-move", function(Y) {
+
+    var DELETE = "myapp-delete",
+        HIDDEN = "myapp-hidden",
+        MIN_SWIPE = 10;
+
+    Y.Node.all(".myexample-hidden").removeClass("myexample-hidden");
+
+    Y.Node.one("#swipe").delegate("gesturemovestart", function(e) {
+
+        var item = e.currentTarget,
+            target = e.target,
+            container = e.container,
+            isDeleteButton = target.hasClass(DELETE);
+
+        // Prevent Text Selection in IE
+        item.once("selectstart", function(e) {
+            e.preventDefault();
+        });
+
+        if (!isDeleteButton) {
+
+            container.all("." + DELETE).addClass(HIDDEN);
+
+            item.setData("swipeStart", e.pageX);
+
+            item.once("gesturemoveend", function(e) {
+
+                var swipeStart = item.getData("swipeStart"),
+                    swipeEnd = e.pageX,
+                    isSwipeLeft = (swipeStart - swipeEnd) > MIN_SWIPE;
+
+                if (isSwipeLeft) {
+                    item.one("." + DELETE).removeClass(HIDDEN);    
+                }
+
+            });
+        } else {
+            item = target.get("parentNode");
+
+            if (item.get("id") != "kitkat" || confirm("Seriously? The KitKats?")) {
+                item.transition({
+                    duration:0.3,
+                    opacity:0,
+                    height:0
+                }, function() {
+                    this.remove();
+                });
+            }
+        }
+
+    }, "li", {
+        preventDefault:true
+    });
+});</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Event Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../event/event-simple.html'>Simple DOM Events</a></li><li><a href='../event/event-timing.html'>Using 'available', 'contentready', and 'domready'</a></li><li><a href='../event/event-ce.html'>Using Custom Events</a></li><li><a href='../event/event-focus-blur.html'>Skinning via Progressive Enhancement using the Event Utility and the Loader</a></li><li><a href='../event/event-synth-hover.html'>Creating a hover event for DOM subscription</a></li><li class='selected'><a href='../event/swipe-gesture.html'>Supporting A Swipe Left Gesture</a></li><li><a href='../yui/yui-augment.html'>Compose Classes of Objects with <code>augment</code> (included with examples for The YUI Global Object)</a></li><li><a href='../node-focusmanager/node-focusmanager-3.html'>Accessible Menu Button (included with examples for Focus Manager Node Plugin)</a></li><li><a href='../node-focusmanager/node-focusmanager-2.html'>Accessible TabView (included with examples for Focus Manager Node Plugin)</a></li><li><a href='../attribute/attribute-event.html'>Attribute Change Events (included with examples for Attribute)</a></li><li><a href='../attribute/attribute-event-speeddate.html'>Attribute Event Based Speed Dating (included with examples for Attribute)</a></li><li><a href='../attribute/attribute-getset.html'>Attribute Getters, Setters and Validators (included with examples for Attribute)</a></li><li><a href='../widget/widget-extend.html'>Extending the base widget class (included with examples for Widget)</a></li><li><a href='../dd/photo-browser.html'>Photo Browser (included with examples for Drag &amp; Drop)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Event Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/event/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_event.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="selected "><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

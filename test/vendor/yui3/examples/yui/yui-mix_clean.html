@@ -1,0 +1,98 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Add Behaviors to Objects with <code>mix</code></title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-debug.js"></script>
+
+<!--there is no custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Add Behaviors to Objects with <code>mix</code></h1>
+
+<div class="exampleIntro">
+	<p>Static classes in JavaScript are implemented as object literals
+with keys corresponding to public class methods.  As such, static classes
+aren't candidates for instantiation or prototype extention.  To add
+functionality to static classes, you need to work with the class's object
+literal &mdash; and that's what YUI's <code>mix</code> method helps you to do.</p>
+
+<p>Click the button below to call methods <code>mix</code>ed into a static
+class, then read the tutorial below for more information about using
+<code>mix</code>.</p>
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<input type="button" name="demo_btn" id="demo_btn" value="click"/>
+<div id="demo_logger"></div>
+<script type="text/javascript">
+YUI({filter:"debug", logInclude: {example:true}}).use("node", function(Y) {
+    // This method is in the core of the library, so we don't have to use() any
+    // additional modules to access it.  However, this example requires 'node'.
+
+    var Logging = function () {
+        var logger = null;
+        
+        return {
+            initLogger : function (logNode) {
+                if (!logger) {
+                    logger = Y.one(logNode);
+                }
+            },
+
+            log : function (message) {
+                if (logger) {
+                    logger.set('innerHTML', logger.get('innerHTML') + '<p>' + message + '</p>');
+                }
+            }
+        }
+    }();
+
+    var PageController = function () {
+        var app_const = 12345;
+
+        return {
+
+            getConst : function () { 
+                return app_const;
+            },
+
+            logConst : function () {
+                this.initLogger('#demo_logger');
+                this.log('PageController class constant = ' + this.getConst() +
+                          ', logged courtesy of object augmentation via Y.mix.');
+            }
+        };
+    }();
+
+    Y.mix(PageController, Logging);
+
+    Y.on('click', PageController.logConst, '#demo_btn', PageController);
+});
+
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

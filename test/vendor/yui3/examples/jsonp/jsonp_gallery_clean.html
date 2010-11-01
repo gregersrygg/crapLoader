@@ -1,0 +1,144 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Reusing a JSONPRequest instance to poll a remote server</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+    #out {
+        margin-top: 2em;
+    }
+    #out h4 {
+        border-right: 100px solid #ccc;
+    }
+</style>
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Reusing a JSONPRequest instance to poll a remote server</h1>
+
+<div class="exampleIntro">
+	<p>This example shows how to create a reusable JSONPRequest for polling as well as how to configure success and failure callbacks.  See the API docs and user guide for a full listing of available configurations.</p>
+
+<p>For this example, we will use a JSONP service hosted on <a href="http://yuilibrary.com">YUILibrary</a> to fetch information about a random Gallery module and render some of the information on the page.</p>
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<div id="demo">
+    <input type="button" id="start" value="Start polling">
+    <input type="button" id="stop" value="Stop polling">
+    <div id="out">
+    </div>
+</div>
+<script>
+YUI().use("jsonp", "substitute", "transition",function (Y) {
+
+    var url = "http://yuilibrary.com/gallery/api/random?callback={callback}",
+        outputDiv = Y.one("#out"),
+        gallery;
+        
+    // Using the configuration object syntax
+    gallery = new Y.JSONPRequest(url, {
+        on: {
+            success: function (response) {
+                var module = response.modules[0],
+                    author = module.owner;
+
+                // Some users don't have a rank
+                if (!author.rank) {
+                    author.rank = "user";
+                }
+
+                // Format the author info and store as a property of the
+                // module object for use by Y.substitute
+                // ('this' refers to the JSONPRequest object by default)
+                module.authorHTML = Y.substitute(this.authorTemplate, author);
+
+                outputDiv.setContent(Y.substitute(this.moduleTemplate, module));
+
+                // Add some flare to the poll interval by showing a "time left"
+                // indicator via the header's border
+                Y.one("#out h4")
+                    .setStyle("borderRightWidth", "100px")
+                    .transition({
+                        borderRightWidth: 0,
+                        duration: 7
+                    }, function () {
+                        if (gallery.polling) {
+                            gallery.send();
+                        }
+                    });
+            },
+
+            failure: function () {
+                gallery.polling = false;
+                outputDiv.setContent(this.failureTemplate);
+
+                // Wire up the Try again button
+                outputDiv.one("button").on("click", function () {
+                    gallery.send();
+                });
+            }
+        }
+    });
+
+
+    gallery.moduleTemplate =
+        '<h4><a href="{url}">{title}</a></h4>' +
+        '<p class="author">{authorHTML}</p>' +
+        '<div>{summary}</div>';
+
+    gallery.authorTemplate =
+        '<img src="{icon}" height="30" width="30">' +
+        ' {fullname} <span class="rank">({rank})</span>';
+
+    gallery.failureTemplate =
+        '<p class="error">Ack, I couldn\'t reach the Gallery web service!</p>' +
+        '<button>Try again</button>';
+
+    gallery.polling = false;
+
+
+    // Click the button to send the JSONP request
+    Y.one("#start").on("click", function (e) {
+        if (!gallery.polling) {
+            gallery.polling = true;
+            gallery.send();
+        }
+    });
+
+    Y.one("#stop").on("click", function (e) {
+        gallery.polling = false;
+    });
+
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

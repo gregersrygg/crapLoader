@@ -1,0 +1,811 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Overlay: Animation Plugin</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<style type="text/css">
+    /* If js is enabled, hide overlay markup off screen while the overlay is being instantiated */
+    .yui3-js-enabled .yui3-overlay-loading {
+        top:-1000em;
+        left:-1000em;
+        position:absolute;
+    }
+
+    .yui3-overlay-content {
+        background-color:#ccc;
+        border:1px solid #000;
+        padding:5px;
+    }
+
+    .yui3-overlay .yui3-widget-hd, 
+    .yui3-overlay .yui3-widget-bd, 
+    .yui3-overlay .yui3-widget-ft {
+        background-color:#eee;
+        padding:2px;
+        border:1px solid #999;
+    }
+
+    .yui3-overlay .yui3-widget-bd {
+        background-color:#fff;
+    } 
+</style>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Overlay: Animation Plugin</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Overlay: Animation Plugin</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example shows how you can use Widget's plugin infrastructure to customize the existing behavior of a widget.</p>
+
+<p>We create an Animation plugin class for Overlay called <code>AnimPlugin</code> which changes the way Overlay instances are shown/hidden, by fading them in and out. The Overlay is initially constructed with the <code>AnimPlugin</code> plugged in <em>(with the duration set to 2 seconds)</em>.
+Clicking the "Unplug AnimPlugin" button, will restore the original non-Animated Overlay show/hide behavior. Clicking on the "Plug AnimPlugin" button will plug in the <code>AnimPlugin</code> again, but with a shorter duration.</p>
+
+<p>NOTE: This example serves as a tutorial for how to build your own plugins. A packaged animation plugin based on this example is available by using the <code>widget-anim</code> module, which sets up a <a href="../../api/WidgetAnim.js.html"><code>Y.Plugin.WidgetAnim</code></a> class, similar to the one discussed in this example.</p>
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="overlay-anim-plugin_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div id="overlay" class="yui3-overlay-loading">
+    <div class="yui3-widget-hd">Overlay Header</div>
+    <div class="yui3-widget-bd">Overlay Body</div>
+    <div class="yui3-widget-ft">Overlay Footer</div>
+</div>
+
+<button type="button" id="show">Show</button>
+<button type="button" id="hide">Hide</button>
+<button type="button" id="unplug">Unplug AnimPlugin</button>
+<button type="button" id="plug">Plug AnimPlugin (duration:0.5)</button>
+
+<script type="text/javascript">
+YUI().use("overlay", "anim", "plugin", function(Y) {
+
+    /* Animation Plugin Constructor */
+    function AnimPlugin(config) {
+        AnimPlugin.superclass.constructor.apply(this, arguments);
+    }
+
+    /* 
+     * The namespace for the plugin. This will be the property on the widget, which will 
+     * reference the plugin instance, when it's plugged in
+     */
+    AnimPlugin.NS = "fx";
+
+    /*
+     * The NAME of the AnimPlugin class. Used to prefix events generated
+     * by the plugin class.
+     */
+    AnimPlugin.NAME = "animPlugin";
+
+    /*
+     * The default set of attributes for the AnimPlugin class.
+     */
+    AnimPlugin.ATTRS = {
+
+        /*
+         * Default duration. Used by the default animation implementations
+         */
+        duration : {
+            value: 0.2
+        },
+
+        /*
+         * Default animation instance used for showing the widget (opacity fade-in)
+         */
+        animVisible : {
+            valueFn : function() {
+
+		var host = this.get("host");
+                var boundingBox = host.get("boundingBox");
+
+                var anim = new Y.Anim({
+                    node: boundingBox,
+                    to: { opacity: 1 },
+                    duration: this.get("duration")
+                });
+
+                // Set initial opacity, to avoid initial flicker
+                if (!host.get("visible")) {
+                    boundingBox.setStyle("opacity", 0);
+                }
+
+                // Clean up, on destroy. Where supported, remove
+                // opacity set using style. Else make 100% opaque
+                anim.on("destroy", function() {
+                    if (Y.UA.ie) {
+                        this.get("node").setStyle("opacity", 1);
+                    } else {
+                        this.get("node").setStyle("opacity", "");
+                    }
+                });
+
+                return anim;
+            }
+        },
+
+        /*
+         * Default animation instance used for hiding the widget (opacity fade-out)
+         */
+        animHidden : {
+            valueFn : function() {
+                return new Y.Anim({
+                    node: this.get("host").get("boundingBox"),
+                    to: { opacity: 0 },
+                    duration: this.get("duration")
+                });
+            }
+        }
+    }
+
+    /*
+     * Extend the base plugin class
+     */
+    Y.extend(AnimPlugin, Y.Plugin.Base, {
+
+        /*
+         * Initialization code. Called when the 
+         * plugin is instantiated (whenever it's 
+         * plugged into the host)
+         */
+        initializer : function(config) {
+            this._bindAnimVisible();
+            this._bindAnimHidden();
+
+            this.after("animVisibleChange", this._bindAnimVisible);
+            this.after("animHiddenChange", this._bindAnimHidden);
+
+            // Override default _uiSetVisible method, with custom animated method
+            this.doBefore("_uiSetVisible", this._uiAnimSetVisible);
+        },
+
+        /*
+         * Destruction code. Invokes destroy in the individual animation instances,
+         * and lets them take care of cleaning up any state.
+         */
+        destructor : function() {
+            this.get("animVisible").destroy();
+            this.get("animHidden").destroy();
+        },
+
+        /*
+         * The custom animation method, added by the plugin.
+         *
+         * This method replaces the default _uiSetVisible handler
+         * Widget provides, by injecting itself before _uiSetVisible,
+         * (using Plugins before method) and preventing the default
+         * behavior.
+         */
+        _uiAnimSetVisible : function(val) {
+            if (this.get("host").get("rendered")) {
+                if (val) {
+                    this.get("animHidden").stop();
+                    this.get("animVisible").run();
+                } else {
+                    this.get("animVisible").stop();
+                    this.get("animHidden").run();
+                }
+                return new Y.Do.Prevent("AnimPlugin prevented default show/hide");
+            }
+        },
+
+        /*
+         * The original Widget _uiSetVisible implementation
+         */
+        _uiSetVisible : function(val) {
+            var host = this.get("host");
+            var hiddenClass = host.getClassName("hidden");
+            if (!val) {
+                host.get("boundingBox").addClass(hiddenClass);
+            } else {
+                host.get("boundingBox").removeClass(hiddenClass);
+            }
+        },
+
+        /* Sets up call to invoke original visibility handling when the animVisible animation is started */
+        _bindAnimVisible : function() {
+            var animVisible = this.get("animVisible");
+
+            // Setup original visibility handling (for show) before starting to animate
+            animVisible.on("start", Y.bind(function() {
+                this._uiSetVisible(true);
+            }, this));
+        },
+
+        /* Sets up call to invoke original visibility handling when the animHidden animation is complete */
+        _bindAnimHidden : function() {
+            var animHidden = this.get("animHidden");
+
+            // Setup original visibility handling (for hide) after completing animation
+            animHidden.after("end", Y.bind(function() {
+                this._uiSetVisible(false);
+            }, this));
+        }
+    });
+
+    // Create a new Overlay instance, and add AnimPlugin with a default duration of 2 seconds
+    var overlay = new Y.Overlay({
+        srcNode: "#overlay",
+        width:"10em",
+        height:"10em",
+        visible:false,
+        shim:false,
+        align: {
+            node: "#show", 
+            points: ["tl", "bl"]
+        },
+        plugins : [{fn:AnimPlugin, cfg:{duration:2}}]
+    });
+    overlay.render();
+
+    Y.on("click", function() {
+        overlay.show();
+    }, "#show");
+
+    Y.on("click", function() {
+        overlay.hide();
+    }, "#hide");
+
+    Y.on("click", function() {
+        overlay.unplug("fx");
+    }, "#unplug");
+
+    Y.on("click", function() {
+        overlay.unplug("fx");
+        overlay.plug(AnimPlugin, {duration:0.5});
+    }, "#plug");
+
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Creating an Animation Plugin For Overlay</h3>
+
+<h4>Setting Up The YUI Instance</h4>
+
+<p>For this example, we'll pull in the <code>overlay</code> module, along with the <code>anim</code> and <code>plugin</code> modules. The <code>anim</code> module provides the animation utility, and <code>plugin</code> will provide
+the <code>Plugin</code> base class which we'll extend to create our <code>AnimPlugin</code>. The code to set up our sandbox instance is shown below:</p>
+ 
+<div id="syntax-93c83f3302f4c97cb3eb76db7d73331f" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;overlay&quot;</span><span class="sy0">,</span> <span class="st0">&quot;anim&quot;</span><span class="sy0">,</span> <span class="st0">&quot;plugin&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">// We'll write our code here, after pulling in the default </span></div></li><li class="li1"><div class="de1">    <span class="co1">// Overlay widget, the Animation utility and the </span></div></li><li class="li1"><div class="de1">    <span class="co1">// Plugin base class</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#123;</span>...<span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">&quot;overlay&quot;</span><span class="sy0">,</span> <span class="st0">&quot;anim&quot;</span><span class="sy0">,</span> <span class="st0">&quot;plugin&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">// We'll write our code here, after pulling in the default </span>
+    <span class="co1">// Overlay widget, the Animation utility and the </span>
+    <span class="co1">// Plugin base class</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-93c83f3302f4c97cb3eb76db7d73331f-plain">YUI({...}).use("overlay", "anim", "plugin", function(Y) {
+    // We'll write our code here, after pulling in the default 
+    // Overlay widget, the Animation utility and the 
+    // Plugin base class
+});</textarea></div>
+<p>Using the <code>overlay</code> module will also pull down the default CSS required for overlay, on top of which we only need to add our required look/feel CSS for the example.</p>
+
+<h4>AnimPlugin Class Structure</h4>
+
+<p>The <code>AnimPlugin</code> class will extend the <code>Plugin</code> base class. Since <code>Plugin</code> derives from <code>Base</code>, we follow the same pattern we use for widgets and other utilities which extend Base to setup our new class.</p>
+
+<p>Namely:</p>
+
+<ul>
+    <li>Setting up the constructor to invoke the superclass constructor</li>
+    <li>Setting up a <code>NAME</code> property, to identify the class</li>
+    <li>Setting up the default attributes, using the <code>ATTRS</code> property</li>
+    <li>Providing prototype implementations for anything we want executed during initialization and destruction using the <code>initializer</code> and <code>destructor</code> lifecycle methods</li>
+</ul>
+    
+<p>Additionally, since this is a plugin, we provide a <code>NS</code> property for the class, which defines the property which will refer to the <code>AnimPlugin</code> instance on the host class (e.g. <code>overlay.fx</code> will be an instance of <code>AnimPlugin</code>)</p>.
+
+<p>This basic structure is shown below:</p>
+
+<div id="syntax-a5b618f3a09fbd2b9781a29c01926d24" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="coMULTI">/* Animation Plugin Constructor */</span></div></li><li class="li1"><div class="de1"><span class="kw2">function</span> AnimPlugin<span class="br0">&#40;</span>config<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    AnimPlugin.<span class="me1">superclass</span>.<span class="me1">constructor</span>.<span class="me1">apply</span><span class="br0">&#40;</span><span class="kw1">this</span><span class="sy0">,</span> arguments<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1"><span class="coMULTI">/* </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;* The namespace for the plugin. This will be the property on the widget, which will </span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;* reference the plugin instance, when it's plugged in</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;*/</span></div></li><li class="li2"><div class="de2">AnimPlugin.<span class="me1">NS</span> <span class="sy0">=</span> <span class="st0">&quot;fx&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;* The NAME of the AnimPlugin class. Used to prefix events generated</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;* by the plugin class.</span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;*/</span></div></li><li class="li1"><div class="de1">AnimPlugin.<span class="kw3">NAME</span> <span class="sy0">=</span> <span class="st0">&quot;animPlugin&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;* The default set of attributes for the AnimPlugin class.</span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;*/</span></div></li><li class="li1"><div class="de1">AnimPlugin.<span class="me1">ATTRS</span> <span class="sy0">=</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * Default duration. Used by the default animation implementations</span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li1"><div class="de1">    duration <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        value<span class="sy0">:</span> <span class="nu0">0.2</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="coMULTI">/*</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    * Default animation instance used for showing the widget (opacity fade-in)</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li1"><div class="de1">    animVisible <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        valueFn <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            ...</div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="coMULTI">/*</span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;    * Default animation instance used for hiding the widget (opacity fade-out)</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;    */</span></div></li><li class="li1"><div class="de1">    animHidden <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        valueFn <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            ...</div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="coMULTI">/*</span></div></li><li class="li2"><div class="de2"><span class="coMULTI">&nbsp;* Extend the base plugin class</span></div></li><li class="li1"><div class="de1"><span class="coMULTI">&nbsp;*/</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">extend</span><span class="br0">&#40;</span>AnimPlugin<span class="sy0">,</span> Y.<span class="me1">Plugin</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Lifecycle methods</span></div></li><li class="li2"><div class="de2">    initializer <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>config<span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    destructor <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Other plugin specific methods</span></div></li><li class="li1"><div class="de1">    _uiAnimSetVisible <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">    _uiSetVisible <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    ...</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="coMULTI">/* Animation Plugin Constructor */</span>
+<span class="kw2">function</span> AnimPlugin<span class="br0">&#40;</span>config<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    AnimPlugin.<span class="me1">superclass</span>.<span class="me1">constructor</span>.<span class="me1">apply</span><span class="br0">&#40;</span><span class="kw1">this</span><span class="sy0">,</span> arguments<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="coMULTI">/* 
+ * The namespace for the plugin. This will be the property on the widget, which will 
+ * reference the plugin instance, when it's plugged in
+ */</span>
+AnimPlugin.<span class="me1">NS</span> <span class="sy0">=</span> <span class="st0">&quot;fx&quot;</span><span class="sy0">;</span>
+&nbsp;
+<span class="coMULTI">/*
+ * The NAME of the AnimPlugin class. Used to prefix events generated
+ * by the plugin class.
+ */</span>
+AnimPlugin.<span class="kw3">NAME</span> <span class="sy0">=</span> <span class="st0">&quot;animPlugin&quot;</span><span class="sy0">;</span>
+&nbsp;
+<span class="coMULTI">/*
+ * The default set of attributes for the AnimPlugin class.
+ */</span>
+AnimPlugin.<span class="me1">ATTRS</span> <span class="sy0">=</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="coMULTI">/*
+     * Default duration. Used by the default animation implementations
+     */</span>
+    duration <span class="sy0">:</span> <span class="br0">&#123;</span>
+        value<span class="sy0">:</span> <span class="nu0">0.2</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="coMULTI">/*
+     * Default animation instance used for showing the widget (opacity fade-in)
+     */</span>
+    animVisible <span class="sy0">:</span> <span class="br0">&#123;</span>
+        valueFn <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            ...
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="coMULTI">/*
+     * Default animation instance used for hiding the widget (opacity fade-out)
+     */</span>
+    animHidden <span class="sy0">:</span> <span class="br0">&#123;</span>
+        valueFn <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            ...
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+<span class="coMULTI">/*
+ * Extend the base plugin class
+ */</span>
+Y.<span class="me1">extend</span><span class="br0">&#40;</span>AnimPlugin<span class="sy0">,</span> Y.<span class="me1">Plugin</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">// Lifecycle methods</span>
+    initializer <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>config<span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span>
+    destructor <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    <span class="co1">// Other plugin specific methods</span>
+    _uiAnimSetVisible <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span>
+    _uiSetVisible <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span> ... <span class="br0">&#125;</span><span class="sy0">,</span>
+    ...
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-a5b618f3a09fbd2b9781a29c01926d24-plain">/* Animation Plugin Constructor */
+function AnimPlugin(config) {
+    AnimPlugin.superclass.constructor.apply(this, arguments);
+}
+
+/* 
+ * The namespace for the plugin. This will be the property on the widget, which will 
+ * reference the plugin instance, when it's plugged in
+ */
+AnimPlugin.NS = "fx";
+
+/*
+ * The NAME of the AnimPlugin class. Used to prefix events generated
+ * by the plugin class.
+ */
+AnimPlugin.NAME = "animPlugin";
+
+/*
+ * The default set of attributes for the AnimPlugin class.
+ */
+AnimPlugin.ATTRS = {
+
+    /*
+     * Default duration. Used by the default animation implementations
+     */
+    duration : {
+        value: 0.2
+    },
+
+    /*
+     * Default animation instance used for showing the widget (opacity fade-in)
+     */
+    animVisible : {
+        valueFn : function() {
+            ...
+        }
+    },
+
+    /*
+     * Default animation instance used for hiding the widget (opacity fade-out)
+     */
+    animHidden : {
+        valueFn : function() {
+            ...
+        }
+    }
+}
+
+/*
+ * Extend the base plugin class
+ */
+Y.extend(AnimPlugin, Y.Plugin, {
+
+    // Lifecycle methods
+    initializer : function(config) { ... },
+    destructor : function() { ... },
+
+    // Other plugin specific methods
+    _uiAnimSetVisible : function(val) { ... },
+    _uiSetVisible : function(val) { ... },
+    ...
+});</textarea></div>
+<h4>Attributes: animVisible, animHidden</h4>
+
+<p>The <code>animVisible</code> and <code>animHidden</code> attributes use Attribute's <code>valueFn</code> support to set up instance based default values for the attributes.</p>
+
+<p>The <code>animHidden</code> attribute is pretty straight forward and simply returns the Animation instance bound to the bounding box of the Overlay to provide a fade-out animation:</p>
+
+<div id="syntax-eaec57acaf58a9e18fe457fac30aedcd" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">animHidden <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    valueFn <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">return</span> <span class="kw2">new</span> Y.<span class="me1">Anim</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            node<span class="sy0">:</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;host&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            to<span class="sy0">:</span> <span class="br0">&#123;</span> opacity<span class="sy0">:</span> <span class="nu0">0</span> <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            duration<span class="sy0">:</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;duration&quot;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">animHidden <span class="sy0">:</span> <span class="br0">&#123;</span>
+    valueFn <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">return</span> <span class="kw2">new</span> Y.<span class="me1">Anim</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+            node<span class="sy0">:</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;host&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+            to<span class="sy0">:</span> <span class="br0">&#123;</span> opacity<span class="sy0">:</span> <span class="nu0">0</span> <span class="br0">&#125;</span><span class="sy0">,</span>
+            duration<span class="sy0">:</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;duration&quot;</span><span class="br0">&#41;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-eaec57acaf58a9e18fe457fac30aedcd-plain">animHidden : {
+    valueFn : function() {
+        return new Y.Anim({
+            node: this.get("host").get("boundingBox"),
+            to: { opacity: 0 },
+            duration: this.get("duration")
+        });
+    }
+}</textarea></div>
+<p>The <code>animVisible</code> attribute is a little more interesting:</p>
+
+<div id="syntax-587c50a195ecfb60b1ed77bf9179b6db" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">animVisible <span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    valueFn <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> host <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;host&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            boundingBox <span class="sy0">=</span> host.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> anim <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Anim</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            node<span class="sy0">:</span> boundingBox<span class="sy0">,</span></div></li><li class="li1"><div class="de1">            to<span class="sy0">:</span> <span class="br0">&#123;</span> opacity<span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            duration<span class="sy0">:</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;duration&quot;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Set initial opacity, to avoid initial flicker</span></div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>host.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;visible&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">            boundingBox.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;opacity&quot;</span><span class="sy0">,</span> <span class="nu0">0</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Clean up, on destroy. Where supported, remove</span></div></li><li class="li1"><div class="de1">        <span class="co1">// opacity set using style. Else make 100% opaque</span></div></li><li class="li2"><div class="de2">        anim.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;destroy&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">if</span> <span class="br0">&#40;</span>Y.<span class="me1">UA</span>.<span class="me1">ie</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="br0">&#41;</span>.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;opacity&quot;</span><span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">                <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="br0">&#41;</span>.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;opacity&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw1">return</span> anim<span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">animVisible <span class="sy0">:</span> <span class="br0">&#123;</span>
+    valueFn <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+        <span class="kw2">var</span> host <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;host&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+            boundingBox <span class="sy0">=</span> host.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw2">var</span> anim <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Anim</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+            node<span class="sy0">:</span> boundingBox<span class="sy0">,</span>
+            to<span class="sy0">:</span> <span class="br0">&#123;</span> opacity<span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">&#125;</span><span class="sy0">,</span>
+            duration<span class="sy0">:</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;duration&quot;</span><span class="br0">&#41;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">// Set initial opacity, to avoid initial flicker</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>host.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;visible&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            boundingBox.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;opacity&quot;</span><span class="sy0">,</span> <span class="nu0">0</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+        <span class="co1">// Clean up, on destroy. Where supported, remove</span>
+        <span class="co1">// opacity set using style. Else make 100% opaque</span>
+        anim.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;destroy&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">if</span> <span class="br0">&#40;</span>Y.<span class="me1">UA</span>.<span class="me1">ie</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+                <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="br0">&#41;</span>.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;opacity&quot;</span><span class="sy0">,</span> <span class="nu0">1</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+                <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;node&quot;</span><span class="br0">&#41;</span>.<span class="me1">setStyle</span><span class="br0">&#40;</span><span class="st0">&quot;opacity&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="kw1">return</span> anim<span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-587c50a195ecfb60b1ed77bf9179b6db-plain">animVisible : {
+    valueFn : function() {
+
+        var host = this.get("host"),
+            boundingBox = host.get("boundingBox");
+
+        var anim = new Y.Anim({
+            node: boundingBox,
+            to: { opacity: 1 },
+            duration: this.get("duration")
+        });
+
+        // Set initial opacity, to avoid initial flicker
+        if (!host.get("visible")) {
+            boundingBox.setStyle("opacity", 0);
+        }
+
+        // Clean up, on destroy. Where supported, remove
+        // opacity set using style. Else make 100% opaque
+        anim.on("destroy", function() {
+            if (Y.UA.ie) {
+                this.get("node").setStyle("opacity", 1);
+            } else {
+                this.get("node").setStyle("opacity", "");
+            }
+        });
+
+        return anim;
+    }
+}</textarea></div>
+<p>It essentially does the same thing as <code>animHidden</code>; setting up an Animation instance to provide an opacity based fade-in. However it also sets up a listener which will attempt to cleanup the opacity state of the Overlay when the plugin is unplugged from the Overlay. When a plugin is unplugged, it is destroyed.</p>
+
+<h4>Lifecycle Methods: initializer, destructor</h4>
+
+<p>In the <code>initializer</code>, we set up listeners on the animation instances (using <code>_bindAnimVisible, _bindAnimHidden</code>), which invoke the original visibility handling to make the Overlay visible before starting the <code>animVisible</code> animation and hide it after the <code>animHidden</code> animation is complete.</p>
+
+<div id="syntax-7c943562ae1b1a2e3732ac09aba0b58d" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">initializer <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>config<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._bindAnimVisible<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>._bindAnimHidden<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="kw1">this</span>.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;animVisibleChange&quot;</span><span class="sy0">,</span> <span class="kw1">this</span>._bindAnimVisible<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;animHiddenChange&quot;</span><span class="sy0">,</span> <span class="kw1">this</span>._bindAnimHidden<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Override default _uiSetVisible method, with custom animated method</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">doBefore</span><span class="br0">&#40;</span><span class="st0">&quot;_uiSetVisible&quot;</span><span class="sy0">,</span> <span class="kw1">this</span>._uiAnimSetVisible<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">...</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">_bindAnimVisible <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    <span class="kw2">var</span> animVisible <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animVisible&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    animVisible.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;start&quot;</span><span class="sy0">,</span> Y.<span class="me1">bind</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// Setup original visibility handling (for show) before starting to animate</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>._uiSetVisible<span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">_bindAnimHidden <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> animHidden <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animHidden&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    animHidden.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;end&quot;</span><span class="sy0">,</span> Y.<span class="me1">bind</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="co1">// Setup original visibility handling (for hide) after completing animation</span></div></li><li class="li1"><div class="de1">        <span class="kw1">this</span>._uiSetVisible<span class="br0">&#40;</span><span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">initializer <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>config<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>._bindAnimVisible<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw1">this</span>._bindAnimHidden<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">this</span>.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;animVisibleChange&quot;</span><span class="sy0">,</span> <span class="kw1">this</span>._bindAnimVisible<span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw1">this</span>.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;animHiddenChange&quot;</span><span class="sy0">,</span> <span class="kw1">this</span>._bindAnimHidden<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Override default _uiSetVisible method, with custom animated method</span>
+    <span class="kw1">this</span>.<span class="me1">doBefore</span><span class="br0">&#40;</span><span class="st0">&quot;_uiSetVisible&quot;</span><span class="sy0">,</span> <span class="kw1">this</span>._uiAnimSetVisible<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span>
+&nbsp;
+...
+&nbsp;
+_bindAnimVisible <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> animVisible <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animVisible&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    animVisible.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;start&quot;</span><span class="sy0">,</span> Y.<span class="me1">bind</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="co1">// Setup original visibility handling (for show) before starting to animate</span>
+        <span class="kw1">this</span>._uiSetVisible<span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+_bindAnimHidden <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> animHidden <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animHidden&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    animHidden.<span class="me1">after</span><span class="br0">&#40;</span><span class="st0">&quot;end&quot;</span><span class="sy0">,</span> Y.<span class="me1">bind</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="co1">// Setup original visibility handling (for hide) after completing animation</span>
+        <span class="kw1">this</span>._uiSetVisible<span class="br0">&#40;</span><span class="kw2">false</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span> <span class="kw1">this</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-7c943562ae1b1a2e3732ac09aba0b58d-plain">initializer : function(config) {
+    this._bindAnimVisible();
+    this._bindAnimHidden();
+
+    this.after("animVisibleChange", this._bindAnimVisible);
+    this.after("animHiddenChange", this._bindAnimHidden);
+
+    // Override default _uiSetVisible method, with custom animated method
+    this.doBefore("_uiSetVisible", this._uiAnimSetVisible);
+}
+
+...
+
+_bindAnimVisible : function() {
+    var animVisible = this.get("animVisible");
+
+    animVisible.on("start", Y.bind(function() {
+        // Setup original visibility handling (for show) before starting to animate
+        this._uiSetVisible(true);
+    }, this));
+},
+
+_bindAnimHidden : function() {
+    var animHidden = this.get("animHidden");
+
+    animHidden.after("end", Y.bind(function() {
+        // Setup original visibility handling (for hide) after completing animation
+        this._uiSetVisible(false);
+    }, this));
+}</textarea></div>
+<p>
+However the key part of the <code>initializer</code> method is the call to <code>this.doBefore("_uiSetVisible", this._uiAnimSetVisible)</code> <em>(line 9)</em>. <code>Plugin</code>'s <code>doBefore</code> and <code>doAfter</code> methods, will let you set up both before/after event listeners, as well as inject code to be executed before or after a given method on the host object (in this case the Overlay) is invoked.
+</p>
+<p>
+For the animation plugin, we want to change how the Overlay updates its UI in response to changes to the <code>visible</code> attribute. Instead of simply flipping visibility (through the application of the <code>yui-overlay-hidden</code> class), we want to fade the Overlay in and out. Therefore, we inject our custom animation method, <code>_uiSetAnimVisible</code>, before the Overlay's <code>_uiSetVisible</code>.
+</p>
+
+<p>Using <code>Plugin</code>'s <code>doBefore/doAfter</code> methods to setup any event listeners and method injection code on the host object (Overlay), ensures that the custom behavior is removed when the plugin is unplugged from the host, restoring it's original behavior.</p>
+
+<p>The <code>destructor</code> simply calls <code>destroy</code> on the animation instances used, and lets them perform their own cleanup (as defined in the discussion on attributes):</p>
+
+<div id="syntax-0f9397ef7bdede6818b8d5d56618cbe9" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">destructor <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animVisible&quot;</span><span class="br0">&#41;</span>.<span class="me1">destroy</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animHidden&quot;</span><span class="br0">&#41;</span>.<span class="me1">destroy</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">destructor <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animVisible&quot;</span><span class="br0">&#41;</span>.<span class="me1">destroy</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animHidden&quot;</span><span class="br0">&#41;</span>.<span class="me1">destroy</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span></pre></div><textarea id="syntax-0f9397ef7bdede6818b8d5d56618cbe9-plain">destructor : function() {
+    this.get("animVisible").destroy();
+    this.get("animHidden").destroy();
+},</textarea></div>
+<h4>The Animated Visibility Method</h4>
+
+<p>The <code>_uiAnimSetVisible</code> method is the method we use to over-ride the default visibility handling for the Overlay. Instead of simply adding or removing the <code>yui-overlay-hidden</code> class, it starts the appropriate animation depending on whether or not visible is being set to true or false:</p>
+
+<div id="syntax-0a76d8a9e2ccd177b3b737fa96f00322" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">_uiAnimSetVisible <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;host&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;rendered&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">if</span> <span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animHidden&quot;</span><span class="br0">&#41;</span>.<span class="kw3">stop</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">            <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animVisible&quot;</span><span class="br0">&#41;</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animVisible&quot;</span><span class="br0">&#41;</span>.<span class="kw3">stop</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animHidden&quot;</span><span class="br0">&#41;</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">        <span class="kw1">return</span> <span class="kw2">new</span> Y.<span class="kw1">Do</span>.<span class="me1">Halt</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">_uiAnimSetVisible <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;host&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;rendered&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animHidden&quot;</span><span class="br0">&#41;</span>.<span class="kw3">stop</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animVisible&quot;</span><span class="br0">&#41;</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+            <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animVisible&quot;</span><span class="br0">&#41;</span>.<span class="kw3">stop</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;animHidden&quot;</span><span class="br0">&#41;</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+        <span class="kw1">return</span> <span class="kw2">new</span> Y.<span class="kw1">Do</span>.<span class="me1">Halt</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-0a76d8a9e2ccd177b3b737fa96f00322-plain">_uiAnimSetVisible : function(val) {
+    if (this.get("host").get("rendered")) {
+        if (val) {
+            this.get("animHidden").stop();
+            this.get("animVisible").run();
+        } else {
+            this.get("animVisible").stop();
+            this.get("animHidden").run();
+        }
+        return new Y.Do.Halt();
+    }
+}</textarea></div>
+<p>Since this method is injected before the default method which handles visibility changes for Overlay (<code>_uiSetVisibility</code>), we invoke <code>Y.Do.Halt()</code> to prevent the original method from being invoked, since we'd like to invoke it in response to the animation starting or completing. 
+<code>Y.Do</code> is YUI's aop infrastructure and is used under the hood by Plugin's <code>doBefore</code> and <code>doAfter</code> methods when injecting code</p>.
+
+<h4>The Original Visibility Method</h4>
+
+<p>The original visiblity handling for Overlay is replicated in the <code>AnimPlugin</code>'s <code>_uiSetVisible</code> method and is invoked before starting the <code>animVisible</code> animation and after completing the <code>animHidden</code> animation as described above.</p>
+
+<div id="syntax-5ea7b7b40f8aef7c77e1ad3e5ff6f796" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">_uiSetVisible <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> host <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;host&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        host.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span>.<span class="me1">addClass</span><span class="br0">&#40;</span>host.<span class="me1">getClassName</span><span class="br0">&#40;</span><span class="st0">&quot;hidden&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        host.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span>host.<span class="me1">getClassName</span><span class="br0">&#40;</span><span class="st0">&quot;hidden&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">_uiSetVisible <span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> host <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;host&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span><span class="sy0">!</span>val<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        host.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span>.<span class="me1">addClass</span><span class="br0">&#40;</span>host.<span class="me1">getClassName</span><span class="br0">&#40;</span><span class="st0">&quot;hidden&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+        host.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;boundingBox&quot;</span><span class="br0">&#41;</span>.<span class="me1">removeClass</span><span class="br0">&#40;</span>host.<span class="me1">getClassName</span><span class="br0">&#40;</span><span class="st0">&quot;hidden&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-5ea7b7b40f8aef7c77e1ad3e5ff6f796-plain">_uiSetVisible : function(val) {
+    var host = this.get("host");
+    if (!val) {
+        host.get("boundingBox").addClass(host.getClassName("hidden"));
+    } else {
+        host.get("boundingBox").removeClass(host.getClassName("hidden"));
+    }
+}</textarea></div>
+<p><strong>NOTE:</strong> We're evaluating whether or not <code>Y.Do</code> may provide access to the original method for a future release, which would make this replicated code unnecessary.</p>
+
+<h4>Using The Plugin</h4>
+
+<p>All objects which derive from <a href="../../api/Base.html">Base</a> are <a href="../../api/Plugin.Host.html">Plugin Hosts</a>. They provide <code>plug</code> and <code>unplug</code> methods to allow users to add/remove plugins to/from existing instances. They also allow the user to specify the set of plugins to be applied to a new instance, along with their configurations, as part of the constructor arguments:</p>
+
+<div id="syntax-a86939f2d56c43d2d7b2f5c65a6f0a72" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> overlay <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Overlay</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    contentBox<span class="sy0">:</span> <span class="st0">&quot;#overlay&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    width<span class="sy0">:</span><span class="st0">&quot;10em&quot;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    height<span class="sy0">:</span><span class="st0">&quot;10em&quot;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">    visible<span class="sy0">:</span><span class="kw2">false</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    shim<span class="sy0">:</span><span class="kw2">false</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    align<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        node<span class="sy0">:</span> <span class="st0">&quot;#show&quot;</span><span class="sy0">,</span> </div></li><li class="li1"><div class="de1">        points<span class="sy0">:</span> <span class="br0">&#91;</span><span class="st0">&quot;tl&quot;</span><span class="sy0">,</span> <span class="st0">&quot;bl&quot;</span><span class="br0">&#93;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    plugins <span class="sy0">:</span> <span class="br0">&#91;</span><span class="br0">&#123;</span>fn<span class="sy0">:</span>AnimPlugin<span class="sy0">,</span> cfg<span class="sy0">:</span><span class="br0">&#123;</span>duration<span class="sy0">:</span><span class="nu0">2</span><span class="br0">&#125;</span><span class="br0">&#125;</span><span class="br0">&#93;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">overlay.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> overlay <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Overlay</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+    contentBox<span class="sy0">:</span> <span class="st0">&quot;#overlay&quot;</span><span class="sy0">,</span>
+    width<span class="sy0">:</span><span class="st0">&quot;10em&quot;</span><span class="sy0">,</span>
+    height<span class="sy0">:</span><span class="st0">&quot;10em&quot;</span><span class="sy0">,</span>
+    visible<span class="sy0">:</span><span class="kw2">false</span><span class="sy0">,</span>
+    shim<span class="sy0">:</span><span class="kw2">false</span><span class="sy0">,</span>
+    align<span class="sy0">:</span> <span class="br0">&#123;</span>
+        node<span class="sy0">:</span> <span class="st0">&quot;#show&quot;</span><span class="sy0">,</span> 
+        points<span class="sy0">:</span> <span class="br0">&#91;</span><span class="st0">&quot;tl&quot;</span><span class="sy0">,</span> <span class="st0">&quot;bl&quot;</span><span class="br0">&#93;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+    plugins <span class="sy0">:</span> <span class="br0">&#91;</span><span class="br0">&#123;</span>fn<span class="sy0">:</span>AnimPlugin<span class="sy0">,</span> cfg<span class="sy0">:</span><span class="br0">&#123;</span>duration<span class="sy0">:</span><span class="nu0">2</span><span class="br0">&#125;</span><span class="br0">&#125;</span><span class="br0">&#93;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+overlay.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-a86939f2d56c43d2d7b2f5c65a6f0a72-plain">var overlay = new Y.Overlay({
+    contentBox: "#overlay",
+    width:"10em",
+    height:"10em",
+    visible:false,
+    shim:false,
+    align: {
+        node: "#show", 
+        points: ["tl", "bl"]
+    },
+    plugins : [{fn:AnimPlugin, cfg:{duration:2}}]
+});
+overlay.render();</textarea></div>
+<p>We use the constructor support to setup the <code>AnimPlugin</code> for the instance with a custom value for its <code>duration</code> attribute as shown on line 11 above.</p>
+
+<p><strong>NOTE:</strong> In the interests of keeping the example focused on the plugin infrastructure, we turn off shimming for the overlay. If we needed to enable shimming, In IE6, we'd need to remove the alpha opacity filter set on the shim while animating, to have IE animate the contents of the Overlay correctly.</p>
+
+<p>The example also uses the <code>plug</code> and <code>unplug</code> methods, to add and remove the custom animation behavior after the instance is created:</p>
+
+<div id="syntax-b492778ed25babd5ea2a9f5945867c31" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">// Listener for the &quot;Unplug AnimPlugin&quot; button, </span></div></li><li class="li1"><div class="de1"><span class="co1">// removes the AnimPlugin from the overlay instance</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    overlay.<span class="me1">unplug</span><span class="br0">&#40;</span><span class="st0">&quot;fx&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#unplug&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// Listener for the &quot;Plug AnimPlugin&quot; button, </span></div></li><li class="li1"><div class="de1"><span class="co1">// removes the AnimPlugin from the overlay instance, </span></div></li><li class="li1"><div class="de1"><span class="co1">// and re-adds it with a new, shorter duration value.</span></div></li><li class="li2"><div class="de2">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    overlay.<span class="me1">unplug</span><span class="br0">&#40;</span><span class="st0">&quot;fx&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    overlay.<span class="me1">plug</span><span class="br0">&#40;</span>AnimPlugin<span class="sy0">,</span> <span class="br0">&#123;</span>duration<span class="sy0">:</span><span class="nu0">0.5</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#plug&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">// Listener for the &quot;Unplug AnimPlugin&quot; button, </span>
+<span class="co1">// removes the AnimPlugin from the overlay instance</span>
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    overlay.<span class="me1">unplug</span><span class="br0">&#40;</span><span class="st0">&quot;fx&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#unplug&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Listener for the &quot;Plug AnimPlugin&quot; button, </span>
+<span class="co1">// removes the AnimPlugin from the overlay instance, </span>
+<span class="co1">// and re-adds it with a new, shorter duration value.</span>
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    overlay.<span class="me1">unplug</span><span class="br0">&#40;</span><span class="st0">&quot;fx&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    overlay.<span class="me1">plug</span><span class="br0">&#40;</span>AnimPlugin<span class="sy0">,</span> <span class="br0">&#123;</span>duration<span class="sy0">:</span><span class="nu0">0.5</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#plug&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-b492778ed25babd5ea2a9f5945867c31-plain">// Listener for the "Unplug AnimPlugin" button, 
+// removes the AnimPlugin from the overlay instance
+Y.on("click", function() {
+    overlay.unplug("fx");
+}, "#unplug");
+
+// Listener for the "Plug AnimPlugin" button, 
+// removes the AnimPlugin from the overlay instance, 
+// and re-adds it with a new, shorter duration value.
+Y.on("click", function() {
+    overlay.unplug("fx");
+    overlay.plug(AnimPlugin, {duration:0.5});
+}, "#plug");</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Overlay Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../overlay/overlay-xy.html'>Basic XY Positioning</a></li><li><a href='../overlay/overlay-align.html'>Alignment Support</a></li><li><a href='../overlay/overlay-stack.html'>Stack Support</a></li><li><a href='../overlay/overlay-stdmod.html'>Standard Module Support</a></li><li><a href='../overlay/overlay-constrain.html'>Constrain Support</a></li><li><a href='../overlay/overlay-io-plugin.html'>IO Plugin</a></li><li class='selected'><a href='../overlay/overlay-anim-plugin.html'>Animation Plugin</a></li><li><a href='../node-focusmanager/node-focusmanager-3.html'>Accessible Menu Button (included with examples for Focus Manager Node Plugin)</a></li><li><a href='../stylesheet/stylesheet_theme.html'>Adjusting a page theme on the fly (included with examples for StyleSheet)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Overlay Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/overlay/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_overlay.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="selected "><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

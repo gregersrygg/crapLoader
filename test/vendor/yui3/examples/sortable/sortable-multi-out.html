@@ -1,0 +1,280 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Sortable List Utility: Multiple Sortable Lists - Outer Join</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+
+<!--there is no custom header content for this example-->
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Sortable List Utility: Multiple Sortable Lists - Outer Join</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Sortable List Utility: Multiple Sortable Lists - Outer Join</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example makes multiple sortable lists that are outer joined together. In the example below you will see 2 lists. Both lists are sortable, but List #1 can move its items into List #2 and they become sortable. However, List #2 <strong>can not</strong> move its items into List #1.</p>
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="sortable-multi-out_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<style>
+    #demo {
+        float: none;
+        border: 1px solid black;
+    }
+    #demo li {
+        background-image: none;
+        list-style-type: none;
+        padding: 3px;
+        width: 150px;
+        border: 1px solid black;
+        margin: 3px;
+        background-color: #8DD5E7;
+    }
+    #demo h3 {
+        color: #000;
+    }
+</style>
+
+<div id="demo" class="yui-g">
+    <div class="yui-u first">
+        <h3>List #1</h3>
+        <ul id="list1">
+            <li>Item #1.1</li>
+            <li>Item #1.2</li>
+            <li>Item #1.3</li>
+            <li>Item #1.4</li>
+            <li>Item #1.5</li>
+            <li>Item #1.6</li>
+            <li>Item #1.7</li>
+            <li>Item #1.8</li>
+            <li>Item #1.9</li>
+            <li>Item #1.10</li>
+        </ul>
+	</div>
+    <div class="yui-u">
+        <h3>List #2</h3>
+        <ul id="list2">
+            <li>Item #2.1</li>
+            <li>Item #2.2</li>
+            <li>Item #2.3</li>
+            <li>Item #2.4</li>
+            <li>Item #2.5</li>
+            <li>Item #2.6</li>
+            <li>Item #2.7</li>
+            <li>Item #2.8</li>
+            <li>Item #2.9</li>
+            <li>Item #2.10</li>
+        </ul>
+	</div>
+</div>
+
+<script>
+
+YUI().use('dd-constrain', 'sortable', function(Y) {
+    var list1 = new Y.Sortable({
+        container: '#list1',
+        nodes: 'li',
+        opacity: '.1',
+        moveType: 'move'
+    });
+    list1.delegate.dd.plug(Y.Plugin.DDConstrained, {
+        constrain2node: '#demo'
+    });
+
+    var list2 = new Y.Sortable({
+        container: '#list2',
+        nodes: 'li',
+        opacity: '.1',
+        moveType: 'move'
+    });
+    list2.delegate.dd.plug(Y.Plugin.DDConstrained, {
+        constrain2node: '#demo'
+    });
+
+
+    list1.join(list2, 'outer');
+});
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<p><strong>Note: When using an outer or inner joined list, you must pick a moveType of 'move' or 'copy', the default 'swap' won't give you the results you expect.</strong></p>
+<p>This example assumes that you have seen the Multiple Sortable Lists - Full Join example and continues from there.</p>
+
+<h3>Joining the lists</h3>
+<p>After creating the <code>Sortable</code> lists, we will do an <code>outer</code> join. Joining <code>list1</code> with <code>list2</code> on the outside.
+But first we need to choose a <code>moveType</code>. The <code>moveType</code> will determine how an item is moved from one list to another: <code>swap</code>, <code>move</code> or <code>copy</code>. For this example we are using the <code>move</code> type.</p>
+<div id="syntax-ee240e505c00c78aeed1c8c2665ff503" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">    <span class="kw2">var</span> list1 <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Sortable</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        container<span class="sy0">:</span> <span class="st0">'#list1'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        nodes<span class="sy0">:</span> <span class="st0">'li'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        opacity<span class="sy0">:</span> <span class="st0">'.1'</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        moveType<span class="sy0">:</span> <span class="st0">'move'</span> <span class="co1">//This is important</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">    <span class="kw2">var</span> list1 <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Sortable</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+        container<span class="sy0">:</span> <span class="st0">'#list1'</span><span class="sy0">,</span>
+        nodes<span class="sy0">:</span> <span class="st0">'li'</span><span class="sy0">,</span>
+        opacity<span class="sy0">:</span> <span class="st0">'.1'</span><span class="sy0">,</span>
+        moveType<span class="sy0">:</span> <span class="st0">'move'</span> <span class="co1">//This is important</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-ee240e505c00c78aeed1c8c2665ff503-plain">    var list1 = new Y.Sortable({
+        container: '#list1',
+        nodes: 'li',
+        opacity: '.1',
+        moveType: 'move' //This is important
+    });</textarea></div>
+<div id="syntax-8b905431aee35a881d58369d0a588235" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">    list1.<span class="me1">join</span><span class="br0">&#40;</span>list2<span class="sy0">,</span> <span class="st0">'outer'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">    list1.<span class="me1">join</span><span class="br0">&#40;</span>list2<span class="sy0">,</span> <span class="st0">'outer'</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-8b905431aee35a881d58369d0a588235-plain">    list1.join(list2, 'outer');</textarea></div>
+<h3>Full Example Source</h3>
+<div id="syntax-98a761f0dfcb7b28b668ad96a78363a1" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-constrain'</span><span class="sy0">,</span> <span class="st0">'sortable'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> list1 <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Sortable</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        container<span class="sy0">:</span> <span class="st0">'#list1'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        nodes<span class="sy0">:</span> <span class="st0">'li'</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        opacity<span class="sy0">:</span> <span class="st0">'.1'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        moveType<span class="sy0">:</span> <span class="st0">'move'</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    list1.<span class="me1">delegate</span>.<span class="me1">dd</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">DDConstrained</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        constrain2node<span class="sy0">:</span> <span class="st0">'#demo'</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> list2 <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Sortable</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        container<span class="sy0">:</span> <span class="st0">'#list2'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        nodes<span class="sy0">:</span> <span class="st0">'li'</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        opacity<span class="sy0">:</span> <span class="st0">'.1'</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    list2.<span class="me1">delegate</span>.<span class="me1">dd</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">DDConstrained</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        constrain2node<span class="sy0">:</span> <span class="st0">'#demo'</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    list1.<span class="me1">join</span><span class="br0">&#40;</span>list2<span class="sy0">,</span> <span class="st0">'outer'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'dd-constrain'</span><span class="sy0">,</span> <span class="st0">'sortable'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> list1 <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Sortable</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+        container<span class="sy0">:</span> <span class="st0">'#list1'</span><span class="sy0">,</span>
+        nodes<span class="sy0">:</span> <span class="st0">'li'</span><span class="sy0">,</span>
+        opacity<span class="sy0">:</span> <span class="st0">'.1'</span><span class="sy0">,</span>
+        moveType<span class="sy0">:</span> <span class="st0">'move'</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    list1.<span class="me1">delegate</span>.<span class="me1">dd</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">DDConstrained</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+        constrain2node<span class="sy0">:</span> <span class="st0">'#demo'</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw2">var</span> list2 <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">Sortable</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
+        container<span class="sy0">:</span> <span class="st0">'#list2'</span><span class="sy0">,</span>
+        nodes<span class="sy0">:</span> <span class="st0">'li'</span><span class="sy0">,</span>
+        opacity<span class="sy0">:</span> <span class="st0">'.1'</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    list2.<span class="me1">delegate</span>.<span class="me1">dd</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">DDConstrained</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+        constrain2node<span class="sy0">:</span> <span class="st0">'#demo'</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+&nbsp;
+    list1.<span class="me1">join</span><span class="br0">&#40;</span>list2<span class="sy0">,</span> <span class="st0">'outer'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-98a761f0dfcb7b28b668ad96a78363a1-plain">YUI().use('dd-constrain', 'sortable', function(Y) {
+    var list1 = new Y.Sortable({
+        container: '#list1',
+        nodes: 'li',
+        opacity: '.1',
+        moveType: 'move'
+    });
+    list1.delegate.dd.plug(Y.Plugin.DDConstrained, {
+        constrain2node: '#demo'
+    });
+
+    var list2 = new Y.Sortable({
+        container: '#list2',
+        nodes: 'li',
+        opacity: '.1'
+    });
+    list2.delegate.dd.plug(Y.Plugin.DDConstrained, {
+        constrain2node: '#demo'
+    });
+
+
+    list1.join(list2, 'outer');
+});</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Sortable List Utility Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../sortable/simple-sortable.html'>Simple Sortable List</a></li><li><a href='../sortable/sortable-float.html'>Simple Sortable List - Floated Nodes</a></li><li><a href='../sortable/sortable-multi.html'>Multiple Sortable Lists - Separate</a></li><li><a href='../sortable/sortable-multi-full.html'>Multiple Sortable Lists - Full Join</a></li><li class='selected'><a href='../sortable/sortable-multi-out.html'>Multiple Sortable Lists - Outer Join</a></li><li><a href='../sortable/sortable-multi-in.html'>Multiple Sortable Lists - Inner Join</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Sortable List Utility Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/sortable/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_sortable.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="selected "><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

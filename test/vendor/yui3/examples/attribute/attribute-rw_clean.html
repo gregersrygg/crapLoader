@@ -1,0 +1,203 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Read-Only and Write-Once Attributes</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+    .example-out .myclass-attrs {
+        font-family:courier;
+        margin-top:2px;
+    }
+
+    .example-out .myclass-title {
+        font-weight:bold;
+        font-family:arial;
+        color:#8dd5e7;
+        margin-top:5px;
+        margin-bottom:3px;
+    }
+
+    .example-out {
+        overflow:auto;
+        border:1px solid #000;
+        color:#ffffff;
+        background-color:#004C6D;
+        margin-top:5px;
+        margin-bottom:20px;
+        height:8em;
+        padding:2px 2px 2px 5px;
+    }
+    
+    #writeInitial label, #writeAgain label, #writeInternally label {
+        font-weight:900;
+    }
+
+    #writeInitial .fooVal, #writeAgain .fooVal, #writeInternally .fooVal {
+        width:9em;
+    }
+
+    #writeInitial .barVal, #writeAgain .barVal, #writeInternally .barVal {
+        width:9em;
+    }
+
+    #writeInitial p, #writeAgain p, #writeInternally p {
+        margin-top:0.2em;
+        margin-bottom:0.2em;
+        color:#004C6D;
+        font-size:108%;
+    }
+</style>
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Read-Only and Write-Once Attributes</h1>
+
+<div class="exampleIntro">
+	Attributes can be configured to be <code>readOnly</code>, stopping them from being modified by the end user, or <code>writeOnce</code> allowing them to be set by the end user, but only once. This example demonstrates how to setup attributes for your class as <code>readOnly</code> or <code>writeOnce</code> attributes, and shows how their behavior differs when the end user attempts to set their values.
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<div id="writeInitial">
+    <p>Construct o1, setting initial values for both foo and bar in the constructor: </p>
+    <label>foo: <input type="text" value="Initial Foo" class="fooVal"></label>
+    <label>bar: <input type="text" value="Initial Bar" class="barVal"></label>
+    <button type="button" class="do">Initial Values</button>
+    <div class="example-out"></div>
+</div>
+<div id="writeAgain">
+    <p>Try setting values again, after they've been set once: </p>
+    <label>foo: <input type="text" value="Set Foo Again" class="fooVal"></label>
+    <label>bar: <input type="text" value="Set Bar Again" class="barVal"></label>
+    <button type="button" class="do">Set Again</button>
+    <div class="example-out"></div>
+</div>
+<div id="writeInternally">
+    <p>Call a MyClass method, which sets foo internally (using _set): </p>
+    <label>foo: <input type="text" value="Set Foo Internally" class="fooVal"></label>
+    <button type="button" class="do">Set Internal</button>
+    <div class="example-out"></div>
+</div>
+
+<script type="text/javascript">
+YUI().use("node", "attribute", function(Y) {
+
+    // Setup a custom class with attribute support
+    function MyClass(cfg) {
+
+        var attrs = {
+            "foo" : {
+                value: "Default Foo",
+                readOnly: true
+            },
+     
+            "bar" : {
+                value: "Default Bar",
+                writeOnce: true
+            }
+        }
+
+        this.addAttrs(attrs, cfg);
+    }
+
+    MyClass.prototype.doSomething = function(val) {
+        // ... Do something which requires
+        // MyClass to change the value
+        // of foo ...
+
+        // Host code can reset value of 
+        // readOnly attributes interally,
+        // by working with the private _set
+        // property
+
+        this._set("foo", val);
+    };
+
+    Y.augment(MyClass, Y.Attribute);
+
+    function displayValues(o, title, node) {
+        var str = 
+            '<div class="myclass"><div class="myclass-title">' 
+            + title + 
+            '</div><ul class="myclass-attrs"><li>foo (readOnly): ' 
+            + o.get("foo") 
+            + '</li><li>bar (writeOnce): '
+            + o.get("bar")
+            + '</li></ul></div>';
+
+        Y.one(node).set("innerHTML", str);
+    }
+
+    var o1;
+
+    Y.on("click", function() {
+
+        var fooVal = Y.one("#writeInitial .fooVal").get("value");
+        var barVal = Y.one("#writeInitial .barVal").get("value");
+
+        o1 = new MyClass({
+            foo: fooVal,
+            bar: barVal
+        });
+
+        displayValues(o1, "Attempt to set initial values in constructor", "#writeInitial .example-out");
+
+    }, "#writeInitial .do");
+
+    Y.on("click", function() {
+
+        if (o1) {
+            var fooVal = Y.one("#writeAgain .fooVal").get("value");
+            var barVal = Y.one("#writeAgain .barVal").get("value");
+
+            // Attempt to reset values:
+            o1.set("foo", fooVal);
+            o1.set("bar", barVal);
+    
+            displayValues(o1, "Attempt to set values again, using set", "#writeAgain .example-out");
+        }
+
+    }, "#writeAgain .do");
+
+    Y.on("click", function() {
+
+        if (o1) {
+            var val = Y.one("#writeInternally .fooVal").get("value");
+            // Call method, which sets foo internally...
+            o1.doSomething(val);
+
+            displayValues(o1, "Set the value of foo (readOnly) internally", "#writeInternally .example-out");
+        }
+
+    }, "#writeInternally .do");
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

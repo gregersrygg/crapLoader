@@ -1,0 +1,255 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: CSS Grids: Using Units</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+
+<!--there is no custom header content for this example-->
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: CSS Grids: Using Units</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>CSS Grids: Using Units</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>YUI Grids comes with a number of predefined units for subdividing your layout.  These units are percentage-based, allowing for nesting and resizing.</p>
+	</div>	
+
+	<div class="module example-container  newWindow">
+			<div id="example-canvas" class="bd">
+
+		<p class="newWindowButton yui-skin-sam">
+        <span id="newWindowLink">
+            <span class="first-child">
+                <a href="cssgrids-units_source.html" target="_blank">View example in new window.</a>
+            </span>
+        </span>	
+    </p>
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<p>Creating a layout using grids requires a <code>yui3-g</code> container and any number of <code>yui3-u-*</code> units.  To create a layout that splits the units 50/50, use <code>yui3-u-1-2</code> units.</p>
+
+<h5>Note</h5>
+<p>The only child elements (e.g. direct descendants) of a <code>yui3-g</code> should be <code>yui-3-u-*</code> elements. Any elements within a <code>yui3-g</code> need to be wrapped in a <code>yui3-u-*</code> of some kind, otherwise you may experience side-effects due to the layout system being used.</p>
+<h4>Basic Markup Structure</h4>
+
+<div id="syntax-ad75c68cf74695175871e1cec307bf9f" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-g&quot;</span><span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-u-1-2&quot;</span><span class="sy0">&gt;&lt;/</span>div<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-u-1-2&quot;</span><span class="sy0">&gt;&lt;/</span>div<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1"><span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-g&quot;</span><span class="sy0">&gt;</span>
+    <span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-u-1-2&quot;</span><span class="sy0">&gt;&lt;/</span>div<span class="sy0">&gt;</span>
+    <span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-u-1-2&quot;</span><span class="sy0">&gt;&lt;/</span>div<span class="sy0">&gt;</span>
+<span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></pre></div><textarea id="syntax-ad75c68cf74695175871e1cec307bf9f-plain"><div class="yui3-g">
+    <div class="yui3-u-1-2"></div>
+    <div class="yui3-u-1-2"></div>
+</div></textarea></div>
+<h4>Provide a Content Container</h4>
+<p>Styling should be applied to a container within the unit, rather than the unit itself.  This allows you to set borders, padding, margins (gutters), etc. without worrying about breaking the layout.  For this demo we will give the content a class of <code>content</code>, but can be called whatever you like.</p>
+<div id="syntax-9c35a9a56a5b8b616bb442a7cc85ec39" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-g&quot;</span><span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-u-1-2&quot;</span><span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;content&quot;</span><span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-u-1-2&quot;</span><span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;content&quot;</span><span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1"><span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-g&quot;</span><span class="sy0">&gt;</span>
+    <span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-u-1-2&quot;</span><span class="sy0">&gt;</span>
+        <span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;content&quot;</span><span class="sy0">&gt;</span>
+&nbsp;
+        <span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span>
+    <span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span>
+    <span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-u-1-2&quot;</span><span class="sy0">&gt;</span>
+        <span class="sy0">&lt;</span>div <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;content&quot;</span><span class="sy0">&gt;</span>
+&nbsp;
+        <span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span>
+    <span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span>
+<span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></pre></div><textarea id="syntax-9c35a9a56a5b8b616bb442a7cc85ec39-plain"><div class="yui3-g">
+    <div class="yui3-u-1-2">
+        <div class="content">
+
+        </div>
+    </div>
+    <div class="yui3-u-1-2">
+        <div class="content">
+
+        </div>
+    </div>
+</div></textarea></div>
+<h4>Adding a Gutter</h4>
+<p>All units align edge to edge, with zero space in between.  You can add space ("gutter"), by simply adding a margin to your content.  This is where additional content styling, such as borders, padding, colors, etc. can be applied as well.</p>
+<div id="syntax-483d897bb67a571ca1e6d82610825bb3" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sy0">&lt;</span>style<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">.<span class="me1">yui3</span><span class="sy0">-</span>g .<span class="me1">content</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    border<span class="sy0">:</span> 2px solid #000<span class="sy0">;</span></div></li><li class="li1"><div class="de1">    margin<span class="sy0">-</span>right<span class="sy0">:</span>10px<span class="sy0">;</span> <span class="co2">/* &quot;column&quot; gutters */</span></div></li><li class="li2"><div class="de2">    padding<span class="sy0">:</span> 1em<span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="sy0">&lt;/</span>style<span class="sy0">&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="sy0">&lt;</span>style<span class="sy0">&gt;</span>
+.<span class="me1">yui3</span><span class="sy0">-</span>g .<span class="me1">content</span> <span class="br0">&#123;</span>
+    border<span class="sy0">:</span> 2px solid #000<span class="sy0">;</span>
+    margin<span class="sy0">-</span>right<span class="sy0">:</span>10px<span class="sy0">;</span> <span class="co2">/* &quot;column&quot; gutters */</span>
+    padding<span class="sy0">:</span> 1em<span class="sy0">;</span>
+<span class="br0">&#125;</span>
+<span class="sy0">&lt;/</span>style<span class="sy0">&gt;</span></pre></div><textarea id="syntax-483d897bb67a571ca1e6d82610825bb3-plain"><style>
+.yui3-g .content {
+    border: 2px solid #000;
+    margin-right:10px; /* "column" gutters */
+    padding: 1em;
+}
+</style></textarea></div>
+<h4>Available Units</h4>
+
+<table class="auto">
+	<thead>
+		<tr class="odd">
+			<th>Class</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>.yui3-u</code></td>
+			<td>shrinks to fit content (unless given an explicit size)</td>
+		</tr>
+		<tr class="odd">
+			<td><code>.yui3-u-1</code></td>
+			<td>fills entire width of container</td>
+		</tr>
+		<tr>
+			<td><code>.yui3-u-1-2</code></td>
+			<td>fills 1/2 the container</td>
+		</tr>
+		<tr class="odd">
+			<td><code>.yui3-u-1-3</code></td>
+			<td>fills 1/3 the container</td>
+		</tr>
+		<tr>
+			<td><code>.yui3-u-2-3</code></td>
+			<td>fills 2/3 the container</td>
+		</tr>
+		<tr class="odd">
+			<td><code>.yui3-u-1-4</code></td>
+			<td>fills 1/4 the container</td>
+		</tr>
+		<tr>
+			<td><code>.yui3-u-3-4</code></td>
+			<td>fills 3/4 the container</td>
+		</tr>
+		<tr class="odd">
+			<td><code>.yui3-u-1-5</code></td>
+			<td>fills 1/5 the container</td>
+		</tr>
+		<tr>
+			<td><code>.yui3-u-2-5</code></td>
+			<td>fills 2/5 the container</td>
+		</tr>
+		<tr class="odd">
+			<td><code>.yui3-u-3-5</code></td>
+			<td>fills 3/5 the container</td>
+		</tr>
+		<tr>
+			<td><code>.yui3-u-4-5</code></td>
+			<td>fills 4/5 the container</td>
+		</tr>
+		<tr class="odd">
+			<td><code>.yui3-u-1-6</code></td>
+			<td>fills 1/6 the container</td>
+		</tr>
+		<tr>
+			<td><code>.yui3-u-5-6</code></td>
+			<td>fills 5/6 the container</td>
+		</tr>
+	</tbody>
+</table>
+<h5>Note:</h5>
+<p>Because CSS examples are susceptible to other CSS on the page, this example is only available in a new window at the above link.</p>
+				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    CSS Grids Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li class='selected'><a href='../cssgrids/cssgrids-units.html'>Using Units</a></li><li><a href='../cssgrids/cssgrids-fixed.html'>Fixed Page Template</a></li><li><a href='../cssgrids/cssgrids-fluid.html'>Fluid Page Template</a></li><li><a href='../cssgrids/cssgrids-align.html'>Aligning Units</a></li><li><a href='../node-menunav/node-menunav-8.html'>Adding Submenus On The Fly (included with examples for MenuNav Node Plugin)</a></li><li><a href='../node-menunav/node-menunav-1.html'>Basic Left Nav (included with examples for MenuNav Node Plugin)</a></li><li><a href='../node-menunav/node-menunav-2.html'>Basic Top Nav (included with examples for MenuNav Node Plugin)</a></li><li><a href='../node-menunav/node-menunav-6.html'>Left Nav With Submenus With Rounded Corners (included with examples for MenuNav Node Plugin)</a></li><li><a href='../node-menunav/node-menunav-5.html'>Left Nav With Submenus With Shadows (included with examples for MenuNav Node Plugin)</a></li><li><a href='../node-menunav/node-menunav-3.html'>Menu Button Top Nav (included with examples for MenuNav Node Plugin)</a></li><li><a href='../node-menunav/node-menunav-7.html'>Skinning Menus Created Using the MenuNav Node Plugin (included with examples for MenuNav Node Plugin)</a></li><li><a href='../node-menunav/node-menunav-4.html'>Split Button Top Nav (included with examples for MenuNav Node Plugin)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More CSS Grids Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/cssgrids/">User's Guide</a> (external)</li> -->
+</ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="selected "><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

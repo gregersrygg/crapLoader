@@ -1,0 +1,735 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Get: Getting a Script Node with JSON Data</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-debug.js"></script>
+<style type="text/css">
+#container ol {
+	/*bringing lists on to the page with breathing room */
+	margin-left:2em !important;
+}
+
+#container ol li {
+	/*giving OL's LIs generated numbers*/
+	list-style: decimal outside !important;	
+}
+
+#container h3 {
+	margin-top: 1em;
+}
+</style>
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Get: Getting a Script Node with JSON Data</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Get: Getting a Script Node with JSON Data</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This example employs the <a href="http://developer.yahoo.com/yui/3/get/">YUI
+Get Utility</a> in a simple use case: retrieving JSON data from a cross-domain
+web service. While this is a relatively common usage, it's important to
+understand the security ramifications of this technique. Scripts loaded via the
+Get Utility (or any other &quot;script node&quot; solution) execute immediately
+once they are loaded. If you do not fully control (or fully trust) the script's
+source, this is not a safe technique and it can put the security of your users'
+data at risk. (For more information on the dangers of cross-site scripting
+[XSS] exploits, <a
+href="http://en.wikipedia.org/wiki/Cross-site_scripting">check out the
+Wikipedia entry on this subject</a>.)</p> <p>Here, we will use a trusted Yahoo!
+Search web service called <a
+href="http://developer.yahoo.com/search/siteexplorer/V1/inlinkData.html">Site
+Explorer</a> to return a list of inbound links for a given URL. The principal
+difference between this example and similar examples using <a
+href="http://developer.yahoo.com/yui/3/io/">YUI IO Utility</a> is
+that this technique does not require a server-side proxy. The browser connects
+directly to the third-party web service without bouncing through a proxy page
+as is required when using the XMLHttpRequest object (on which IO Utility
+relies).</p>
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="get-script-basic_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	<div id="container">
+
+    <!--Use a real form that works without JavaScript:-->
+    <form method="GET" action="http://siteexplorer.search.yahoo.com/advsearch" id="siteExplorer">
+
+        <label for="searchString">Site URL:</label> <input type="text" name="p" id="searchString" value="http://developer.yahoo.com/yui" size="40">
+        
+        <input type="hidden" name="bwm" value="i">
+        <input type="hidden" name="bwms" value="p">
+    
+        <input type="submit" id="siteExplorerData" value="Click here to get JSON data.">
+    
+    </form>
+
+    <div id="results">
+        <!--JSON output will be written to the DOM here-->
+        
+    </div>
+</div>
+
+<script type="text/javascript">
+
+YUI({filter:"debug", logInclude: {get:true, event:true, example:true}}).use("node", "dump",
+
+function(Y) { 
+
+    // We are going to create a global variable to get the 
+    // data back from the web service
+    MyNamespace = YUI.namespace('example.SiteExplorer');
+
+    var elResults = Y.one("#results"),
+        tIds = {},
+        loading = false,
+        current = null;
+        
+    // We use the Get Utility's success handler in conjunction with
+    // the web service callback in order to detect bad responses 
+    // from the web service.
+    var onSiteExplorerSuccess = function(o) {
+
+        // stop blocking requests
+        loading = false;
+
+        // A success response means the script node is inserted.  However, the
+        // utility is unable to detect whether or not the content of the script
+        // node is correct, or even if there was a bad response (like a 404
+        // error).  To get around this, we use the web service callback to
+        // verify that the script contents was correct.
+        if (o.tId in tIds) {
+Y.log("The Get Utility has fired the success handler indicating that the " +
+          "requested script has loaded and is ready for use.", "info", "example");
+        } else {
+Y.log("The Get utility has fired onSuccess but the webservice callback did not " +
+          "fire.  We could retry the transaction here, or notify the user of the " +
+          "failure.", "info", "example");
+        }
+
+    };
+
+    var onSiteExplorerFailure = function(o) {
+Y.log("The Get Utility failed.", "info", "example");
+    };
+
+    var onSiteExplorerTimeout = function(o) {
+Y.log("The Get Utility timed out.", "info", "example");
+    };
+    
+    //function to retrieve data from Yahoo! Site Explorer web service --
+    // http://developer.yahoo.com/search/siteexplorer/V1/inlinkData.html
+    var getSiteExplorerData = function() {
+        Y.log("Button clicked; getSiteExplorerData firing.", "info", "example");
+
+        // block multiple requests
+        if (loading) {
+            return;
+        }
+        loading = true;
+        
+        //Load the transitional state of the results section:
+        elResults.set("innerHTML", "<h3>Retrieving incoming links for " +
+            Y.one("#searchString").get('value') + ":</h3>" +
+            "<img src='http://l.yimg.com/a/i/nt/ic/ut/bsc/busybar_1.gif' " +
+            "alt='Please wait...'>");
+        
+        //prepare the URL for the Yahoo Site Explorer API:
+        var sURL = "http://search.yahooapis.com/SiteExplorerService/V1/inlinkData?" +
+            "appid=3wEDxLHV34HvAU2lMnI51S4Qra5m.baugqoSv4gcRllqqVZm3UrMDZWToMivf5BJ3Mom" +
+            "&results=20&output=json&omit_inlinks=domain" +
+            "&callback=MyNamespace.callback" +
+            "&query=" + encodeURIComponent(Y.one("#searchString").get('value'));
+        
+        //This simple line is the call to the Get Utility; we pass
+        //in the URL and the configuration object, which in this case
+        //consists merely of our success and failure callbacks:
+        var transactionObj = Y.Get.script(sURL, {
+            onSuccess: onSiteExplorerSuccess,
+            onFailure: onSiteExplorerFailure,
+            onTimeout: onSiteExplorerTimeout,
+            timeout: 20000,
+            context: Y
+        });
+        
+        //The script method returns a single-field object containing the
+        //tranaction id:
+        Y.log("Get Utility transaction started; transaction object: " + Y.dump(transactionObj), "info", "example");
+
+        // keep track of the current transaction id.  The transaction will be
+        // considered complete only if the web service callback is executed.
+        current = transactionObj.tId; 
+    };
+
+    MyNamespace.callback = function(results) {
+        Y.log("Web service returned data to Y.example.SiteExplorer.callback; beginning to process.", "info", "example");
+
+        // Mark the transaction as complete.  This will be checked by the onSuccess
+        // handler to determine if the transaction really succeeded.
+        tIds[current] = true;
+        
+        //work with the returned data to extract meaningful fields:
+        var aResults = results.ResultSet.Result;
+        var totalLinks = results.ResultSet.totalResultsAvailable;
+        var returnedLinkCount = results.ResultSet.totalResultsReturned;
+        
+        if(aResults) {//there are inbound links; process and display them:
+        
+            //write header and open list of inbound links:          
+            var html = "<h3>There are " +
+                totalLinks + 
+                " inbound links for this page; here are the first " + 
+                returnedLinkCount +
+                ":</h3><ol>";
+            
+            //process list of inbound links:
+            for (var i=0; i < aResults.length; i++) {
+                html += "<li><strong>" +
+                    aResults[i].Title +
+                    ":</strong> <a href='" +
+                    aResults[i].Url +
+                    "'>" + aResults[i].Url +
+                    "</a></li>";
+            }
+            
+            //close list of inbound links
+            html += "</ol>";
+            
+        } else {//no inbound links exist for this page:
+        
+            var html = "<h3>There are no inbound links for the page specified.</h3>";
+            
+        }
+        
+        //insert string into DOM:
+        elResults.set('innerHTML', html);
+    };
+
+    //suppress default form behavior
+    Y.on("submit", function(e) {
+        e.preventDefault();
+        getSiteExplorerData();
+    }, "#siteExplorer");
+
+});
+
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h2 class="first">Using the Get Utility to Get a Script File with JSON-formatted Contents</h2>
+
+<p>Here, we'll use <a href="http://developer.yahoo.com/yui/3/get/">the YUI Get Utility</a> to retrieve data via the <a href="http://developer.yahoo.com/search/siteexplorer/V1/inlinkData.html">Yahoo! Search Site-Explorer web service</a>, one of many Yahoo! APIs that support JSON.</p>
+
+<p>First, we create a plain HTML form that will work for users who do not have JavaScript enabled:</p>
+
+<div id="syntax-beaba2b264099b9ca8c6cc9c7b2537ef" class="yui-syntax-highlight"><div class="numbers"><pre class="html4strict" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;container&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">  <span class="sc-1">&lt;!-- Use a real form that works without JavaScript: --&gt;</span></div></li><li class="li1"><div class="de1">  <span class="sc2">&lt;<span class="kw2">form</span> <span class="kw3">method</span><span class="sy0">=</span><span class="st0">&quot;GET&quot;</span> <span class="kw3">action</span><span class="sy0">=</span><span class="st0">&quot;http://siteexplorer.search.yahoo.com/advsearch&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;siteExplorer&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;searchString&quot;</span>&gt;</span>Site URL:<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span></div></li><li class="li2"><div class="de2">    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;text&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;searchString&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;p&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;http://developer.yahoo.com/yui&quot;</span> <span class="kw3">size</span><span class="sy0">=</span><span class="st0">&quot;40&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;hidden&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;bwm&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;i&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;hidden&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;bwms&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;p&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;submit&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;siteExplorerButton&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;Click here to get JSON data.&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">  <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">form</span>&gt;</span></div></li><li class="li2"><div class="de2">  <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;results&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc-1">&lt;!--JSON output will be written to the DOM here--&gt;</span></div></li><li class="li1"><div class="de1">  <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="html4strict" style="font-family:monospace;"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;container&quot;</span>&gt;</span>
+  <span class="sc-1">&lt;!-- Use a real form that works without JavaScript: --&gt;</span>
+  <span class="sc2">&lt;<span class="kw2">form</span> <span class="kw3">method</span><span class="sy0">=</span><span class="st0">&quot;GET&quot;</span> <span class="kw3">action</span><span class="sy0">=</span><span class="st0">&quot;http://siteexplorer.search.yahoo.com/advsearch&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;siteExplorer&quot;</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">label</span> <span class="kw3">for</span><span class="sy0">=</span><span class="st0">&quot;searchString&quot;</span>&gt;</span>Site URL:<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">label</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;text&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;searchString&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;p&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;http://developer.yahoo.com/yui&quot;</span> <span class="kw3">size</span><span class="sy0">=</span><span class="st0">&quot;40&quot;</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;hidden&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;bwm&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;i&quot;</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;hidden&quot;</span> <span class="kw3">name</span><span class="sy0">=</span><span class="st0">&quot;bwms&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;p&quot;</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">input</span> <span class="kw3">type</span><span class="sy0">=</span><span class="st0">&quot;submit&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;siteExplorerButton&quot;</span> <span class="kw3">value</span><span class="sy0">=</span><span class="st0">&quot;Click here to get JSON data.&quot;</span>&gt;</span>
+  <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">form</span>&gt;</span>
+  <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;results&quot;</span>&gt;</span>
+    <span class="sc-1">&lt;!--JSON output will be written to the DOM here--&gt;</span>
+  <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></pre></div><textarea id="syntax-beaba2b264099b9ca8c6cc9c7b2537ef-plain"><div id="container">
+  <!-- Use a real form that works without JavaScript: -->
+  <form method="GET" action="http://siteexplorer.search.yahoo.com/advsearch" id="siteExplorer">
+    <label for="searchString">Site URL:</label>
+    <input type="text" name="searchString" id="p" value="http://developer.yahoo.com/yui" size="40">
+    <input type="hidden" name="bwm" value="i">
+    <input type="hidden" name="bwms" value="p">
+    <input type="submit" id="siteExplorerButton" value="Click here to get JSON data.">
+  </form>
+  <div id="results">
+    <!--JSON output will be written to the DOM here-->
+  </div>
+</div></textarea></div>
+<p>With this in place, we can progressively enhance the form to create an in-page interaction for users with JavaScript turned on.</p>
+
+<p>The most important JavaScript piece here is the method that we fire on form submission.  This method triggers our call to the Get Utility. This method, called <code>getSiteExplorerData</code>, accomplishes four things:</p>
+<ol>
+  <li>It loads a transitional state for the display, alerting the user to the fact that data is being retrieved as a result of her action;</li>
+  <li>It prepares the URL that will be passed to the Get Utility;</li>
+  <li>It calls the Get Utility, passing in the URL of the script resource to load (in this case, the URL of our web service with the relevant paramaters assembled in the querystring);</li>
+  <li>It specifies the callback and the context in which the callback should
+  run. Note that in this example the web service itself provides callback
+  functionality, allowing us to pass a globally accessible callback function
+  name as one of the parameters of the REST API; you can see this reference
+  below. As a result, we're making direct use of the intrinsic web service
+  callback in this example and just stubbing out the built-in Get Utility
+  callback for the sake of illustration.</li> </ol> <p> 
+
+<div id="syntax-f8c03576200f526ed7b54cffd72acccc" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">//function to retrieve data from Yahoo!  Site Explorer web service --</span></div></li><li class="li1"><div class="de1"><span class="co1">// http://developer.yahoo.com/search/siteexplorer/V1/inlinkData.html</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">var</span> getSiteExplorerData <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Button clicked; getSiteExplorerData firing.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// block multiple requests</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>loading<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">return</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    loading <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//Load the transitional state of the results section:</span></div></li><li class="li1"><div class="de1">    elResults.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&lt;h3&gt;Retrieving incoming links for &quot;</span> <span class="sy0">+</span></div></li><li class="li2"><div class="de2">        Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#searchString&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'value'</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;:&lt;/h3&gt;&quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&lt;img src='http://l.yimg.com/a/i/nt/ic/ut/bsc/busybar_1.gif' &quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;alt='Please wait...'&gt;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//prepare the URL for the Yahoo Site Explorer API:</span></div></li><li class="li2"><div class="de2">    <span class="kw2">var</span> sURL <span class="sy0">=</span> <span class="st0">&quot;http://search.yahooapis.com/SiteExplorerService/V1/inlinkData?&quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;appid=3wEDxLHV34HvAU2lMnI51S4Qra5m.baugqoSv4gcRllqqVZm3UrMDZWToMivf5BJ3Mom&quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&amp;results=20&amp;output=json&amp;omit_inlinks=domain&quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&amp;callback=MyNamespace.callback&quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&amp;query=&quot;</span> <span class="sy0">+</span> encodeURIComponent<span class="br0">&#40;</span>Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#searchString&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'value'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//This simple line is the call to the Get Utility; we pass</span></div></li><li class="li1"><div class="de1">    <span class="co1">//in the URL and the configuration object, which in this case</span></div></li><li class="li1"><div class="de1">    <span class="co1">//consists merely of our success and failure callbacks:</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> transactionObj <span class="sy0">=</span> Y.<span class="me1">Get</span>.<span class="me1">script</span><span class="br0">&#40;</span>sURL<span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        onSuccess<span class="sy0">:</span> onSiteExplorerSuccess<span class="sy0">,</span></div></li><li class="li1"><div class="de1">        onFailure<span class="sy0">:</span> onSiteExplorerFailure<span class="sy0">,</span></div></li><li class="li1"><div class="de1">        onTimeout<span class="sy0">:</span> onSiteExplorerTimeout<span class="sy0">,</span></div></li><li class="li1"><div class="de1">        timeout<span class="sy0">:</span> <span class="nu0">20000</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        context<span class="sy0">:</span> Y</div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//The script method returns a single-field object containing the</span></div></li><li class="li1"><div class="de1">    <span class="co1">//tranaction id:</span></div></li><li class="li1"><div class="de1">    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Get Utility transaction started; transaction object: &quot;</span> <span class="sy0">+</span> Y.<span class="me1">dump</span><span class="br0">&#40;</span>transactionObj<span class="br0">&#41;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// keep track of the current transaction id.  The transaction will be</span></div></li><li class="li1"><div class="de1">    <span class="co1">// considered complete only if the web service callback is executed.</span></div></li><li class="li1"><div class="de1">    current <span class="sy0">=</span> transactionObj.<span class="me1">tId</span><span class="sy0">;</span> </div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">//function to retrieve data from Yahoo!  Site Explorer web service --</span>
+<span class="co1">// http://developer.yahoo.com/search/siteexplorer/V1/inlinkData.html</span>
+&nbsp;
+<span class="kw2">var</span> getSiteExplorerData <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Button clicked; getSiteExplorerData firing.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// block multiple requests</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span>loading<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">return</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+    loading <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//Load the transitional state of the results section:</span>
+    elResults.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&lt;h3&gt;Retrieving incoming links for &quot;</span> <span class="sy0">+</span>
+        Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#searchString&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'value'</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;:&lt;/h3&gt;&quot;</span> <span class="sy0">+</span>
+        <span class="st0">&quot;&lt;img src='http://l.yimg.com/a/i/nt/ic/ut/bsc/busybar_1.gif' &quot;</span> <span class="sy0">+</span>
+        <span class="st0">&quot;alt='Please wait...'&gt;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//prepare the URL for the Yahoo Site Explorer API:</span>
+    <span class="kw2">var</span> sURL <span class="sy0">=</span> <span class="st0">&quot;http://search.yahooapis.com/SiteExplorerService/V1/inlinkData?&quot;</span> <span class="sy0">+</span>
+        <span class="st0">&quot;appid=3wEDxLHV34HvAU2lMnI51S4Qra5m.baugqoSv4gcRllqqVZm3UrMDZWToMivf5BJ3Mom&quot;</span> <span class="sy0">+</span>
+        <span class="st0">&quot;&amp;results=20&amp;output=json&amp;omit_inlinks=domain&quot;</span> <span class="sy0">+</span>
+        <span class="st0">&quot;&amp;callback=MyNamespace.callback&quot;</span> <span class="sy0">+</span>
+        <span class="st0">&quot;&amp;query=&quot;</span> <span class="sy0">+</span> encodeURIComponent<span class="br0">&#40;</span>Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#searchString&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'value'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//This simple line is the call to the Get Utility; we pass</span>
+    <span class="co1">//in the URL and the configuration object, which in this case</span>
+    <span class="co1">//consists merely of our success and failure callbacks:</span>
+    <span class="kw2">var</span> transactionObj <span class="sy0">=</span> Y.<span class="me1">Get</span>.<span class="me1">script</span><span class="br0">&#40;</span>sURL<span class="sy0">,</span> <span class="br0">&#123;</span>
+        onSuccess<span class="sy0">:</span> onSiteExplorerSuccess<span class="sy0">,</span>
+        onFailure<span class="sy0">:</span> onSiteExplorerFailure<span class="sy0">,</span>
+        onTimeout<span class="sy0">:</span> onSiteExplorerTimeout<span class="sy0">,</span>
+        timeout<span class="sy0">:</span> <span class="nu0">20000</span><span class="sy0">,</span>
+        context<span class="sy0">:</span> Y
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//The script method returns a single-field object containing the</span>
+    <span class="co1">//tranaction id:</span>
+    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Get Utility transaction started; transaction object: &quot;</span> <span class="sy0">+</span> Y.<span class="me1">dump</span><span class="br0">&#40;</span>transactionObj<span class="br0">&#41;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// keep track of the current transaction id.  The transaction will be</span>
+    <span class="co1">// considered complete only if the web service callback is executed.</span>
+    current <span class="sy0">=</span> transactionObj.<span class="me1">tId</span><span class="sy0">;</span> 
+<span class="br0">&#125;</span><span class="sy0">;</span></pre></div><textarea id="syntax-f8c03576200f526ed7b54cffd72acccc-plain">//function to retrieve data from Yahoo!  Site Explorer web service --
+// http://developer.yahoo.com/search/siteexplorer/V1/inlinkData.html
+
+var getSiteExplorerData = function() {
+    Y.log("Button clicked; getSiteExplorerData firing.", "info", "example");
+
+    // block multiple requests
+    if (loading) {
+        return;
+    }
+    loading = true;
+    
+    //Load the transitional state of the results section:
+    elResults.set("innerHTML", "<h3>Retrieving incoming links for " +
+        Y.one("#searchString").get('value') + ":</h3>" +
+        "<img src='http://l.yimg.com/a/i/nt/ic/ut/bsc/busybar_1.gif' " +
+        "alt='Please wait...'>");
+    
+    //prepare the URL for the Yahoo Site Explorer API:
+    var sURL = "http://search.yahooapis.com/SiteExplorerService/V1/inlinkData?" +
+        "appid=3wEDxLHV34HvAU2lMnI51S4Qra5m.baugqoSv4gcRllqqVZm3UrMDZWToMivf5BJ3Mom" +
+        "&results=20&output=json&omit_inlinks=domain" +
+        "&callback=MyNamespace.callback" +
+        "&query=" + encodeURIComponent(Y.one("#searchString").get('value'));
+    
+    //This simple line is the call to the Get Utility; we pass
+    //in the URL and the configuration object, which in this case
+    //consists merely of our success and failure callbacks:
+    var transactionObj = Y.Get.script(sURL, {
+        onSuccess: onSiteExplorerSuccess,
+        onFailure: onSiteExplorerFailure,
+        onTimeout: onSiteExplorerTimeout,
+        timeout: 20000,
+        context: Y
+    });
+    
+    //The script method returns a single-field object containing the
+    //tranaction id:
+    Y.log("Get Utility transaction started; transaction object: " + Y.dump(transactionObj), "info", "example");
+
+    // keep track of the current transaction id.  The transaction will be
+    // considered complete only if the web service callback is executed.
+    current = transactionObj.tId; 
+};</textarea></div></p>
+<p>The full JavaScript codeblock for this example reads as follows:</p>
+
+<div id="syntax-87f3704eccbc82aa741b5b6cd3dfa24e" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">// We are going to create a global variable to get the </span></div></li><li class="li1"><div class="de1"><span class="co1">// data back from the web service</span></div></li><li class="li1"><div class="de1">MyNamespace <span class="sy0">=</span> YUI.<span class="kw2">namespace</span><span class="br0">&#40;</span><span class="st0">'example.SiteExplorer'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="kw2">var</span> elResults <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#results&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    tIds <span class="sy0">=</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    loading <span class="sy0">=</span> <span class="kw2">false</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    current <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="co1">// We use the Get Utility's success handler in conjunction with</span></div></li><li class="li1"><div class="de1"><span class="co1">// the web service callback in order to detect bad responses </span></div></li><li class="li1"><div class="de1"><span class="co1">// from the web service.</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> onSiteExplorerSuccess <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="co1">// stop blocking requests</span></div></li><li class="li1"><div class="de1">    loading <span class="sy0">=</span> <span class="kw2">false</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// A success response means the script node is inserted.  However, the</span></div></li><li class="li1"><div class="de1">    <span class="co1">// utility is unable to detect whether or not the content of the script</span></div></li><li class="li2"><div class="de2">    <span class="co1">// node is correct, or even if there was a bad response (like a 404</span></div></li><li class="li1"><div class="de1">    <span class="co1">// error).  To get around this, we use the web service callback to</span></div></li><li class="li1"><div class="de1">    <span class="co1">// verify that the script contents was correct.</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>o.<span class="me1">tId</span> <span class="kw1">in</span> tIds<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;The Get Utility has fired the success handler indicating that the &quot;</span> <span class="sy0">+</span></div></li><li class="li2"><div class="de2">      <span class="st0">&quot;requested script has loaded and is ready for use.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;The Get utility has fired onSuccess but the webservice callback did not &quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">      <span class="st0">&quot;fire.  We could retry the transaction here, or notify the user of the &quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">      <span class="st0">&quot;failure.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">var</span> onSiteExplorerFailure <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;The Get Utility failed.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="kw2">var</span> onSiteExplorerTimeout <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;The Get Utility timed out.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">//function to retrieve data from Yahoo! Site Explorer web service --</span></div></li><li class="li1"><div class="de1"><span class="co1">// http://developer.yahoo.com/search/siteexplorer/V1/inlinkData.html</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> getSiteExplorerData <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Button clicked; getSiteExplorerData firing.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// block multiple requests</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>loading<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        <span class="kw1">return</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    loading <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//Load the transitional state of the results section:</span></div></li><li class="li1"><div class="de1">    elResults.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&lt;h3&gt;Retrieving incoming links for &quot;</span> <span class="sy0">+</span></div></li><li class="li2"><div class="de2">        Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#searchString&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'value'</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;:&lt;/h3&gt;&quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&lt;img src='http://l.yimg.com/a/i/nt/ic/ut/bsc/busybar_1.gif' &quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;alt='Please wait...'&gt;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//prepare the URL for the Yahoo Site Explorer API:</span></div></li><li class="li2"><div class="de2">    <span class="kw2">var</span> sURL <span class="sy0">=</span> <span class="st0">&quot;http://search.yahooapis.com/SiteExplorerService/V1/inlinkData?&quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;appid=3wEDxLHV34HvAU2lMnI51S4Qra5m.baugqoSv4gcRllqqVZm3UrMDZWToMivf5BJ3Mom&quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&amp;results=20&amp;output=json&amp;omit_inlinks=domain&quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&amp;callback=MyNamespace.callback&quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">&quot;&amp;query=&quot;</span> <span class="sy0">+</span> encodeURIComponent<span class="br0">&#40;</span>Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#searchString&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'value'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//This simple line is the call to the Get Utility; we pass</span></div></li><li class="li1"><div class="de1">    <span class="co1">//in the URL and the configuration object, which in this case</span></div></li><li class="li1"><div class="de1">    <span class="co1">//consists merely of our success and failure callbacks:</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> transactionObj <span class="sy0">=</span> Y.<span class="me1">Get</span>.<span class="me1">script</span><span class="br0">&#40;</span>sURL<span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        onSuccess<span class="sy0">:</span> onSiteExplorerSuccess<span class="sy0">,</span></div></li><li class="li1"><div class="de1">        onFailure<span class="sy0">:</span> onSiteExplorerFailure<span class="sy0">,</span></div></li><li class="li1"><div class="de1">        onTimeout<span class="sy0">:</span> onSiteExplorerTimeout<span class="sy0">,</span></div></li><li class="li1"><div class="de1">        timeout<span class="sy0">:</span> <span class="nu0">20000</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        context<span class="sy0">:</span> Y</div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//The script method returns a single-field object containing the</span></div></li><li class="li1"><div class="de1">    <span class="co1">//tranaction id:</span></div></li><li class="li1"><div class="de1">    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Get Utility transaction started; transaction object: &quot;</span> <span class="sy0">+</span> Y.<span class="me1">dump</span><span class="br0">&#40;</span>transactionObj<span class="br0">&#41;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// keep track of the current transaction id.  The transaction will be</span></div></li><li class="li1"><div class="de1">    <span class="co1">// considered complete only if the web service callback is executed.</span></div></li><li class="li1"><div class="de1">    current <span class="sy0">=</span> transactionObj.<span class="me1">tId</span><span class="sy0">;</span> </div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">MyNamespace.<span class="me1">callback</span> <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>results<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Web service returned data to Y.example.SiteExplorer.callback; beginning to process.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// Mark the transaction as complete.  This will be checked by the onSuccess</span></div></li><li class="li2"><div class="de2">    <span class="co1">// handler to determine if the transaction really succeeded.</span></div></li><li class="li1"><div class="de1">    tIds<span class="br0">&#91;</span>current<span class="br0">&#93;</span> <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//work with the returned data to extract meaningful fields:</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> aResults <span class="sy0">=</span> results.<span class="me1">ResultSet</span>.<span class="me1">Result</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="kw2">var</span> totalLinks <span class="sy0">=</span> results.<span class="me1">ResultSet</span>.<span class="me1">totalResultsAvailable</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> returnedLinkCount <span class="sy0">=</span> results.<span class="me1">ResultSet</span>.<span class="me1">totalResultsReturned</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw1">if</span><span class="br0">&#40;</span>aResults<span class="br0">&#41;</span> <span class="br0">&#123;</span><span class="co1">//there are inbound links; process and display them:</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">        <span class="co1">//write header and open list of inbound links:          </span></div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> html <span class="sy0">=</span> <span class="st0">&quot;&lt;h3&gt;There are &quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">            totalLinks <span class="sy0">+</span> </div></li><li class="li1"><div class="de1">            <span class="st0">&quot; inbound links for this page; here are the first &quot;</span> <span class="sy0">+</span> </div></li><li class="li1"><div class="de1">            returnedLinkCount <span class="sy0">+</span></div></li><li class="li2"><div class="de2">            <span class="st0">&quot;:&lt;/h3&gt;&lt;ol&gt;&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//process list of inbound links:</span></div></li><li class="li1"><div class="de1">        <span class="kw1">for</span> <span class="br0">&#40;</span><span class="kw2">var</span> i<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> aResults.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            html <span class="sy0">+=</span> <span class="st0">&quot;&lt;li&gt;&lt;strong&gt;&quot;</span> <span class="sy0">+</span></div></li><li class="li2"><div class="de2">                aResults<span class="br0">&#91;</span>i<span class="br0">&#93;</span>.<span class="me1">Title</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">                <span class="st0">&quot;:&lt;/strong&gt; &lt;a href='&quot;</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">                aResults<span class="br0">&#91;</span>i<span class="br0">&#93;</span>.<span class="me1">Url</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">                <span class="st0">&quot;'&gt;&quot;</span> <span class="sy0">+</span> aResults<span class="br0">&#91;</span>i<span class="br0">&#93;</span>.<span class="me1">Url</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">                <span class="st0">&quot;&lt;/a&gt;&lt;/li&gt;&quot;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">//close list of inbound links</span></div></li><li class="li1"><div class="de1">        html <span class="sy0">+=</span> <span class="st0">&quot;&lt;/ol&gt;&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><span class="co1">//no inbound links exist for this page:</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="kw2">var</span> html <span class="sy0">=</span> <span class="st0">&quot;&lt;h3&gt;There are no inbound links for the page specified.&lt;/h3&gt;&quot;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">//insert string into DOM:</span></div></li><li class="li1"><div class="de1">    elResults.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span> html<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2"><span class="co1">//suppress default form behavior</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;submit&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    getSiteExplorerData<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#siteExplorer&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">&nbsp;</div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">// We are going to create a global variable to get the </span>
+<span class="co1">// data back from the web service</span>
+MyNamespace <span class="sy0">=</span> YUI.<span class="kw2">namespace</span><span class="br0">&#40;</span><span class="st0">'example.SiteExplorer'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw2">var</span> elResults <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#results&quot;</span><span class="br0">&#41;</span><span class="sy0">,</span>
+    tIds <span class="sy0">=</span> <span class="br0">&#123;</span><span class="br0">&#125;</span><span class="sy0">,</span>
+    loading <span class="sy0">=</span> <span class="kw2">false</span><span class="sy0">,</span>
+    current <span class="sy0">=</span> <span class="kw2">null</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// We use the Get Utility's success handler in conjunction with</span>
+<span class="co1">// the web service callback in order to detect bad responses </span>
+<span class="co1">// from the web service.</span>
+<span class="kw2">var</span> onSiteExplorerSuccess <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+&nbsp;
+    <span class="co1">// stop blocking requests</span>
+    loading <span class="sy0">=</span> <span class="kw2">false</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// A success response means the script node is inserted.  However, the</span>
+    <span class="co1">// utility is unable to detect whether or not the content of the script</span>
+    <span class="co1">// node is correct, or even if there was a bad response (like a 404</span>
+    <span class="co1">// error).  To get around this, we use the web service callback to</span>
+    <span class="co1">// verify that the script contents was correct.</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span>o.<span class="me1">tId</span> <span class="kw1">in</span> tIds<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;The Get Utility has fired the success handler indicating that the &quot;</span> <span class="sy0">+</span>
+      <span class="st0">&quot;requested script has loaded and is ready for use.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;The Get utility has fired onSuccess but the webservice callback did not &quot;</span> <span class="sy0">+</span>
+      <span class="st0">&quot;fire.  We could retry the transaction here, or notify the user of the &quot;</span> <span class="sy0">+</span>
+      <span class="st0">&quot;failure.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+&nbsp;
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw2">var</span> onSiteExplorerFailure <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;The Get Utility failed.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw2">var</span> onSiteExplorerTimeout <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>o<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;The Get Utility timed out.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">//function to retrieve data from Yahoo! Site Explorer web service --</span>
+<span class="co1">// http://developer.yahoo.com/search/siteexplorer/V1/inlinkData.html</span>
+<span class="kw2">var</span> getSiteExplorerData <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Button clicked; getSiteExplorerData firing.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// block multiple requests</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span>loading<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">return</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span>
+    loading <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//Load the transitional state of the results section:</span>
+    elResults.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;innerHTML&quot;</span><span class="sy0">,</span> <span class="st0">&quot;&lt;h3&gt;Retrieving incoming links for &quot;</span> <span class="sy0">+</span>
+        Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#searchString&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'value'</span><span class="br0">&#41;</span> <span class="sy0">+</span> <span class="st0">&quot;:&lt;/h3&gt;&quot;</span> <span class="sy0">+</span>
+        <span class="st0">&quot;&lt;img src='http://l.yimg.com/a/i/nt/ic/ut/bsc/busybar_1.gif' &quot;</span> <span class="sy0">+</span>
+        <span class="st0">&quot;alt='Please wait...'&gt;&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//prepare the URL for the Yahoo Site Explorer API:</span>
+    <span class="kw2">var</span> sURL <span class="sy0">=</span> <span class="st0">&quot;http://search.yahooapis.com/SiteExplorerService/V1/inlinkData?&quot;</span> <span class="sy0">+</span>
+        <span class="st0">&quot;appid=3wEDxLHV34HvAU2lMnI51S4Qra5m.baugqoSv4gcRllqqVZm3UrMDZWToMivf5BJ3Mom&quot;</span> <span class="sy0">+</span>
+        <span class="st0">&quot;&amp;results=20&amp;output=json&amp;omit_inlinks=domain&quot;</span> <span class="sy0">+</span>
+        <span class="st0">&quot;&amp;callback=MyNamespace.callback&quot;</span> <span class="sy0">+</span>
+        <span class="st0">&quot;&amp;query=&quot;</span> <span class="sy0">+</span> encodeURIComponent<span class="br0">&#40;</span>Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">&quot;#searchString&quot;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'value'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//This simple line is the call to the Get Utility; we pass</span>
+    <span class="co1">//in the URL and the configuration object, which in this case</span>
+    <span class="co1">//consists merely of our success and failure callbacks:</span>
+    <span class="kw2">var</span> transactionObj <span class="sy0">=</span> Y.<span class="me1">Get</span>.<span class="me1">script</span><span class="br0">&#40;</span>sURL<span class="sy0">,</span> <span class="br0">&#123;</span>
+        onSuccess<span class="sy0">:</span> onSiteExplorerSuccess<span class="sy0">,</span>
+        onFailure<span class="sy0">:</span> onSiteExplorerFailure<span class="sy0">,</span>
+        onTimeout<span class="sy0">:</span> onSiteExplorerTimeout<span class="sy0">,</span>
+        timeout<span class="sy0">:</span> <span class="nu0">20000</span><span class="sy0">,</span>
+        context<span class="sy0">:</span> Y
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//The script method returns a single-field object containing the</span>
+    <span class="co1">//tranaction id:</span>
+    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Get Utility transaction started; transaction object: &quot;</span> <span class="sy0">+</span> Y.<span class="me1">dump</span><span class="br0">&#40;</span>transactionObj<span class="br0">&#41;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// keep track of the current transaction id.  The transaction will be</span>
+    <span class="co1">// considered complete only if the web service callback is executed.</span>
+    current <span class="sy0">=</span> transactionObj.<span class="me1">tId</span><span class="sy0">;</span> 
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+MyNamespace.<span class="me1">callback</span> <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>results<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Web service returned data to Y.example.SiteExplorer.callback; beginning to process.&quot;</span><span class="sy0">,</span> <span class="st0">&quot;info&quot;</span><span class="sy0">,</span> <span class="st0">&quot;example&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Mark the transaction as complete.  This will be checked by the onSuccess</span>
+    <span class="co1">// handler to determine if the transaction really succeeded.</span>
+    tIds<span class="br0">&#91;</span>current<span class="br0">&#93;</span> <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//work with the returned data to extract meaningful fields:</span>
+    <span class="kw2">var</span> aResults <span class="sy0">=</span> results.<span class="me1">ResultSet</span>.<span class="me1">Result</span><span class="sy0">;</span>
+    <span class="kw2">var</span> totalLinks <span class="sy0">=</span> results.<span class="me1">ResultSet</span>.<span class="me1">totalResultsAvailable</span><span class="sy0">;</span>
+    <span class="kw2">var</span> returnedLinkCount <span class="sy0">=</span> results.<span class="me1">ResultSet</span>.<span class="me1">totalResultsReturned</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">if</span><span class="br0">&#40;</span>aResults<span class="br0">&#41;</span> <span class="br0">&#123;</span><span class="co1">//there are inbound links; process and display them:</span>
+&nbsp;
+        <span class="co1">//write header and open list of inbound links:          </span>
+        <span class="kw2">var</span> html <span class="sy0">=</span> <span class="st0">&quot;&lt;h3&gt;There are &quot;</span> <span class="sy0">+</span>
+            totalLinks <span class="sy0">+</span> 
+            <span class="st0">&quot; inbound links for this page; here are the first &quot;</span> <span class="sy0">+</span> 
+            returnedLinkCount <span class="sy0">+</span>
+            <span class="st0">&quot;:&lt;/h3&gt;&lt;ol&gt;&quot;</span><span class="sy0">;</span>
+&nbsp;
+        <span class="co1">//process list of inbound links:</span>
+        <span class="kw1">for</span> <span class="br0">&#40;</span><span class="kw2">var</span> i<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> aResults.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            html <span class="sy0">+=</span> <span class="st0">&quot;&lt;li&gt;&lt;strong&gt;&quot;</span> <span class="sy0">+</span>
+                aResults<span class="br0">&#91;</span>i<span class="br0">&#93;</span>.<span class="me1">Title</span> <span class="sy0">+</span>
+                <span class="st0">&quot;:&lt;/strong&gt; &lt;a href='&quot;</span> <span class="sy0">+</span>
+                aResults<span class="br0">&#91;</span>i<span class="br0">&#93;</span>.<span class="me1">Url</span> <span class="sy0">+</span>
+                <span class="st0">&quot;'&gt;&quot;</span> <span class="sy0">+</span> aResults<span class="br0">&#91;</span>i<span class="br0">&#93;</span>.<span class="me1">Url</span> <span class="sy0">+</span>
+                <span class="st0">&quot;&lt;/a&gt;&lt;/li&gt;&quot;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+&nbsp;
+        <span class="co1">//close list of inbound links</span>
+        html <span class="sy0">+=</span> <span class="st0">&quot;&lt;/ol&gt;&quot;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><span class="co1">//no inbound links exist for this page:</span>
+&nbsp;
+        <span class="kw2">var</span> html <span class="sy0">=</span> <span class="st0">&quot;&lt;h3&gt;There are no inbound links for the page specified.&lt;/h3&gt;&quot;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="br0">&#125;</span>
+&nbsp;
+    <span class="co1">//insert string into DOM:</span>
+    elResults.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'innerHTML'</span><span class="sy0">,</span> html<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">//suppress default form behavior</span>
+Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;submit&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    getSiteExplorerData<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#siteExplorer&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;</pre></div><textarea id="syntax-87f3704eccbc82aa741b5b6cd3dfa24e-plain">// We are going to create a global variable to get the 
+// data back from the web service
+MyNamespace = YUI.namespace('example.SiteExplorer');
+
+var elResults = Y.one("#results"),
+    tIds = {},
+    loading = false,
+    current = null;
+    
+// We use the Get Utility's success handler in conjunction with
+// the web service callback in order to detect bad responses 
+// from the web service.
+var onSiteExplorerSuccess = function(o) {
+
+    // stop blocking requests
+    loading = false;
+
+    // A success response means the script node is inserted.  However, the
+    // utility is unable to detect whether or not the content of the script
+    // node is correct, or even if there was a bad response (like a 404
+    // error).  To get around this, we use the web service callback to
+    // verify that the script contents was correct.
+    if (o.tId in tIds) {
+Y.log("The Get Utility has fired the success handler indicating that the " +
+      "requested script has loaded and is ready for use.", "info", "example");
+    } else {
+Y.log("The Get utility has fired onSuccess but the webservice callback did not " +
+      "fire.  We could retry the transaction here, or notify the user of the " +
+      "failure.", "info", "example");
+    }
+
+};
+
+var onSiteExplorerFailure = function(o) {
+Y.log("The Get Utility failed.", "info", "example");
+};
+
+var onSiteExplorerTimeout = function(o) {
+Y.log("The Get Utility timed out.", "info", "example");
+};
+
+//function to retrieve data from Yahoo! Site Explorer web service --
+// http://developer.yahoo.com/search/siteexplorer/V1/inlinkData.html
+var getSiteExplorerData = function() {
+    Y.log("Button clicked; getSiteExplorerData firing.", "info", "example");
+
+    // block multiple requests
+    if (loading) {
+        return;
+    }
+    loading = true;
+    
+    //Load the transitional state of the results section:
+    elResults.set("innerHTML", "<h3>Retrieving incoming links for " +
+        Y.one("#searchString").get('value') + ":</h3>" +
+        "<img src='http://l.yimg.com/a/i/nt/ic/ut/bsc/busybar_1.gif' " +
+        "alt='Please wait...'>");
+    
+    //prepare the URL for the Yahoo Site Explorer API:
+    var sURL = "http://search.yahooapis.com/SiteExplorerService/V1/inlinkData?" +
+        "appid=3wEDxLHV34HvAU2lMnI51S4Qra5m.baugqoSv4gcRllqqVZm3UrMDZWToMivf5BJ3Mom" +
+        "&results=20&output=json&omit_inlinks=domain" +
+        "&callback=MyNamespace.callback" +
+        "&query=" + encodeURIComponent(Y.one("#searchString").get('value'));
+    
+    //This simple line is the call to the Get Utility; we pass
+    //in the URL and the configuration object, which in this case
+    //consists merely of our success and failure callbacks:
+    var transactionObj = Y.Get.script(sURL, {
+        onSuccess: onSiteExplorerSuccess,
+        onFailure: onSiteExplorerFailure,
+        onTimeout: onSiteExplorerTimeout,
+        timeout: 20000,
+        context: Y
+    });
+    
+    //The script method returns a single-field object containing the
+    //tranaction id:
+    Y.log("Get Utility transaction started; transaction object: " + Y.dump(transactionObj), "info", "example");
+
+    // keep track of the current transaction id.  The transaction will be
+    // considered complete only if the web service callback is executed.
+    current = transactionObj.tId; 
+};
+
+MyNamespace.callback = function(results) {
+    Y.log("Web service returned data to Y.example.SiteExplorer.callback; beginning to process.", "info", "example");
+
+    // Mark the transaction as complete.  This will be checked by the onSuccess
+    // handler to determine if the transaction really succeeded.
+    tIds[current] = true;
+    
+    //work with the returned data to extract meaningful fields:
+    var aResults = results.ResultSet.Result;
+    var totalLinks = results.ResultSet.totalResultsAvailable;
+    var returnedLinkCount = results.ResultSet.totalResultsReturned;
+    
+    if(aResults) {//there are inbound links; process and display them:
+    
+        //write header and open list of inbound links:          
+        var html = "<h3>There are " +
+            totalLinks + 
+            " inbound links for this page; here are the first " + 
+            returnedLinkCount +
+            ":</h3><ol>";
+        
+        //process list of inbound links:
+        for (var i=0; i < aResults.length; i++) {
+            html += "<li><strong>" +
+                aResults[i].Title +
+                ":</strong> <a href='" +
+                aResults[i].Url +
+                "'>" + aResults[i].Url +
+                "</a></li>";
+        }
+        
+        //close list of inbound links
+        html += "</ol>";
+        
+    } else {//no inbound links exist for this page:
+    
+        var html = "<h3>There are no inbound links for the page specified.</h3>";
+        
+    }
+    
+    //insert string into DOM:
+    elResults.set('innerHTML', html);
+};
+
+//suppress default form behavior
+Y.on("submit", function(e) {
+    e.preventDefault();
+    getSiteExplorerData();
+}, "#siteExplorer");
+</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Get Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li class='selected'><a href='../get/get-script-basic.html'>Getting a Script Node with JSON Data</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Get Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/get/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/Get.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="selected "><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {filter:"debug", logInclude: {get:true, event:true, example:true}};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

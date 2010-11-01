@@ -1,0 +1,87 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Drag Delegation</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+<!--there is no custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Drag Delegation</h1>
+
+<div class="exampleIntro">
+	<p>This example shows how to create multiple draggable items efficiently.</p>
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<style>
+    #demo {
+        width: 200px;
+    }
+    #demo ul li {
+        border: 1px solid black;
+        background-color: #8DD5E7;
+        cursor: move;
+        margin: 3px;
+        list-style-type: none;
+    }
+</style>
+
+<div id="demo">
+    <ul>
+        <li>Item #1</li>
+        <li>Item #2</li>
+        <li>Item #3</li>
+        <li>Item #4</li>
+        <li>Item #5</li>
+        <li>Item #6</li>
+        <li>Item #7</li>
+        <li>Item #8</li>
+        <li>Item #9</li>
+        <li>Item #10</li>
+    </ul>
+</div>
+
+<button type="button" id="make">Add More</button>
+<script>
+
+YUI().use('dd-delegate', function(Y) {
+    var del = new Y.DD.Delegate({
+        container: '#demo',
+        nodes: 'li'
+    });
+
+    Y.one('#make').on('click', function(e) {
+        var demo = Y.one('#demo ul');
+        for (var i = 1; i < 11; i++) {
+            demo.append('<li>New item #' + i + '</li>');
+        }
+    });
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

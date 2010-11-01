@@ -1,0 +1,168 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Basic Attribute Configuration</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+    .example-out .myclass-attrs {
+        font-family:courier;
+        margin-top:2px;
+    }
+
+    .example-out .myclass-title {
+        font-weight:bold;
+        font-family:arial;
+        color:#8dd5e7;
+        margin-top:5px;
+        margin-bottom:3px;
+    }
+
+    .example-out {
+        overflow:auto;
+        border:1px solid #000;
+        color:#ffffff;
+        background-color:#004C6D;
+        margin:5px;
+        height:8em;
+        padding:2px 2px 2px 5px;
+    }
+</style>
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Basic Attribute Configuration</h1>
+
+<div class="exampleIntro">
+	<p>This example provides an introduction to the Attribute utility, showing how you can use it to add attribute support to your own custom classes.</p>
+
+<p>
+It is geared towards users who want to create their own classes from scratch and add Attribute support. In most cases you should consider extending the <a href="http://developer.yahoo.com/yui/3/base/index.html"><code>Base</code></a> class when you need managed attribute support, 
+instead of augmenting Attribute directly, especially if you expect your class to be extended. <a href="http://developer.yahoo.com/yui/3/base/index.html"><code>Base</code></a> does the work described in this example for you, in addition to making it easier for users to extend you class.
+</p>			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<div id="createo1">
+    <button type="button" class="do">Create First Instance</button> Construct o1, with default attribute values
+    <div class="example-out"></div>
+</div>
+<div id="updateo1">
+    <button type="button" class="do">Update First Instance</button> Update the first instance, using set
+    <div class="example-out"></div>
+</div>
+<div id="createo2">
+    <button type="button" class="do">Create Second Instance</button> Create the second instance, passing initial values to the constructor
+    <div class="example-out"></div>
+</div>
+
+<script type="text/javascript">
+
+// Get a new instance of YUI and 
+// load it with the required set of modules
+
+YUI().use("node", "attribute", function(Y) {
+
+    // Setup custom class which we want to 
+    // add managed attribute support to
+
+    function MyClass(cfg) {
+
+        // When constructed, setup the initial attributes for the instance, by calling the addAttrs method.
+        var attrs = {
+            // Add 3 attributes, foo, bar and foobar
+            "foo" : {
+                value:5
+            },
+     
+            "bar" : {
+                value:"Hello World!"
+            },
+    
+            "foobar" : {
+                value:true
+            }
+        };
+
+        this.addAttrs(attrs, cfg);
+    }
+
+    // Augment custom class with Attribute
+    Y.augment(MyClass, Y.Attribute);
+
+    function displayValues(o, title, node) {
+        var str = 
+            '<div class="myclass"><div class="myclass-title">' 
+            + title + 
+            '</div><ul class="myclass-attrs"><li>foo: ' 
+            + o.get("foo") 
+            + '</li><li>bar: '
+            + o.get("bar")
+            + '</li><li>foobar: '
+            + o.get("foobar")
+            + '</li></ul></div>';
+
+        Y.one(node).set("innerHTML", str);
+    }
+
+    Y.on("click", function() {
+
+        // Create a new instance, but don't provide any initial attribute values.
+        var o1 = new MyClass();
+
+        // Display current values
+        displayValues(o1, "o1 with default values, set during construction", "#createo1 .example-out");
+
+        Y.on("click", function() {
+
+            // Update values, using the "set" method
+            o1.set("foo", 10);
+            o1.set("bar", "Hello New World!");
+            o1.set("foobar", false);
+
+            displayValues(o1, "o1 values updated using set, after construction", "#updateo1 .example-out");
+
+        }, "#updateo1 .do");
+
+    }, "#createo1 .do");
+
+    Y.on("click", function() {
+
+        var o2 = new MyClass({
+            foo: 7,
+            bar: "Aloha World!",
+            foobar: false
+        });
+
+        displayValues(o2, "o2 values set during construction", "#createo2 .example-out");
+
+    }, "#createo2 .do");
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

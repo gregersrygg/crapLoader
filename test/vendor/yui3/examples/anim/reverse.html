@@ -1,0 +1,337 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>YUI Library Examples: Animation: Reversing an Animation</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
+
+<style>
+    /*Supplemental CSS for the YUI distribution*/
+    #custom-doc { width: 95%; min-width: 950px; }
+    #pagetitle {background-image: url(../../assets/bg_hd.gif);}
+/*    #pagetitle h1 {background-image: url(../../assets/title_h_bg.gif);}*/
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<link href="assets//anim.css" rel="stylesheet" type="text/css">
+
+</head>
+<body id="yahoo-com" class="yui3-skin-sam  yui-skin-sam">
+<div id="custom-doc" class="yui-t2">
+<div id="hd">
+	<div id="ygunav">
+		<p>
+            <em>
+                <a href="http://developer.yahoo.com/yui/3/">YUI 3.x Home</a> <i> - </i>	
+            </em>
+		</p>
+		<form action="http://search.yahoo.com/search" id="sitesearchform">
+            <input name="vs" type="hidden" value="developer.yahoo.com">
+            <input name="vs" type="hidden" value="yuiblog.com">
+		    <div id="sitesearch">
+		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+			    <input type="text" id="searchinput" name="p">
+			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
+		    </div>
+		</form>
+    </div>
+	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
+	<div id="pagetitle"><h1>YUI Library Examples: Animation: Reversing an Animation</h1></div>
+</div>
+<div id="bd">
+
+
+	<div id="yui-main">
+		<div class="yui-b">
+		  <div class="yui-ge">
+			  <div class="yui-u first example" id="main">
+
+	<h2>Animation: Reversing an Animation</h2>
+
+	<div id="example" class="promo">
+	<div class="example-intro">
+	<p>This demonstrates how to use the <code>reverse</code> attribute to change the behavior of the animation.</p>
+<p> Click the icon in the header to toggle the element's <code>height</code>.</p>
+
+	</div>	
+
+	<div class="module example-container ">
+			<div class="hd exampleHd">
+			<p class="newWindowButton yui-skin-sam">
+                <a href="reverse_clean.html" target="_blank">View example in new window.</a>
+            </p>
+		</div>		<div id="example-canvas" class="bd">
+
+		
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	
+	    
+<div id="demo" class="yui3-module">
+    <div class="yui3-hd">
+        <h4>Animation Demo</h4>
+    </div>
+    <div class="yui3-bd">
+        <p>This an example of what you can do with the YUI Animation Utility.</p>
+        <p><em>Follow the instructions above to see the animation in action.</em></p>
+    </div>
+</div>
+<p>This is placeholder text used to demonstrate how the above animation affects subsequent content.</p> 
+<script type="text/javascript">
+YUI({filter: 'raw'}).use("node", "anim", function(Y) {
+    var module = Y.one('#demo');
+
+    // add fx plugin to module body
+    var content = module.query('.yui3-bd').plug(Y.Plugin.NodeFX, {
+        from: { height: 1 },
+        to: {
+            height: function(node) { // dynamic in case of change
+                return node.get('scrollHeight'); // get expanded height (offsetHeight may be zero)
+            }
+        },
+
+        easing: Y.Easing.easeOut,
+        duration: 0.5
+    });
+
+    var onClick = function(e) {
+        module.toggleClass('yui3-closed');
+        content.fx.set('reverse', !content.fx.get('reverse')); // toggle reverse 
+        content.fx.run();
+    };
+
+    // use dynamic control for dynamic behavior
+    var control = Y.Node.create(
+        '<a title="show/hide content" class="yui3-toggle">' +
+            '<em>toggle</em>' +
+        '</a>'
+    );
+
+    // append dynamic control to header section
+    module.query('.yui3-hd').appendChild(control);
+    control.on('click', onClick);
+
+});
+
+</script>
+	
+	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+	
+		
+		</div>
+	</div>			
+	</div>
+		
+	<h3>Setting up the HTML</h3>
+<p>First we add some HTML to animate.</p>
+<div id="syntax-cd2d9f2d93e89ed9491d2a3be3dcc402" class="yui-syntax-highlight"><div class="numbers"><pre class="html4strict" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;demo&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-module&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-hd&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>Animation Demo<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">a</span> <span class="kw3">title</span><span class="sy0">=</span><span class="st0">&quot;remove module&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-toggle&quot;</span>&gt;&lt;<span class="kw2">em</span>&gt;</span>-<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;</span></div></li><li class="li2"><div class="de2">    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-bd&quot;</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">p</span>&gt;</span>This an example of what you can do with the YUI Animation Utility.<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sc2">&lt;<span class="kw2">p</span>&gt;&lt;<span class="kw2">em</span>&gt;</span>Follow the instructions above to see the animation in action.<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li><li class="li2"><div class="de2"><span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="html4strict" style="font-family:monospace;"><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;demo&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-module&quot;</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-hd&quot;</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">h4</span>&gt;</span>Animation Demo<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">h4</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">a</span> <span class="kw3">title</span><span class="sy0">=</span><span class="st0">&quot;remove module&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-toggle&quot;</span>&gt;&lt;<span class="kw2">em</span>&gt;</span>-<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">a</span>&gt;</span>
+    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+    <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-bd&quot;</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">p</span>&gt;</span>This an example of what you can do with the YUI Animation Utility.<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span>
+        <span class="sc2">&lt;<span class="kw2">p</span>&gt;&lt;<span class="kw2">em</span>&gt;</span>Follow the instructions above to see the animation in action.<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">p</span>&gt;</span>
+    <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span>
+<span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span></pre></div><textarea id="syntax-cd2d9f2d93e89ed9491d2a3be3dcc402-plain"><div id="demo" class="yui3-module">
+    <div class="yui3-hd">
+        <h4>Animation Demo</h4>
+        <a title="remove module" class="yui3-toggle"><em>-</em></a>
+    </div>
+    <div class="yui3-bd">
+        <p>This an example of what you can do with the YUI Animation Utility.</p>
+        <p><em>Follow the instructions above to see the animation in action.</em></p>
+    </div>
+</div></textarea></div>
+<h3>Using the NodeFX Plugin</h3>
+<p>For this example, we will use <code>Node</code>'s <code>fx</code> plugin to animate the element.  The plugin adds the anim instance to the <code>Node</code> instance, pre-configuring it to use the Node instance as the <code>Anim</code>'s node.  The <code>plug</code> method accepts a class to construct and an optional config to pass to the constructor.</p>
+<p>Setting the <code>from</code> attribute to the expanded height of the element allows us to toggle the effect using the <code>reverse</code> attribute, which we will see below (<code>from</code> uses current value when omitted).</p>
+
+<div id="syntax-2f5b570c20dd68c0c2859f09c839a948" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> module <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// add fx plugin to module body</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> content <span class="sy0">=</span> module.<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">'.yui3-bd'</span><span class="br0">&#41;</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFX</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">    from<span class="sy0">:</span> <span class="br0">&#123;</span> height<span class="sy0">:</span> <span class="nu0">0</span> <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    to<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        height<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span> <span class="br0">&#123;</span> <span class="co1">// dynamic in case of change</span></div></li><li class="li1"><div class="de1">            <span class="kw1">return</span> node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'scrollHeight'</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// get expanded height (offsetHeight may be zero)</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    easing<span class="sy0">:</span> Y.<span class="me1">Easing</span>.<span class="me1">easeOut</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    from<span class="sy0">:</span> <span class="br0">&#123;</span> height<span class="sy0">:</span> <span class="nu0">0</span> <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">    duration<span class="sy0">:</span> <span class="nu0">0.5</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> module <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// add fx plugin to module body</span>
+<span class="kw2">var</span> content <span class="sy0">=</span> module.<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">'.yui3-bd'</span><span class="br0">&#41;</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFX</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+    from<span class="sy0">:</span> <span class="br0">&#123;</span> height<span class="sy0">:</span> <span class="nu0">0</span> <span class="br0">&#125;</span><span class="sy0">,</span>
+    to<span class="sy0">:</span> <span class="br0">&#123;</span>
+        height<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span> <span class="br0">&#123;</span> <span class="co1">// dynamic in case of change</span>
+            <span class="kw1">return</span> node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'scrollHeight'</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// get expanded height (offsetHeight may be zero)</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+    easing<span class="sy0">:</span> Y.<span class="me1">Easing</span>.<span class="me1">easeOut</span><span class="sy0">,</span>
+    from<span class="sy0">:</span> <span class="br0">&#123;</span> height<span class="sy0">:</span> <span class="nu0">0</span> <span class="br0">&#125;</span><span class="sy0">,</span>
+    duration<span class="sy0">:</span> <span class="nu0">0.5</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-2f5b570c20dd68c0c2859f09c839a948-plain">var module = Y.one('#demo');
+
+// add fx plugin to module body
+var content = module.query('.yui3-bd').plug(Y.Plugin.NodeFX, {
+    from: { height: 0 },
+    to: {
+        height: function(node) { // dynamic in case of change
+            return node.get('scrollHeight'); // get expanded height (offsetHeight may be zero)
+        }
+    },
+
+    easing: Y.Easing.easeOut,
+    from: { height: 0 },
+    duration: 0.5
+});</textarea></div>
+<h3>Creating the Control Element</h3>
+<p>Because our behavior only works when JS is available, let's go ahead and add our control element using JS as well.</p>
+
+<div id="syntax-08e4652b6c701e35415639cdc96391fc" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="co1">// use dynamic control for dynamic behavior</span></div></li><li class="li1"><div class="de1"><span class="kw2">var</span> control <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span></div></li><li class="li1"><div class="de1">    <span class="st0">'&lt;a title=&quot;show/hide content&quot; class=&quot;yui3-toggle&quot;&gt;'</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">'&lt;em&gt;toggle&lt;/em&gt;'</span> <span class="sy0">+</span></div></li><li class="li2"><div class="de2">    <span class="st0">'&lt;/a&gt;'</span></div></li><li class="li1"><div class="de1"><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1"><span class="co1">// append dynamic control to header section</span></div></li><li class="li1"><div class="de1">module.<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">'.yui3-hd'</span><span class="br0">&#41;</span>.<span class="me1">appendChild</span><span class="br0">&#40;</span>control<span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="co1">// use dynamic control for dynamic behavior</span>
+<span class="kw2">var</span> control <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span>
+    <span class="st0">'&lt;a title=&quot;show/hide content&quot; class=&quot;yui3-toggle&quot;&gt;'</span> <span class="sy0">+</span>
+        <span class="st0">'&lt;em&gt;toggle&lt;/em&gt;'</span> <span class="sy0">+</span>
+    <span class="st0">'&lt;/a&gt;'</span>
+<span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// append dynamic control to header section</span>
+module.<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">'.yui3-hd'</span><span class="br0">&#41;</span>.<span class="me1">appendChild</span><span class="br0">&#40;</span>control<span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-08e4652b6c701e35415639cdc96391fc-plain">// use dynamic control for dynamic behavior
+var control = Y.Node.create(
+    '<a title="show/hide content" class="yui3-toggle">' +
+        '<em>toggle</em>' +
+    '</a>'
+);
+
+// append dynamic control to header section
+module.query('.yui3-hd').appendChild(control);</textarea></div><h3>Toggling Animation Behavior</h3>
+<p>Before calling <code>run</code> in our <code>click</code> handler, we will use the <code>reverse</code> attribute toggle the direction of the animation depending on whether its opening or closing.</p>
+
+<div id="syntax-09f6c4c2c1dcf4fe6eecaa0753af751d" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> onClick <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    module.<span class="me1">toggleClass</span><span class="br0">&#40;</span><span class="st0">'yui-closed'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    content.<span class="me1">fx</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'reverse'</span><span class="sy0">,</span> <span class="sy0">!</span>content.<span class="me1">fx</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'reverse'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// toggle reverse</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> onClick <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    module.<span class="me1">toggleClass</span><span class="br0">&#40;</span><span class="st0">'yui-closed'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    content.<span class="me1">fx</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'reverse'</span><span class="sy0">,</span> <span class="sy0">!</span>content.<span class="me1">fx</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'reverse'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// toggle reverse</span>
+<span class="br0">&#125;</span><span class="sy0">;</span></pre></div><textarea id="syntax-09f6c4c2c1dcf4fe6eecaa0753af751d-plain">var onClick = function(e) {
+    module.toggleClass('yui-closed');
+    content.fx.set('reverse', !content.fx.get('reverse')); // toggle reverse
+};</textarea></div>
+<h3>Running the Animation</h3>
+<p>Finally we add an event handler to run the animation.</p>
+<div id="syntax-f5d795a37075311f0fb6054d865a60b9" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">module.<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">'.yui3-toggle'</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> onClick<span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">module.<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">'.yui3-toggle'</span><span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> onClick<span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-f5d795a37075311f0fb6054d865a60b9-plain">module.query('.yui3-toggle').on('click', onClick);</textarea></div>
+<h3>Full Script Source</h3>
+<div id="syntax-c26473f37a84cd4524083e180c41e786" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'anim'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> module <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// add fx plugin to module body</span></div></li><li class="li2"><div class="de2">    <span class="kw2">var</span> content <span class="sy0">=</span> module.<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">'.yui3-bd'</span><span class="br0">&#41;</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFX</span><span class="sy0">,</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        from<span class="sy0">:</span> <span class="br0">&#123;</span> height<span class="sy0">:</span> <span class="nu0">0</span> <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        to<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            height<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span> <span class="br0">&#123;</span> <span class="co1">// dynamic in case of change</span></div></li><li class="li1"><div class="de1">                <span class="kw1">return</span> node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'scrollHeight'</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// get expanded height (offsetHeight may be zero)</span></div></li><li class="li2"><div class="de2">            <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        easing<span class="sy0">:</span> Y.<span class="me1">Easing</span>.<span class="me1">easeOut</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        duration<span class="sy0">:</span> <span class="nu0">0.5</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> onClick <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        module.<span class="me1">toggleClass</span><span class="br0">&#40;</span><span class="st0">'yui-closed'</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        content.<span class="me1">fx</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'reverse'</span><span class="sy0">,</span> <span class="sy0">!</span>content.<span class="me1">fx</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'reverse'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// toggle reverse</span></div></li><li class="li2"><div class="de2">        content.<span class="me1">fx</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="co1">// use dynamic control for dynamic behavior</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> control <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span></div></li><li class="li2"><div class="de2">        <span class="st0">'&lt;a title=&quot;show/hide content&quot; class=&quot;yui3-toggle&quot;&gt;'</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">            <span class="st0">'&lt;em&gt;toggle&lt;/em&gt;'</span> <span class="sy0">+</span></div></li><li class="li1"><div class="de1">        <span class="st0">'&lt;/a&gt;'</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li2"><div class="de2">    <span class="co1">// append dynamic control to header section</span></div></li><li class="li1"><div class="de1">    module.<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">'.yui3-hd'</span><span class="br0">&#41;</span>.<span class="me1">appendChild</span><span class="br0">&#40;</span>control<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    control.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> onClick<span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'anim'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="kw2">var</span> module <span class="sy0">=</span> Y.<span class="me1">one</span><span class="br0">&#40;</span><span class="st0">'#demo'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// add fx plugin to module body</span>
+    <span class="kw2">var</span> content <span class="sy0">=</span> module.<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">'.yui3-bd'</span><span class="br0">&#41;</span>.<span class="me1">plug</span><span class="br0">&#40;</span>Y.<span class="me1">Plugin</span>.<span class="me1">NodeFX</span><span class="sy0">,</span> <span class="br0">&#123;</span>
+        from<span class="sy0">:</span> <span class="br0">&#123;</span> height<span class="sy0">:</span> <span class="nu0">0</span> <span class="br0">&#125;</span><span class="sy0">,</span>
+        to<span class="sy0">:</span> <span class="br0">&#123;</span>
+            height<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span>node<span class="br0">&#41;</span> <span class="br0">&#123;</span> <span class="co1">// dynamic in case of change</span>
+                <span class="kw1">return</span> node.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'scrollHeight'</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// get expanded height (offsetHeight may be zero)</span>
+            <span class="br0">&#125;</span>
+        <span class="br0">&#125;</span><span class="sy0">,</span>
+&nbsp;
+        easing<span class="sy0">:</span> Y.<span class="me1">Easing</span>.<span class="me1">easeOut</span><span class="sy0">,</span>
+        duration<span class="sy0">:</span> <span class="nu0">0.5</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw2">var</span> onClick <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        module.<span class="me1">toggleClass</span><span class="br0">&#40;</span><span class="st0">'yui-closed'</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        content.<span class="me1">fx</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'reverse'</span><span class="sy0">,</span> <span class="sy0">!</span>content.<span class="me1">fx</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'reverse'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// toggle reverse</span>
+        content.<span class="me1">fx</span>.<span class="me1">run</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// use dynamic control for dynamic behavior</span>
+    <span class="kw2">var</span> control <span class="sy0">=</span> Y.<span class="me1">Node</span>.<span class="me1">create</span><span class="br0">&#40;</span>
+        <span class="st0">'&lt;a title=&quot;show/hide content&quot; class=&quot;yui3-toggle&quot;&gt;'</span> <span class="sy0">+</span>
+            <span class="st0">'&lt;em&gt;toggle&lt;/em&gt;'</span> <span class="sy0">+</span>
+        <span class="st0">'&lt;/a&gt;'</span>
+    <span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// append dynamic control to header section</span>
+    module.<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">'.yui3-hd'</span><span class="br0">&#41;</span>.<span class="me1">appendChild</span><span class="br0">&#40;</span>control<span class="br0">&#41;</span><span class="sy0">;</span>
+    control.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click'</span><span class="sy0">,</span> onClick<span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-c26473f37a84cd4524083e180c41e786-plain">YUI().use('anim', function(Y) {
+    var module = Y.one('#demo');
+
+    // add fx plugin to module body
+    var content = module.query('.yui3-bd').plug(Y.Plugin.NodeFX, {
+        from: { height: 0 },
+        to: {
+            height: function(node) { // dynamic in case of change
+                return node.get('scrollHeight'); // get expanded height (offsetHeight may be zero)
+            }
+        },
+
+        easing: Y.Easing.easeOut,
+        duration: 0.5
+    });
+
+    var onClick = function(e) {
+        module.toggleClass('yui-closed');
+        content.fx.set('reverse', !content.fx.get('reverse')); // toggle reverse
+        content.fx.run();
+    };
+
+    // use dynamic control for dynamic behavior
+    var control = Y.Node.create(
+        '<a title="show/hide content" class="yui3-toggle">' +
+            '<em>toggle</em>' +
+        '</a>'
+    );
+
+    // append dynamic control to header section
+    module.query('.yui3-hd').appendChild(control);
+    control.on('click', onClick);
+});</textarea></div>				</div>
+				<div class="yui-u sidebar">
+					
+				
+					<div id="examples" class="mod box4">
+                        <div class="hd">
+						<h4>
+    Animation Examples:</h4>
+                        </div>
+						<div class="bd">
+							<ul>
+								<li><a href='../anim/basic.html'>Basic Animation</a></li><li><a href='../anim/easing.html'>Animation Easing</a></li><li><a href='../anim/colors.html'>Animating Colors</a></li><li><a href='../anim/alt-iterations.html'>Alternating Iterations</a></li><li><a href='../anim/anim-xy.html'>Animating XY Position</a></li><li><a href='../anim/curve.html'>Animating Along a Curved Path</a></li><li><a href='../anim/scroll.html'>Animated Scrolling</a></li><li class='selected'><a href='../anim/reverse.html'>Reversing an Animation</a></li><li><a href='../anim/end-event.html'>Using the End Event</a></li><li><a href='../anim/anim-chaining.html'>Chaining Animations Using the <code>end</code> Event</a></li><li><a href='../overlay/overlay-anim-plugin.html'>Animation Plugin (included with examples for Overlay)</a></li><li><a href='../async-queue/queue_app.html'>Building a UI with AsyncQueue (included with examples for AsyncQueue)</a></li>							</ul>
+						</div>
+					</div>
+					
+					<div class="mod box4">
+                        <div class="hd">
+						<h4>More Animation Resources:</h4>
+                        </div>
+                        <div class="bd">
+						<ul>
+							<!-- <li><a href="http://developer.yahoo.com/yui/anim/">User's Guide</a> (external)</li> -->
+<li><a href="../../api/module_anim.html">API Documentation</a></li></ul>
+                        </div>
+					</div>
+			  </div>
+		</div>
+		
+		</div>
+	</div>
+
+
+<div class="yui-b toc3" id="tocWrapper">
+<!-- TABLE OF CONTENTS -->
+<div id="toc">
+	
+<ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="selected "><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+</div>
+</div>
+	</div><!--closes bd-->
+
+	<div id="ft">
+        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
+            <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
+            <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
+            <a href="http://careers.yahoo.com/">Job Openings</a></p>
+	</div>
+</div>
+<script language="javascript"> 
+var yuiConfig = {};
+</script>
+<script src="../../assets/syntax.js"></script>
+<script src="../../assets/dpSyntaxHighlighter.js"></script>
+<script language="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script>
+</body>
+</html>

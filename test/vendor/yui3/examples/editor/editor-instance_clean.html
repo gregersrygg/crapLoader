@@ -1,0 +1,117 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Using the Editor's Instance</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+<!--there is no custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Using the Editor's Instance</h1>
+
+<div class="exampleIntro">
+	<p>Use the Editor's instance to query the iframe</p>
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<style>
+    #editor_cont {
+        width: 600px;
+        border: 1px solid #999;
+        margin: 2em;
+        background-color: #f2f2f2;
+    }
+    #editor {
+        height: 265px;
+        background-color: #fff;
+    }
+    #buttons, #out {
+        padding: 10px;
+    }
+    #buttons {
+        border-bottom: 1px solid #999;
+    }
+    #out {
+        font-weight: bold;
+        border-top: 1px solid #999;
+    }
+</style>
+
+<p>Click the buttons below to query the Editor for its contents. You can even modify the contents and click them again to see the difference.</p>
+
+<div id="editor_cont">
+    <div id="buttons">
+        <button id="btags"># B tags?</button>
+        <button id="itags"># I tags?</button>
+        <button id="ctags"># with class foo?</button>
+    </div>
+    <div id="editor"></div>
+    <div id="out">&nbsp;</div>
+</div>
+
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+<script>
+
+YUI().use('editor', function(Y) {
+
+    var log = function(str) {
+        Y.one('#out').set('innerHTML', str);
+    };
+
+    //Create the Base Editor
+    var editor = new Y.EditorBase({
+        content: '<p><b>This is <i class="foo">a test</i></b></p><p><b style="color: red; font-family: Comic Sans MS">This is <span class="foo">a test</span></b></p>',
+        extracss: '.foo { font-weight: normal; color: black; background-color: yellow; }'
+    });
+    //Rendering the Editor
+    editor.render('#editor');
+
+    Y.on('click', function(e) {
+        var inst = editor.getInstance(),
+            bs = inst.all('b');
+        
+        log('There are (' + bs.size() + ') B tags in the iframe.');
+    }, '#btags');
+
+    Y.on('click', function(e) {
+        var inst = editor.getInstance(),
+            bs = inst.all('i');
+        
+        log('There are (' + bs.size() + ') I tags in the iframe.');
+    }, '#itags');
+
+    Y.on('click', function(e) {
+        var inst = editor.getInstance(),
+            bs = inst.all('.foo');
+        
+        log('There are (' + bs.size() + ') items with class foo in the iframe.');
+    }, '#ctags');
+
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

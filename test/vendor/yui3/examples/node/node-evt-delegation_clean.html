@@ -1,0 +1,69 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Delegating Node Events</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link type="text/css" rel="stylesheet" href="../../build/cssfonts/fonts-min.css" />
+<script type="text/javascript" src="../../build/yui/yui-min.js"></script>
+
+
+<!--begin custom header content for this example-->
+<link href="assets//node.css" rel="stylesheet" type="text/css">
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui3-skin-sam  yui-skin-sam">
+
+<h1>Delegating Node Events</h1>
+
+<div class="exampleIntro">
+	<p>This example demonstrates using a single event listener on a list to delegate clicks on the list items.</p>
+
+			
+</div>
+
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<ul id="demo">
+    <li><em>click me if you don't mind...</em></li>
+    <li><em>click me if you don't mind...</em></li>
+    <li><em>click me if you don't mind...</em></li>
+    <li><em>click me if you don't mind...</em></li>
+</ul>
+
+<script type="text/javascript">
+YUI().use("selector-css3", "node", function(Y) {
+    var nodes = Y.all('#demo li');
+
+    var onClick = function(e) {
+        e.currentTarget.addClass('yui3-pass'); // e.currentTarget === #demo li 
+        e.target.setContent('thanks for the click!'); // e.target === #demo li or #demo li em
+        e.container.setStyle('border', '5px solid blue'); // e.container === #demo
+
+        nodes.filter(':not(.yui3-pass)').setContent('Click me too please!');
+    };
+
+    Y.one('#demo').delegate('click', onClick, 'li');
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>
