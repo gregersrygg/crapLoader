@@ -76,6 +76,34 @@ var crapLoader = (function() {
         getElById: function(domId) {
             return elementCache[domId] || (elementCache[domId] = document.getElementById(domId));
         },
+        
+        getElementByIdReplacement: function(domId) {
+            var el = publ.orgGetElementById.call(document, domId);
+            if(el) return el;
+            if(inputBuffer.length) {
+                var before = new Date().getTime();
+                var html = inputBuffer.join("");
+                var frag = document.createDocumentFragment();
+                var div = document.createElement("div");
+                div.innerHTML = html;
+                frag.appendChild(div);
+                var found = traverseForElById(domId, div);
+                var after = new Date().getTime();
+                if(found && window.console) console.log("FOUND by id!!! " + found.id + " " + (after-before) + "ms");
+                return found;
+            }
+            
+            function traverseForElById(domId, el) {
+                var children = el.children;
+                if(children && children.length) {
+                    for(var i=0,l=children.length; i<l; i++) {
+                        var child = children[i];
+                        if(child.id && child.id === domId) return child;
+                        if(child.children && child.children.length) return traverseForElById(child);
+                    }
+                }
+            }
+        },
 
         loadScript: function(obj) {
             loading++;
@@ -167,7 +195,8 @@ var crapLoader = (function() {
             initialized = true;
             priv.extend(globalOptions, options);
             
-            document.write = priv.writeReplacement; 
+            document.write = priv.writeReplacement;
+            document.getElementById = priv.getElementByIdReplacement;
         },
          
         loadScript: function(src, domId, options) {
@@ -189,7 +218,8 @@ var crapLoader = (function() {
             }
         },
         
-        orgWrite: document.write,
+        orgGetElementById: document.getElementById,
+        orgWrite: document.write
      };
 
     return publ;
