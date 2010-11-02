@@ -21,16 +21,20 @@ var crapLoader = (function() {
      
 
     priv = {
+        checkQueue: function() {
+            if(queue.length) {
+                priv.loadScript( queue.shift() );
+            }
+        },
+        
         checkWriteBuffer: function(obj) {
             var buffer = writeBuffer[obj.domId];
 
             if(buffer && buffer.length) {
                 priv.writeHtml( buffer.shift(), obj );
 
-            } else if(queue.length) {
-                console.log("Loading script from queue!");
-                priv.loadScript( queue.shift() );
-
+            } else {
+                priv.finished(obj);
             }
         },
 
@@ -40,6 +44,14 @@ var crapLoader = (function() {
                 t[k] = s[k];
             }
             return t;
+        },
+        
+        finished: function(obj) {
+            if(obj.success && typeof obj.success == "function") {
+                obj.success.call(obj.domId);
+            }
+            
+            priv.checkQueue();
         },
 
         flush: function(obj) {
@@ -52,10 +64,11 @@ var crapLoader = (function() {
             
             htmlPartArray = priv.separateScriptsFromHtml( outputFromScript );
             
+            
             if(!writeBuffer[domId]) {
                 writeBuffer[domId] = htmlPartArray;
             } else {
-                writeBuffer[domId].unshift.apply(writeBuffer, htmlPartArray);
+                Array.prototype.unshift.apply(writeBuffer[domId], htmlPartArray);
             }
             priv.checkWriteBuffer(obj);
         },
@@ -90,9 +103,6 @@ var crapLoader = (function() {
                     }
                     
                     priv.flush(obj);
-                    if(obj.success && typeof obj.success == "function") {
-                        obj.success.call(script);
-                    }
                 }
             };
             
@@ -104,29 +114,26 @@ var crapLoader = (function() {
             // This arises when a base node is used (#2709 and #4378).
             head.insertBefore( script, head.firstChild );
             setTimeout(function() {
-                if(!script.loaded) console.error("SCRIPT NOT LOADED", script.src);
+                if(!script.loaded) throw new Error("SCRIPT NOT LOADED: " + script.src);
             }, 3000);
         },
         
         printScriptSrc: function(obj) {
-            var logoutput = "", i=obj.depth;
-            while(i-- > 1) {
-                logoutput += " ";
-            }
-            if(i-- > 0) {
-                logoutput += "+"
-            }
-            logoutput += "--" + obj.src;
-            console.log(logoutput);
+            var i=obj.depth, logoutput = obj.domId + " [" + i + "]: ";
+            //while(i-- > 1) {
+            //    logoutput += "   ";
+            //}
+            logoutput += "\t" +(obj.src.length > 50 ? obj.src.substr(0,50)+"..." : obj.src);
+            if(window.console) console.log(logoutput);
         },
         
         separateScriptsFromHtml: function(htmlStr) {
-            var chunks = []
-                ,splitHtml = htmlStr.split(splitScriptsRegex)
-                ,i = 0
-                ,l = splitHtml.length
-                ,scriptMatch
-                ,tmp;
+            var splitHtml = [], tmp = htmlStr.split(splitScriptsRegex);
+
+            for(var i=0, l=tmp.length; i<l; i=i+1) {
+                if(tmp[i]!=="") splitHtml.push(tmp[i]);
+            }
+            
             return splitHtml;    
         },
 
@@ -139,6 +146,8 @@ var crapLoader = (function() {
             } else {
                 var container = priv.getElById(obj.domId);
                 if(!container) throw new Error("crapLoader: Unable to inject html. Element with id '" + obj.domId + "' does not exist");
+                //console.log("    " + html.substring(0, html.length > 40 ? 40 : html.length).replace(/\n/g, "") + "...");
+                //console.log(html);
                 container.innerHTML += html;
                 priv.checkWriteBuffer(obj);
             }
@@ -168,10 +177,15 @@ var crapLoader = (function() {
             obj.domId = domId;
             obj.depth = 0;
             
-            if(loading && globalOptions.loadSequentially) {
+            if(globalOptions.loadSequentially) {
                 queue.push(obj);
+                setTimeout(function() {
+                    if(loading === 0) priv.checkQueue();
+                }, 1);
             } else {
-                priv.loadScript(obj);
+                setTimeout(function() {
+                    priv.loadScript(obj);
+                }, 1);
             }
         },
         

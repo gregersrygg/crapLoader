@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml"> 
-<head> 
+<head>
+	<meta charset="utf-8"/>
 	<title> 
                 FINN.no: Reise, Torget, Eiendom, Bil, MC, Båt, Tjenester ...
     </title>
@@ -20,7 +21,7 @@
 	<!--[if lte IE 6]>
 		<link rel="stylesheet" type="text/css" media="screen" href="http://cache.finn.no/styles/ie.css">
 	<![endif]--> 
-	<script type="text/javascript" language="javascript" src="file:///Users/figrrygg/devel/crapLoader/src/crapLoader.js"></script> 
+	<script type="text/javascript" language="javascript" src="file:///Users/gregers/devel/crapLoader/src/crapLoader.js"></script> 
 	<script type="text/javascript">
 		crapLoader.hijack({loadSequentially: true, printTree: true});
 	</script>
@@ -93,9 +94,9 @@
     </script> 
     <script id="helios_script_2" type="text/javascript"> 
     <!--
-    function HELIOS_AD(pos, domId) {
+    function HELIOS_AD(pos, domId, callback) {
         var url = helios_server + 'addyn|' + helios_version + '|' + helios_network + '|' + helios_fallback[pos] + '|0|' + helios_size[pos] + '|ADTECH;cookie=info;loc=100;target=_blank;alias=' + helios_alias[pos] + ';key=' + helios_keywords + rsi_segs + ';grp=' + helios_group + ';' + helios_keyvalues + ';randnum=' + helios_random_id + ';' + helios_parameters + ';misc=' + new Date().getTime();
-		crapLoader.loadScript(url, domId);
+		crapLoader.loadScript(url, domId, {success: callback});
     }
     //-->
     </script> 
@@ -119,22 +120,19 @@
                <div id="dominant_campaign_left">
     <script type="text/javascript">
         // <![CDATA[
-        if (typeof HELIOS_AD == 'function') HELIOS_AD("Left1", "dominant_campaign_left");
+        if (typeof HELIOS_AD == 'function') HELIOS_AD("Left1", "dominant_campaign_left", function() {
+			var dcl = document.getElementById("leftbanner");
+			var emptygif = new RegExp( /empty.gif$/ );
+			var bool = false;
+			if(dcl.getElementsByTagName("object").length !== 0 ||
+			( dcl.getElementsByTagName("img").length !== 0  && !dcl.getElementsByTagName("img")[0].src.match(emptygif))){
+				document.getElementsByTagName("body")[0].setAttribute('class',"dominant_campaign");
+				document.getElementsByTagName("body")[0].setAttribute('className',"dominant_campaign");
+			}
+		});
         // ]]>
     </script>
 </div>
-<script type="text/javascript">
-
-		var dcl = document.getElementById("leftbanner");
-		var emptygif = new RegExp( /empty.gif$/ );
-		var bool = false;
-		if(dcl.getElementsByTagName("object").length !== 0 ||
-		( dcl.getElementsByTagName("img").length !== 0  && !dcl.getElementsByTagName("img")[0].src.match(emptygif))){
-			document.getElementsByTagName("body")[0].setAttribute('class',"dominant_campaign");
-			document.getElementsByTagName("body")[0].setAttribute('className',"dominant_campaign");
-		}
-
-</script>
  
             </div> 
             <div id="topbanner"> 
@@ -772,75 +770,7 @@
  
  
         </div> 
-    </li> 
-	
- 
-    
-    <li id="follow-us"> 
-        <div class="site-module-content"> 
-            
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-<span class="dot bluedot dot1"></span><span class="dot bluedot dot2"></span><span class="dot bluedot dot3"></span><span class="dot bluedot dot4"></span> 
-            
- 
- 
- 
- 
- 
-<h3>Følg oss på</h3> 
- 
-<div id="fb-root"></div> 
-<script type="text/javascript"> 
-    window.fbAsyncInit = function() {
-        FB.init({appId: '70543103445', status: true, cookie: true,
-            xfbml: true});
-    };
-    (function() {
-        var e = document.createElement('script');
-        e.async = true;
-        e.src = 'http://connect.facebook.net/nb_NO/all.js';
-        document.getElementById('fb-root').appendChild(e);
-    }());
-</script> 
-<div class="module-content"> 
-    <div class="icon"> 
-        <a href="http://www.facebook.com/finn.no" target="_blank"> 
-            <img src="http://cache.finn.no/img//facebook-icon.png" alt="facebook" style="border: 0;"/> 
-        </a> 
-    </div> 
-    <div class="text"> 
-        <a href="http://www.facebook.com/finn.no" target="_blank">FINN på Facebook</a> 
- 
- 
-<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.facebook.com%2Ffinn.no&amp;layout=standard&amp;show_faces=false&amp;width=215&amp;action=like&amp;colorscheme=light&amp;height=45"
-		scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:215px; height:45px;" allowTransparency="true"></iframe> 
-    </div> 
-    <div style="clear: both"></div> 
-    <div class="icon"> 
-        <a href="http://www.twitter.com/finn_no" target="_blank"> 
-            <img src="http://cache.finn.no/img//twitter-icon.png" alt="twitter" style="border: 0;"/> 
-        </a> 
-    </div> 
-    <div class="text"> 
-        Nå er vi på Twitter<br/> 
-        <a href="http://www.twitter.com/finn_no" target="_blank">Følg oss på Twitter</a> 
-    </div> 
-    <div style="clear: both"></div> 
- 
-</div> 
- 
-        </div> 
-    </li> 
-    
+    </li>     
  
     
         <li id="promo-travel-small"> 
@@ -1026,31 +956,7 @@
             </div> 
         
  
- 
- 
- 
-    
-        
-            <script type="text/javascript" SRC="http://cache.finn.no/clientscript/popsurvey_frontpage.js"></script> 
-            <script type="text/javascript"> 
-                rand = Math.floor(Math.random()*5);
-                if(rand==1)
-                    checkPopUp();
-            </script> 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    
- 
- 
-        </div> 
+  		</div> 
  
         <div id="sitewide-footer"> 
             
