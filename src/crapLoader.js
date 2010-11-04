@@ -7,8 +7,8 @@ var crapLoader = (function() {
         ,chunkBuffer
         ,loading = 0
         ,elementCache = {}
-        ,splitScriptsRegex = /(<script[^>]+src=['"]?[^'"\s]+[^>]*>\s*<\/script>)/
-        ,externalScriptSrcRegex = /<script[^>]+src=['"]?([^'"\s]+)[^>]*>\s*<\/script>/
+        ,splitScriptsRegex = /(<script[^>]+src=['"]?[^'"\s]+[^>]*>\s*<\/script>)/gim
+        ,externalScriptSrcRegex = /<script[^>]+src=['"]?([^'"\s]+)[^>]*>\s*<\/script>/im
         ,globalOptions = {
             loadSequentially: false,
             printTree: false
@@ -17,7 +17,8 @@ var crapLoader = (function() {
             async: false,
             charset: "utf-8",
             success: undefined
-        },priv,publ;
+        },priv,publ
+        ,splitWithCapturingParenthesesWorks = ("abc".split(/(b)/)[1]==="b");
      
 
     priv = {
@@ -156,13 +157,41 @@ var crapLoader = (function() {
         },
         
         separateScriptsFromHtml: function(htmlStr) {
-            var splitHtml = [], tmp = htmlStr.split(splitScriptsRegex);
-
-            for(var i=0, l=tmp.length; i<l; i=i+1) {
-                if(tmp[i]!=="") splitHtml.push(tmp[i]);
+            return priv.split(htmlStr, splitScriptsRegex);
+        },
+        
+        split: function(str, regexp) {
+            var match, prevIndex=0, tmp, result = [];
+            
+            if(false && splitWithCapturingParenthesesWorks) {
+                tmp = str.split(regexp);
+            } else {
+                // Cross browser split technique from Steven Levithan
+                // http://blog.stevenlevithan.com/archives/cross-browser-split
+                tmp = [];
+                while(match = regexp.exec(str)) {
+                    if(match.index > prevIndex) {
+                        result.push(str.slice(prevIndex, match.index));
+                    }    
+        
+                    if(match.length > 1 && match.index < str.length) {
+                        Array.prototype.push.apply(tmp, match.slice(1));
+                    }
+                    
+                    prevIndex = regexp.lastIndex;
+                }
+                
+                if(prevIndex < str.length) {
+                    tmp.push(str.slice(prevIndex));
+                }
+                
             }
             
-            return splitHtml;    
+            for(var i=0, l=tmp.length; i<l; i=i+1) {
+                if(tmp[i]!=="") result.push(tmp[i]);
+            }
+            
+            return result;
         },
 
         writeHtml: function(html, obj) {
