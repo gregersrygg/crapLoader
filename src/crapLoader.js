@@ -1,3 +1,4 @@
+// TODO: Support scripts that use ondomready or onload (Omniture, Brightcove)
 
 var crapLoader = (function() {
     var initialized = false
