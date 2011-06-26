@@ -219,7 +219,7 @@ var adLoader = (function() {
             } else {
                 var container = priv.getElById(obj.domId);
                 if(!container) throw new Error("adLoader: Unable to inject html. Element with id '" + obj.domId + "' does not exist");
-                html = this.trim(html);
+                html = this.trim(html); // newline before <object> cause weird effects in IE
                 if(html) container.innerHTML += html;
                 priv.checkWriteBuffer(obj);
             }
