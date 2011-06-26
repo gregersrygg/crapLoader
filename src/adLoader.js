@@ -77,7 +77,7 @@ var adLoader = (function() {
                ,outputFromScript
                ,htmlPartArray;
 
-            outputFromScript = inputBuffer.join("");
+            outputFromScript = this.stripNoScript( inputBuffer.join("") );
             inputBuffer = [];
 
             htmlPartArray = priv.separateScriptsFromHtml( outputFromScript );
@@ -143,10 +143,7 @@ var adLoader = (function() {
                         this.readyState === "loaded" || this.readyState === "complete") ) {
                     done = true;
                     script.onload = script.onreadystatechange = null;
-                    if ( head && script.parentNode ) {
-                        head.removeChild( script );
-                    }
-
+                    
                     priv.flush(obj);
                 }
             };
@@ -204,6 +201,14 @@ var adLoader = (function() {
 
             return result;
         },
+        
+        stripNoScript: function(html) {
+            return html.replace(/<noscript>.*?<\/noscript>/ig, "");
+        },
+        
+        trim: function(str) {
+            return str.replace(/^\s*|\s*$/gim, "");;
+        },
 
         writeHtml: function(html, obj) {
             var scriptMatch = html.match(externalScriptSrcRegex);
@@ -214,7 +219,8 @@ var adLoader = (function() {
             } else {
                 var container = priv.getElById(obj.domId);
                 if(!container) throw new Error("adLoader: Unable to inject html. Element with id '" + obj.domId + "' does not exist");
-                container.innerHTML += html;
+                html = this.trim(html);
+                if(html) container.innerHTML += html;
                 priv.checkWriteBuffer(obj);
             }
         },
