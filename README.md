@@ -15,18 +15,20 @@ I've found, but I'm sure there are plenty of edge-cases it does not handle
 with a *reproducible standalone example*.
 
 *Use at your own responsibility!*
-[Murpy's laws apply](http://www.murphys-laws.com/murphy/murphy-laws.html)
+[Murpy's laws](http://www.murphys-laws.com/murphy/murphy-laws.html) apply
 
 Usage
 -----
 First you have to hijack document.write. You can do before or after page load,
 but it has to be before you load the scripts that use document.write.
+
     crapLoader.hijack({  /* hijacks write, writeln and getElementById */
         loadSequentially: true /* Load in parallel or sequential? default false */
     });
 
 Then you must use crapLoader to load each script and supply a container id for
 the output from document.write.
+
     crapLoader.loadScript(url, "banner", {
         charset: "utf-8", /* Charset when injecting scripts. default utf-8 */
         success: function() {
