@@ -7,6 +7,7 @@ prevents you from loading a script asynchronously, but this lib hijacks
 document.write and delegates the content loaded from each script into the
 correct position.
 
+
 Stability
 ---------
 crapLoader can handle more than any other open-source document.write hack that
@@ -16,6 +17,7 @@ with a *reproducible standalone example*.
 
 *Use at your own responsibility!*
 [Murpy's laws](http://www.murphys-laws.com/murphy/murphy-laws.html) apply
+
 
 Usage
 -----
@@ -36,3 +38,9 @@ the output from document.write.
             crapLoader.release(); // release hijacked methods
         }
     });
+
+
+Alternatives
+------------
+See my collection of document.write bookmarks on Delicious:
+http://www.delicious.com/gregersrygg/document.write
