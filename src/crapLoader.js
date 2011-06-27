@@ -16,7 +16,7 @@
  *
  */
 
-var adLoader = (function() {
+var crapLoader = (function() {
     var initialized = false
         ,queue = []
         ,inputBuffer = []
@@ -218,7 +218,7 @@ var adLoader = (function() {
                 priv.loadScript(obj);
             } else {
                 var container = priv.getElById(obj.domId);
-                if(!container) throw new Error("adLoader: Unable to inject html. Element with id '" + obj.domId + "' does not exist");
+                if(!container) throw new Error("crapLoader: Unable to inject html. Element with id '" + obj.domId + "' does not exist");
                 html = this.trim(html); // newline before <object> cause weird effects in IE
                 if(html) container.innerHTML += html;
                 priv.checkWriteBuffer(obj);
