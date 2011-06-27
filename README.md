@@ -21,16 +21,16 @@ Usage
 -----
 First you have to hijack document.write. You can do before or after page load,
 but it has to be before you load the scripts that use document.write.
-`crapLoader.hijack({  /* hijacks write, writeln and getElementById */
-    loadSequentially: true /* Load in parallel or sequential? default false */
-});`
+    crapLoader.hijack({  /* hijacks write, writeln and getElementById */
+        loadSequentially: true /* Load in parallel or sequential? default false */
+    });
 
 Then you must use crapLoader to load each script and supply a container id for
 the output from document.write.
-`crapLoader.loadScript(url, "banner", {
-    charset: "utf-8", /* Charset when injecting scripts. default utf-8 */
-    success: function() {
-        /* Callback when the script and dependencies are completely loaded */
-        crapLoader.release(); // release hijacked methods
-    }
-});`
+    crapLoader.loadScript(url, "banner", {
+        charset: "utf-8", /* Charset when injecting scripts. default utf-8 */
+        success: function() {
+            /* Callback when the script and dependencies are completely loaded */
+            crapLoader.release(); // release hijacked methods
+        }
+    });
