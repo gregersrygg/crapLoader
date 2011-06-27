@@ -24,18 +24,17 @@ var crapLoader = (function() {
         ,chunkBuffer
         ,loading = 0
         ,elementCache = {}
-        ,splitScriptsRegex = /(<script[^>]+src=['"]?[^'"\s]+[^>]*>\s*<\/script>)/gim
-        ,externalScriptSrcRegex = /<script[^>]+src=['"]?([^'"\s]+)[^>]*>\s*<\/script>/im
+        ,splitScriptsRegex = /(<script[\s\S]*?<\/script>)/gim
         ,globalOptions = {
             loadSequentially: false,
             printTree: false
         }
         ,defaultOptions = {
-            async: false,
-            charset: "utf-8",
+            charset: undefined,
             success: undefined
         },priv,publ
-        ,splitWithCapturingParenthesesWorks = ("abc".split(/(b)/)[1]==="b");
+        ,splitWithCapturingParenthesesWorks = ("abc".split(/(b)/)[1]==="b")
+        ,head = document.getElementsByTagName("head")[0] || document.documentElement;
 
 
     priv = {
@@ -121,18 +120,29 @@ var crapLoader = (function() {
                 }
             }
         },
+        
+        globalEval: (function() {
+            return (window.execScript ? function(code, language) {
+                window.execScript(code, language || "JavaScript");
+            } : function(code, language) {
+                if(language && !/^javascript/i.test(language)) { return; }
+                window.eval.call(window, code);
+            });
+        })(),
+        
+        isScript: function(html) {
+            return html.toLowerCase().indexOf("<script") === 0;
+        },
 
         loadScript: function(obj) {
             loading++;
             // async loading code from jQuery
-            var head = document.getElementsByTagName("head")[0] || document.documentElement
-               ,script = document.createElement("script");
-            script.type = "text/javascript";
-            script.charset = obj.charset;
+            var script = document.createElement("script");
+            if(obj.type) script.type = obj.type;
+            if(obj.charset) script.charset = obj.charset;
+            if(obj.language) script.language = obj.language;
 
-            if(globalOptions.printTree) {
-                priv.printScriptSrc(obj);
-            }
+            priv.printScript(obj);
 
             var done = false;
             // Attach handlers for all browsers
@@ -160,8 +170,13 @@ var crapLoader = (function() {
             }, 3000);
         },
 
-        printScriptSrc: function(obj) {
-
+        printScript: function(obj, code, lang) {
+            if(!globalOptions.printTree) return;
+            var indent = "";
+            var depth = obj.depth;
+            while(depth--) { indent += "\t"; }
+            window.console && console.log("crapLoader (#"+obj.domId+"): " + indent +
+                (code ? "Inline " + lang + ": " + code.replace("\n", " ").substr(0, 30) + "..." : obj.src))
         },
 
         separateScriptsFromHtml: function(htmlStr) {
@@ -171,7 +186,7 @@ var crapLoader = (function() {
         split: function(str, regexp) {
             var match, prevIndex=0, tmp, result = [];
 
-            if(false && splitWithCapturingParenthesesWorks) {
+            if(splitWithCapturingParenthesesWorks) {
                 tmp = str.split(regexp);
             } else {
                 // Cross browser split technique from Steven Levithan
@@ -207,15 +222,30 @@ var crapLoader = (function() {
         },
         
         trim: function(str) {
+            if(!str) return str;
             return str.replace(/^\s*|\s*$/gim, "");;
         },
 
         writeHtml: function(html, obj) {
-            var scriptMatch = html.match(externalScriptSrcRegex);
-            if(scriptMatch && scriptMatch.length == 2) {
-                var scriptSrc = scriptMatch[1];
-                obj.src = scriptSrc;
-                priv.loadScript(obj);
+            if( this.isScript(html) ) {
+                var dummy = document.createElement("div");
+                dummy.innerHTML = "dummy<div>" + html + "</div>"; // trick for IE
+                var script = dummy.children[0].children[0];
+                var lang = script.getAttribute("language") || "javascript";
+                if(script.src) {
+                    obj.src = script.src;
+                    obj.charset = script.charset;
+                    obj.language = lang;
+                    obj.type = script.type;
+                    priv.loadScript(obj);
+                } else {
+                    var code = this.trim( script.text );
+                    if(code) {
+                        this.printScript( obj, code, lang);
+                        this.globalEval( code, lang);
+                    }
+                    priv.checkWriteBuffer(obj);
+                }
             } else {
                 var container = priv.getElById(obj.domId);
                 if(!container) throw new Error("crapLoader: Unable to inject html. Element with id '" + obj.domId + "' does not exist");
@@ -274,11 +304,3 @@ var crapLoader = (function() {
 
     return publ;
 })();
-
-if(typeof define === "function") {
-    define("crapLoader",  function() {
-        var crapLoader = window.crapLoader;
-        delete window.crapLoader;
-        return crapLoader;
-    });
-}
