@@ -238,12 +238,13 @@ var adLoader = (function() {
             initialized = true;
             priv.extend(globalOptions, options);
 
-            document.write = priv.writeReplacement;
+            document.write = document.writeln = priv.writeReplacement;
             document.getElementById = priv.getElementByIdReplacement;
         },
 
         release: function() {
             document.write = this.orgWrite;
+            document.writeln = this.orgWriteLn;
             document.getElementById = this.orgGetElementById;
         },
 
@@ -267,7 +268,8 @@ var adLoader = (function() {
         },
 
         orgGetElementById: document.getElementById,
-        orgWrite: document.write
+        orgWrite: document.write,
+        orgWriteLn: document.writeln
      };
 
     return publ;
