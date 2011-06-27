@@ -19,8 +19,8 @@ with a *reproducible standalone example*.
 
 Usage
 -----
-First you have to hijack document.write. You can do before or after page load,
-but it has to be before you load the scripts that use document.write.
+First you have to hijack document.write. You can do it before or after page
+load, but it has to be before you load the scripts that use document.write.
 
     crapLoader.hijack({  /* hijacks write, writeln and getElementById */
         loadSequentially: true /* Load in parallel or sequential? default false */
