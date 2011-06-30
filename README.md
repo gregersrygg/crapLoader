@@ -56,7 +56,7 @@ Then you must use crapLoader to load each script and supply a container id for t
     <script type="text/javascript">
         crapLoader.loadScript("http://foo.bar/ad1.js", "banner1", {
             succsess: function() {
-                if( $("#banner1").has("img[src*='1px.gif']") ) {
+                if( $("#banner1").has(":not(img[src*='1px.gif'])") ) {
                     $("body").addClass("dominance");
                 }
             }
