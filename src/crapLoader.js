@@ -28,7 +28,7 @@ var crapLoader = (function() {
         ,globalOptions = {
             autoRelease: true,
             loadSequentially: false,
-            debug: true
+            debug: false
         }
         ,defaultOptions = {
             charset: undefined,
@@ -110,7 +110,9 @@ var crapLoader = (function() {
         },
 
         getElementByIdReplacement: function(domId) {
-            var el = publ.orgGetElementById.call(document, domId);
+            var el = ( publ.orgGetElementById.call
+                ? publ.orgGetElementById.call(document, domId)
+                : publ.orgGetElementById(domId) );
             if(el) return el;
             if(inputBuffer.length) {
                 var before = new Date().getTime();
@@ -168,7 +170,7 @@ var crapLoader = (function() {
                         this.readyState === "loaded" || this.readyState === "complete") ) {
                     done = true;
                     script.onload = script.onreadystatechange = null;
-                    
+                    priv.debug("onload " + obj.src, obj);
                     priv.flush(obj);
                 }
             };
@@ -186,7 +188,9 @@ var crapLoader = (function() {
         },
 
         logScript: function(obj, code, lang) {
-            this.debug((code ? "Inline " + lang + ": " + code.replace("\n", " ").substr(0, 30) + "..." : obj.src), obj);
+            this.debug((code
+                ? "Inline " + lang + ": " + code.replace("\n", " ").substr(0, 30) + "..."
+                : "Inject " + obj.src), obj);
         },
 
         separateScriptsFromHtml: function(htmlStr) {
@@ -231,9 +235,13 @@ var crapLoader = (function() {
             return html.replace(/<noscript>.*?<\/noscript>/ig, "");
         },
         
+        supportsOnloadReliably: function() {
+            return !/Internet Explorer/i.test(navigator.appName);
+        },
+        
         trim: function(str) {
             if(!str) return str;
-            return str.replace(/^\s*|\s*$/gim, "");;
+            return str.replace(/^\s*|\s*$/gi, "");
         },
 
         writeHtml: function(html, obj) {
@@ -267,7 +275,7 @@ var crapLoader = (function() {
 
         writeReplacement: function(str) {
             inputBuffer.push(str);
-
+            priv.debug("write: " + str);
         }
 
     };
@@ -277,7 +285,11 @@ var crapLoader = (function() {
             if(isHijacked) return;
             isHijacked = true;
             priv.extend(globalOptions, options);
-
+            if(!priv.supportsOnloadReliably()) {
+                globalOptions.loadSequentially = true;
+                priv.debug("Browsers onload is not reliable. Using sequential loading.");
+            }
+            
             document.write = document.writeln = priv.writeReplacement;
             document.getElementById = priv.getElementByIdReplacement;
         },
