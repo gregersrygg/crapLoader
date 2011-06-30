@@ -27,7 +27,7 @@ var crapLoader = (function() {
         ,splitScriptsRegex = /(<script[\s\S]*?<\/script>)/gim
         ,globalOptions = {
             loadSequentially: false,
-            printTree: false
+            debug: false
         }
         ,defaultOptions = {
             charset: undefined,
@@ -53,6 +53,14 @@ var crapLoader = (function() {
             } else {
                 priv.finished(obj);
             }
+        },
+        
+        debug: function(obj, message) {
+            if(!globalOptions.debug || !window.console) return;
+            var indent = "";
+            var depth = obj.depth;
+            while(depth--) { indent += "    "; }
+            console.log("crapLoader (#"+obj.domId+"): " + indent + message);
         },
 
         extend: function(t, s) {
@@ -142,7 +150,7 @@ var crapLoader = (function() {
             if(obj.charset) script.charset = obj.charset;
             if(obj.language) script.language = obj.language;
 
-            priv.printScript(obj);
+            priv.logScript(obj);
 
             var done = false;
             // Attach handlers for all browsers
@@ -170,13 +178,8 @@ var crapLoader = (function() {
             }, 3000);
         },
 
-        printScript: function(obj, code, lang) {
-            if(!globalOptions.printTree) return;
-            var indent = "";
-            var depth = obj.depth;
-            while(depth--) { indent += "\t"; }
-            window.console && console.log("crapLoader (#"+obj.domId+"): " + indent +
-                (code ? "Inline " + lang + ": " + code.replace("\n", " ").substr(0, 30) + "..." : obj.src))
+        logScript: function(obj, code, lang) {
+            this.debug(obj, (code ? "Inline " + lang + ": " + code.replace("\n", " ").substr(0, 30) + "..." : obj.src));
         },
 
         separateScriptsFromHtml: function(htmlStr) {
@@ -241,7 +244,7 @@ var crapLoader = (function() {
                 } else {
                     var code = this.trim( script.text );
                     if(code) {
-                        this.printScript( obj, code, lang);
+                        this.logScript( obj, code, lang);
                         this.globalEval( code, lang);
                     }
                     priv.checkWriteBuffer(obj);
