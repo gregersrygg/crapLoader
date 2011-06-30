@@ -17,7 +17,7 @@
  */
 
 var crapLoader = (function() {
-    var initialized = false
+    var isHijacked = false
         ,queue = []
         ,inputBuffer = []
         ,writeBuffer = {}
@@ -26,8 +26,9 @@ var crapLoader = (function() {
         ,elementCache = {}
         ,splitScriptsRegex = /(<script[\s\S]*?<\/script>)/gim
         ,globalOptions = {
+            autoRelease: true,
             loadSequentially: false,
-            debug: false
+            debug: true
         }
         ,defaultOptions = {
             charset: undefined,
@@ -41,6 +42,9 @@ var crapLoader = (function() {
         checkQueue: function() {
             if(queue.length) {
                 priv.loadScript( queue.shift() );
+            } else if(loading === 0 && globalOptions.autoRelease) {
+                this.debug("Queue is empty. Auto-releasing.");
+                publ.release();
             }
         },
 
@@ -55,12 +59,15 @@ var crapLoader = (function() {
             }
         },
         
-        debug: function(obj, message) {
+        debug: function(message, obj) {
             if(!globalOptions.debug || !window.console) return;
-            var indent = "";
-            var depth = obj.depth;
-            while(depth--) { indent += "    "; }
-            console.log("crapLoader (#"+obj.domId+"): " + indent + message);
+            var objExtra = "";
+            if(obj) {
+                objExtra = "#"+obj.domId+" ";
+                var depth = obj.depth;
+                while(depth--) { objExtra += "    "; }
+            }
+            console.log("crapLoader " + objExtra + message);
         },
 
         extend: function(t, s) {
@@ -179,7 +186,7 @@ var crapLoader = (function() {
         },
 
         logScript: function(obj, code, lang) {
-            this.debug(obj, (code ? "Inline " + lang + ": " + code.replace("\n", " ").substr(0, 30) + "..." : obj.src));
+            this.debug((code ? "Inline " + lang + ": " + code.replace("\n", " ").substr(0, 30) + "..." : obj.src), obj);
         },
 
         separateScriptsFromHtml: function(htmlStr) {
@@ -267,8 +274,8 @@ var crapLoader = (function() {
 
     publ = {
         hijack: function(options) {
-            if(initialized) return;
-            initialized = true;
+            if(isHijacked) return;
+            isHijacked = true;
             priv.extend(globalOptions, options);
 
             document.write = document.writeln = priv.writeReplacement;
@@ -276,12 +283,18 @@ var crapLoader = (function() {
         },
 
         release: function() {
+            if(!isHijacked) return;
+            isHijacked = false;
             document.write = this.orgWrite;
             document.writeln = this.orgWriteLn;
             document.getElementById = this.orgGetElementById;
         },
 
         loadScript: function(src, domId, options) {
+            if(!isHijacked) {
+                priv.debug("Not in hijacked mode. Auto-hijacking.");
+                this.hijack();
+            }
             var defaultOptsCopy = priv.extend({}, defaultOptions);
             var obj = priv.extend(defaultOptsCopy, options);
             obj.src = src;
