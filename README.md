@@ -5,7 +5,8 @@ document.write in it. The recommended solution is to use iframes for
 third-party content, but this is not always possible. Normally document.write
 prevents you from loading a script asynchronously, but this lib hijacks
 document.write and delegates the content loaded from each script into the
-correct position.
+correct position. Not all ad-providers allow you to replace document.write,
+so make sure to check their terms before you start using this library.
 
 
 Stability
