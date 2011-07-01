@@ -27,7 +27,7 @@ var crapLoader = (function() {
         ,splitScriptsRegex = /(<script[\s\S]*?<\/script>)/gim
         ,globalOptions = {
             autoRelease: true,
-            loadSequentially: false,
+            parallel: true,
             debug: false
         }
         ,defaultOptions = {
@@ -285,9 +285,9 @@ var crapLoader = (function() {
             if(isHijacked) return;
             isHijacked = true;
             priv.extend(globalOptions, options);
-            if(!priv.supportsOnloadReliably()) {
-                globalOptions.loadSequentially = true;
-                priv.debug("Browsers onload is not reliable. Using sequential loading.");
+            if(globalOptions.parallel && !priv.supportsOnloadReliably()) {
+                globalOptions.parallel = false;
+                priv.debug("Browsers onload is not reliable. Disabling parallel loading.");
             }
             
             document.write = document.writeln = priv.writeReplacement;
@@ -313,14 +313,14 @@ var crapLoader = (function() {
             obj.domId = domId;
             obj.depth = 0;
 
-            if(globalOptions.loadSequentially) {
+            if(globalOptions.parallel) {
+                setTimeout(function() {
+                    priv.loadScript(obj);
+                }, 1);
+            } else {
                 queue.push(obj);
                 setTimeout(function() {
                     if(loading === 0) priv.checkQueue();
-                }, 1);
-            } else {
-                setTimeout(function() {
-                    priv.loadScript(obj);
                 }, 1);
             }
         },

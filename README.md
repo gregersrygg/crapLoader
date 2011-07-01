@@ -45,7 +45,7 @@ First you have to hijack document.write. It should only be called once even if y
 
     crapLoader.hijack({        /* Hijacks write, writeln and getElementById */
         debug: true,           /* Logs debug output to the console */
-        loadSequentially: true /* Load in parallel or sequential? default false */
+        parallel: false        /* Load in parallel or sequential? default true */
     });
 
 Then you must use crapLoader to load each script and supply a container id for the output from document.write.
