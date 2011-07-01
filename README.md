@@ -5,19 +5,28 @@ document.write in it. The recommended solution is to use iframes for
 third-party content, but this is not always possible. Normally document.write
 prevents you from loading a script asynchronously, but this lib hijacks
 document.write and delegates the content loaded from each script into the
-correct position. Not all ad-providers allow you to replace document.write,
-so make sure to check their terms before you start using this library.
+correct position.
 
 
-Stability
----------
-crapLoader can handle more than any other open-source document.write hack that
-I've found, but I'm sure there are plenty of edge-cases it does not handle
-(yet). If you find something crapLoader can't handle please open a new issue
-with a *reproducible standalone example*.
+Features
+--------
+* Load (almost) any third-party script asynchronously
+    * Does not block rendering of your page
+    * Load the banners in parallel! Except in IE ;(
+* Handles recursive scripts
+    * Inline and external javascript
+    * Inline and external vbscript
+* Buffer document.write, flush on script load event
+    * Handles document.getElementById from the buffer
+* Tested (manually) in IE 6-10, latest Firefox, Chrome, Safari, Opera
 
-*Use at your own responsibility!*
-[Murpy's laws](http://www.murphys-laws.com/murphy/murphy-laws.html) apply
+
+Disadvantages
+-------------
+* You never know for sure that all ads will load correctly
+* Ads might circumvent by getting a clean doc.write from an iframe
+    * Possible to stop, but won't
+* Using this script might violate the terms of your ad provider
 
 
 Simple usage
@@ -66,6 +75,17 @@ Then you must use crapLoader to load each script and supply a container id for t
             charset: "iso-8859-1"
         });
     </script>
+
+
+Stability
+---------
+crapLoader can handle more than any other open-source document.write hack that
+I've found, but I'm sure there are plenty of edge-cases it does not handle
+(yet). If you find something crapLoader can't handle please open a new issue
+with a *reproducible standalone example*.
+
+*Use at your own responsibility!*
+[Murpy's laws](http://www.murphys-laws.com/murphy/murphy-laws.html) apply
 
 
 Alternatives
