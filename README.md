@@ -10,10 +10,13 @@ correct position.
 
 Features
 --------
-* Load (almost) any third-party script asynchronously
-    * Does not block rendering of your page
-    * Load the banners in parallel! Except in IE ;(
-* Handles recursive scripts
+* Load (almost) any **third-party script asynchronously**
+    * Does **not block rendering** of your page
+        * Your visitors see your content earlier
+        * DOMContentLoaded (a.k.a. $(doc).ready ) and window.onload triggered earlier
+    * Load the **banners in parallel!** Except in IE ;(
+        * Banners loads faster (at least in theory)
+* Handles **recursive scripts**
     * Inline and external javascript
     * Inline and external vbscript
 * Buffer document.write, flush on script load event
@@ -27,6 +30,8 @@ Disadvantages
 * Ads might circumvent by getting a clean doc.write from an iframe
     * Possible to stop, but won't
 * Using this script might violate the terms of your ad provider
+* You can't use document.write in your own scripts, but *why* would you?!?
+* document.getElementById will be a tad slower until all scripts loaded with crapLoader are finished loading
 
 
 Simple usage
