@@ -35,7 +35,12 @@ var crapLoader = (function() {
             success: undefined
         },priv,publ
         ,splitWithCapturingParenthesesWorks = ("abc".split(/(b)/)[1]==="b")
-        ,head = document.getElementsByTagName("head")[0] || document.documentElement;
+        ,head = document.getElementsByTagName("head")[0] || document.documentElement
+        ,support = {
+            scriptOnloadTriggeredAccurately: false,
+            splitWithCapturingParentheses: ("abc".split(/(b)/)[1]==="b")
+        };
+
 
 
     priv = {
@@ -80,7 +85,7 @@ var crapLoader = (function() {
 
         finished: function(obj) {
             if(obj.success && typeof obj.success == "function") {
-                obj.success.call(obj.domId);
+                obj.success.call( document.getElementById(obj.domId) );
             }
 
             priv.checkQueue();
@@ -200,7 +205,7 @@ var crapLoader = (function() {
         split: function(str, regexp) {
             var match, prevIndex=0, tmp, result = [];
 
-            if(splitWithCapturingParenthesesWorks) {
+            if(support.splitWithCapturingParentheses) {
                 tmp = str.split(regexp);
             } else {
                 // Cross browser split technique from Steven Levithan
@@ -233,10 +238,6 @@ var crapLoader = (function() {
         
         stripNoScript: function(html) {
             return html.replace(/<noscript>.*?<\/noscript>/ig, "");
-        },
-        
-        supportsOnloadReliably: function() {
-            return !/Internet Explorer/i.test(navigator.appName);
         },
         
         trim: function(str) {
@@ -285,11 +286,11 @@ var crapLoader = (function() {
             if(isHijacked) return;
             isHijacked = true;
             priv.extend(globalOptions, options);
-            if(globalOptions.parallel && !priv.supportsOnloadReliably()) {
+            if(globalOptions.parallel && !support.scriptOnloadTriggeredAccurately) {
                 globalOptions.parallel = false;
                 priv.debug("Browsers onload is not reliable. Disabling parallel loading.");
             }
-            
+
             document.write = document.writeln = priv.writeReplacement;
             document.getElementById = priv.getElementByIdReplacement;
         },
@@ -325,10 +326,19 @@ var crapLoader = (function() {
             }
         },
 
-        orgGetElementById: document.getElementById,
-        orgWrite: document.write,
-        orgWriteLn: document.writeln
-     };
+        orgGetElementById   : document.getElementById,
+        orgWrite            : document.write,
+        orgWriteLn          : document.writeln,
+        _olt                : 1,
+        _oltCallback        : function() {
+            support.scriptOnloadTriggeredAccurately = (publ._olt===2)
+        }
+    };
 
     return publ;
+})();
+
+(function(){
+    var src = "data:text/javascript;base64,Y3JhcExvYWRlci5fb2x0PTI=";
+    document.write('<script src="'+src+'" onload="crapLoader._oltCallback()"></script><script src="'+src.replace(/I/, "M")+'"></script>');
 })();
