@@ -15,29 +15,31 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
+/*jslint browser: true, evil: true*/
+/*globals console*/
 
 var crapLoader = (function() {
-    var isHijacked = false
-        ,queue = []
-        ,inputBuffer = []
-        ,writeBuffer = {}
-        ,chunkBuffer
-        ,loading = 0
-        ,elementCache = {}
-        ,returnedElements = []
-        ,splitScriptsRegex = /(<script[\s\S]*?<\/script>)/gim
-        ,globalOptions = {
+    var isHijacked = false,
+        queue = [],
+        inputBuffer = [],
+        writeBuffer = {},
+        chunkBuffer,
+        loading = 0,
+        elementCache = {},
+        returnedElements = [],
+        splitScriptsRegex = /(<script[\s\S]*?<\/script>)/gim,
+        globalOptions = {
             autoRelease: true,
             parallel: true,
             debug: false
-        }
-        ,defaultOptions = {
+        },
+        defaultOptions = {
             charset: undefined,
             success: undefined
-        },priv,publ
-        ,splitWithCapturingParenthesesWorks = ("abc".split(/(b)/)[1]==="b")
-        ,head = document.getElementsByTagName("head")[0] || document.documentElement
-        ,support = {
+        },priv,publ,
+        splitWithCapturingParenthesesWorks = ("abc".split(/(b)/)[1]==="b"),
+        head = document.getElementsByTagName("head")[0] || document.documentElement,
+        support = {
             scriptOnloadTriggeredAccurately: false,
             splitWithCapturingParentheses: ("abc".split(/(b)/)[1]==="b")
         };
@@ -62,10 +64,11 @@ var crapLoader = (function() {
                 priv.writeHtml( buffer.shift(), obj );
 
             } else {
-                while (returnedEl = returnedElements.pop()) {
+                while (returnedElements.length > 0) {
+                    returnedEl = returnedElements.pop();
                     var id = returnedEl.id;
                     var elInDoc = priv.getElementById(id);
-                    if(!elInDoc) continue;
+                    if (!elInDoc) continue;
                     var parent = elInDoc.parentNode;
                     elInDoc.id = id + "__tmp";
                     parent.insertBefore(returnedEl, elInDoc);
@@ -87,15 +90,16 @@ var crapLoader = (function() {
         },
 
         extend: function(t, s) {
+            var k;
             if(!s) return t;
-            for(var k in s) {
+            for(k in s) {
                 t[k] = s[k];
             }
             return t;
         },
 
         finished: function(obj) {
-            if(obj.success && typeof obj.success == "function") {
+            if(obj.success && typeof obj.success === "function") {
                 obj.success.call( document.getElementById(obj.domId) );
             }
 
@@ -103,9 +107,9 @@ var crapLoader = (function() {
         },
 
         flush: function(obj) {
-            var domId = obj.domId
-               ,outputFromScript
-               ,htmlPartArray;
+            var domId = obj.domId,
+               outputFromScript,
+               htmlPartArray;
 
             outputFromScript = this.stripNoScript( inputBuffer.join("") );
             inputBuffer = [];
@@ -126,36 +130,38 @@ var crapLoader = (function() {
         },
         
         getElementById: function(domId) {
-            return ( publ.orgGetElementById.call
-                ? publ.orgGetElementById.call(document, domId)
-                : publ.orgGetElementById(domId) );
+            return ( publ.orgGetElementById.call ?
+                publ.orgGetElementById.call(document, domId) :
+                publ.orgGetElementById(domId) );
         },
 
         getElementByIdReplacement: function(domId) {
-            var el = priv.getElementById(domId);
-            if(el) return el;
-            if(inputBuffer.length) {
-                var html = inputBuffer.join("");
-                var frag = document.createDocumentFragment();
-                var div = document.createElement("div");
-                div.innerHTML = html;
-                frag.appendChild(div);
-                var found = traverseForElById(domId, div);
-                if (found) {
-                    returnedElements.push(found);
-                }
-                return found;
-            }
-
+            var el = priv.getElementById(domId),
+                html, frag, div, found;
+            
             function traverseForElById(domId, el) {
-                var children = el.children;
+                var children = el.children, i, l, child;
                 if(children && children.length) {
-                    for(var i=0,l=children.length; i<l; i++) {
-                        var child = children[i];
+                    for(i=0,l=children.length; i<l; i++) {
+                        child = children[i];
                         if(child.id && child.id === domId) return child;
                         if(child.children && child.children.length) return traverseForElById(child);
                     }
                 }
+            }
+            
+            if(el) return el;
+            if(inputBuffer.length) {
+                html = inputBuffer.join("");
+                frag = document.createDocumentFragment();
+                div = document.createElement("div");
+                div.innerHTML = html;
+                frag.appendChild(div);
+                found = traverseForElById(domId, div);
+                if (found) {
+                    returnedElements.push(found);
+                }
+                return found;
             }
         },
         
@@ -209,9 +215,9 @@ var crapLoader = (function() {
         },
 
         logScript: function(obj, code, lang) {
-            this.debug((code
-                ? "Inline " + lang + ": " + code.replace("\n", " ").substr(0, 30) + "..."
-                : "Inject " + obj.src), obj);
+            this.debug((code ?
+                "Inline " + lang + ": " + code.replace("\n", " ").substr(0, 30) + "..." :
+                "Inject " + obj.src), obj);
         },
 
         separateScriptsFromHtml: function(htmlStr) {
@@ -219,7 +225,7 @@ var crapLoader = (function() {
         },
 
         split: function(str, regexp) {
-            var match, prevIndex=0, tmp, result = [];
+            var match, prevIndex=0, tmp, result = [], i, l;
 
             if(support.splitWithCapturingParentheses) {
                 tmp = str.split(regexp);
@@ -245,7 +251,7 @@ var crapLoader = (function() {
 
             }
 
-            for(var i=0, l=tmp.length; i<l; i=i+1) {
+            for(i=0, l=tmp.length; i<l; i=i+1) {
                 if(tmp[i]!=="") result.push(tmp[i]);
             }
 
@@ -347,14 +353,14 @@ var crapLoader = (function() {
         orgWriteLn          : document.writeln,
         _olt                : 1,
         _oltCallback        : function() {
-            support.scriptOnloadTriggeredAccurately = (publ._olt===2)
+            support.scriptOnloadTriggeredAccurately = (publ._olt===2);
         }
     };
 
     return publ;
-})();
+}());
 
 (function(){
     var src = "data:text/javascript;base64,Y3JhcExvYWRlci5fb2x0PTI=";
     document.write('<script src="'+src+'" onload="crapLoader._oltCallback()"></script><script src="'+src.replace(/I/, "M")+'"></script>');
-})();
+}());
