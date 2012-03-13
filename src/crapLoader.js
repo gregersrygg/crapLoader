@@ -24,6 +24,7 @@ var crapLoader = (function() {
         ,chunkBuffer
         ,loading = 0
         ,elementCache = {}
+        ,returnedElements = []
         ,splitScriptsRegex = /(<script[\s\S]*?<\/script>)/gim
         ,globalOptions = {
             autoRelease: true,
@@ -54,12 +55,22 @@ var crapLoader = (function() {
         },
 
         checkWriteBuffer: function(obj) {
-            var buffer = writeBuffer[obj.domId];
+            var buffer = writeBuffer[obj.domId],
+                returnedEl;
 
             if(buffer && buffer.length) {
                 priv.writeHtml( buffer.shift(), obj );
 
             } else {
+                while (returnedEl = returnedElements.pop()) {
+                    var id = returnedEl.id;
+                    var elInDoc = priv.getElementById(id);
+                    if(!elInDoc) continue;
+                    var parent = elInDoc.parentNode;
+                    elInDoc.id = id + "__tmp";
+                    parent.insertBefore(returnedEl, elInDoc);
+                    parent.removeChild(elInDoc);
+                }
                 priv.finished(obj);
             }
         },
@@ -110,24 +121,29 @@ var crapLoader = (function() {
             priv.checkWriteBuffer(obj);
         },
 
-        getElById: function(domId) {
+        getCachedElById: function(domId) {
             return elementCache[domId] || (elementCache[domId] = document.getElementById(domId));
+        },
+        
+        getElementById: function(domId) {
+            return ( publ.orgGetElementById.call
+                ? publ.orgGetElementById.call(document, domId)
+                : publ.orgGetElementById(domId) );
         },
 
         getElementByIdReplacement: function(domId) {
-            var el = ( publ.orgGetElementById.call
-                ? publ.orgGetElementById.call(document, domId)
-                : publ.orgGetElementById(domId) );
+            var el = priv.getElementById(domId);
             if(el) return el;
             if(inputBuffer.length) {
-                var before = new Date().getTime();
                 var html = inputBuffer.join("");
                 var frag = document.createDocumentFragment();
                 var div = document.createElement("div");
                 div.innerHTML = html;
                 frag.appendChild(div);
                 var found = traverseForElById(domId, div);
-                var after = new Date().getTime();
+                if (found) {
+                    returnedElements.push(found);
+                }
                 return found;
             }
 
@@ -266,7 +282,7 @@ var crapLoader = (function() {
                     priv.checkWriteBuffer(obj);
                 }
             } else {
-                var container = priv.getElById(obj.domId);
+                var container = priv.getCachedElById(obj.domId);
                 if(!container) throw new Error("crapLoader: Unable to inject html. Element with id '" + obj.domId + "' does not exist");
                 html = this.trim(html); // newline before <object> cause weird effects in IE
                 if(html) container.innerHTML += html;
