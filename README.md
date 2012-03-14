@@ -89,6 +89,9 @@ I've found, but I'm sure there are plenty of edge-cases it does not handle
 (yet). If you find something crapLoader can't handle please open a new issue
 with a *reproducible standalone example*.
 
+crapLoader has been used in production for one of Norways most used websites
+since June 2011.
+
 *Use at your own responsibility!*
 [Murpy's laws](http://www.murphys-laws.com/murphy/murphy-laws.html) apply
 
