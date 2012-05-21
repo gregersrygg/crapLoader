@@ -77,7 +77,7 @@ var crapLoader = (function() {
                 priv.finished(obj);
             }
         },
-        
+
         debug: function(message, obj) {
             if(!globalOptions.debug || !window.console) return;
             var objExtra = "";
@@ -128,7 +128,7 @@ var crapLoader = (function() {
         getCachedElById: function(domId) {
             return elementCache[domId] || (elementCache[domId] = document.getElementById(domId));
         },
-        
+
         getElementById: function(domId) {
             return ( publ.orgGetElementById.call ?
                 publ.orgGetElementById.call(document, domId) :
@@ -138,7 +138,7 @@ var crapLoader = (function() {
         getElementByIdReplacement: function(domId) {
             var el = priv.getElementById(domId),
                 html, frag, div, found;
-            
+
             function traverseForElById(domId, el) {
                 var children = el.children, i, l, child;
                 if(children && children.length) {
@@ -149,7 +149,7 @@ var crapLoader = (function() {
                     }
                 }
             }
-            
+
             if(el) return el;
             if(inputBuffer.length) {
                 html = inputBuffer.join("");
@@ -164,7 +164,7 @@ var crapLoader = (function() {
                 return found;
             }
         },
-        
+
         globalEval: (function() {
             return (window.execScript ? function(code, language) {
                 window.execScript(code, language || "JavaScript");
@@ -173,9 +173,14 @@ var crapLoader = (function() {
                 window.eval.call(window, code);
             });
         })(),
-        
+
         isScript: function(html) {
             return html.toLowerCase().indexOf("<script") === 0;
+        },
+
+        run: function(obj) {
+            obj.fn();
+            this.flush(obj);
         },
 
         loadScript: function(obj) {
@@ -257,11 +262,11 @@ var crapLoader = (function() {
 
             return result;
         },
-        
+
         stripNoScript: function(html) {
             return html.replace(/<noscript>.*?<\/noscript>/ig, "");
         },
-        
+
         trim: function(str) {
             if(!str) return str;
             return str.replace(/^\s*|\s*$/gi, "");
@@ -346,6 +351,18 @@ var crapLoader = (function() {
                     if(loading === 0) priv.checkQueue();
                 }, 1);
             }
+        },
+
+        runInSandbox: function(domId, fn, options) {
+            if(!isHijacked) {
+                priv.debug("Not in hijacked mode. Auto-hijacking.");
+                this.hijack();
+            }
+            var defaultOptsCopy = priv.extend({}, defaultOptions);
+            var obj = priv.extend(defaultOptsCopy, options);
+            obj.fn = fn;
+            obj.domId = domId;
+            priv.run(obj);
         },
 
         orgGetElementById   : document.getElementById,
