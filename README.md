@@ -82,6 +82,15 @@ Then you must use crapLoader to load each script and supply a container id for t
     </script>
 
 
+Sandboxing Code
+---------------
+Sometimes you need to run code that doesn't directly get loaded from an external source but may in turn call something evil. To protect against this you can run code within a sandboxed DOM element. This won't guarantee that the code executed can't access elsewhere but it will capture document.write and follow subsequent script loads.
+
+    crapLoader.runInSandbox('my-dom-id', function() {
+        evilFunctionThatMayCallDocumentWrite();
+    });
+
+
 Stability
 ---------
 crapLoader can handle more than any other open-source document.write hack that
