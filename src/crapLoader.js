@@ -35,7 +35,9 @@ var crapLoader = (function() {
         },
         defaultOptions = {
             charset: undefined,
-            success: undefined
+            success: undefined,
+            func: undefined,
+            src: undefined
         },priv,publ,
         splitWithCapturingParenthesesWorks = ("abc".split(/(b)/)[1]==="b"),
         head = document.getElementsByTagName("head")[0] || document.documentElement,
@@ -178,8 +180,9 @@ var crapLoader = (function() {
             return html.toLowerCase().indexOf("<script") === 0;
         },
 
-        run: function(obj) {
-            obj.fn();
+        runFunc: function(obj) {
+            obj.func();
+            obj.depth++;
             this.flush(obj);
         },
 
@@ -329,17 +332,27 @@ var crapLoader = (function() {
             document.writeln = this.orgWriteLn;
             document.getElementById = this.orgGetElementById;
         },
-
-        loadScript: function(src, domId, options) {
+        
+        handle: function(options) {
             if(!isHijacked) {
                 priv.debug("Not in hijacked mode. Auto-hijacking.");
                 this.hijack();
             }
             var defaultOptsCopy = priv.extend({}, defaultOptions);
             var obj = priv.extend(defaultOptsCopy, options);
-            obj.src = src;
-            obj.domId = domId;
             obj.depth = 0;
+            
+            if (!obj.domId) {
+                obj.domId = "craploader_" + new Date().getTime();
+                var span = document.createElement("span");
+                span.id = obj.domId;
+                document.body.appendChild(span);
+            }
+            
+            if (options.func) {
+                priv.runFunc(obj);
+                return;
+            }
 
             if(globalOptions.parallel) {
                 setTimeout(function() {
@@ -353,16 +366,26 @@ var crapLoader = (function() {
             }
         },
 
-        runInSandbox: function(domId, fn, options) {
-            if(!isHijacked) {
-                priv.debug("Not in hijacked mode. Auto-hijacking.");
-                this.hijack();
+        loadScript: function(src, domId, options) {
+            if (typeof domId !== "string") {
+                options = domId;
+                domId = undefined;
             }
-            var defaultOptsCopy = priv.extend({}, defaultOptions);
-            var obj = priv.extend(defaultOptsCopy, options);
-            obj.fn = fn;
-            obj.domId = domId;
-            priv.run(obj);
+            this.handle(priv.extend({
+                src:    src,
+                domId:  domId
+            }, options));
+        },
+
+        runFunc: function(func, domId, options) {
+            if (typeof domId !== "string") {
+                options = domId;
+                domId = undefined;
+            }
+            this.handle(priv.extend({
+                domId:  domId,
+                func:     func
+            }, options));
         },
 
         orgGetElementById   : document.getElementById,
