@@ -37,7 +37,8 @@ var crapLoader = (function() {
             charset: undefined,
             success: undefined,
             func: undefined,
-            src: undefined
+            src: undefined,
+            timeout: 3000
         },priv,publ,
         splitWithCapturingParenthesesWorks = ("abc".split(/(b)/)[1]==="b"),
         head = document.getElementsByTagName("head")[0] || document.documentElement,
@@ -219,7 +220,7 @@ var crapLoader = (function() {
             head.insertBefore( script, head.firstChild );
             setTimeout(function() {
                 if(!script.loaded) throw new Error("SCRIPT NOT LOADED: " + script.src);
-            }, 3000);
+            }, obj.timeout);
         },
 
         logScript: function(obj, code, lang) {
@@ -332,7 +333,7 @@ var crapLoader = (function() {
             document.writeln = this.orgWriteLn;
             document.getElementById = this.orgGetElementById;
         },
-        
+
         handle: function(options) {
             if(!isHijacked) {
                 priv.debug("Not in hijacked mode. Auto-hijacking.");
@@ -341,14 +342,14 @@ var crapLoader = (function() {
             var defaultOptsCopy = priv.extend({}, defaultOptions);
             var obj = priv.extend(defaultOptsCopy, options);
             obj.depth = 0;
-            
+
             if (!obj.domId) {
                 obj.domId = "craploader_" + new Date().getTime();
                 var span = document.createElement("span");
                 span.id = obj.domId;
                 document.body.appendChild(span);
             }
-            
+
             if (options.func) {
                 priv.runFunc(obj);
                 return;
