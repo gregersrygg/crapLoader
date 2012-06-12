@@ -1,0 +1,25 @@
+{
+	"name": "crapLoader",
+	"version": "0.1.0",
+	"description": "Asynchronous script loader for ads, widgets and other third-party content",
+	"keywords": [
+		"script",
+		"loader",
+		"async"
+	],
+	"homepage": "https://github.com/gregersrygg/crapLoader",
+	"bugs": "https://github.com/gregersrygg/crapLoader/issues",
+	"author": {
+		"name": "Gregers Rygg"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/gregersrygg/crapLoader.git"
+	},
+	"devDependencies": {
+		"grunt": "~0.3.9"
+	},
+	"licenses": [{
+		"type": "MIT"
+	}]
+}
