@@ -15,18 +15,27 @@ module.exports = function( grunt ) {
 		},
 		concat: {
 			dist: {
-				src: ['<banner:meta.banner>', 'src/<%= pkg.name %>.js'],
+				src: [
+					'<banner:meta.banner>',
+					'<file_strip_banner:src/<%= pkg.name %>.js>'
+				],
 				dest: 'dist/<%= pkg.name %>.js'
 			}
 		},
 		min: {
 			dist: {
-				src: ['<banner:meta.banner>', 'src/<%= pkg.name %>.js'],
+				src: [
+					'<banner:meta.banner>',
+					'src/<%= pkg.name %>.js'
+				],
 				dest: 'dist/<%= pkg.name %>.min.js'
 			}
 		},
 		lint: {
-			files: ['grunt.js', 'src/<%= pkg.name %>.js']
+			files: [
+				'grunt.js',
+				'src/<%= pkg.name %>.js'
+			]
 		},
 		watch: {
 			files: '<config:lint.files>',
@@ -55,6 +64,6 @@ module.exports = function( grunt ) {
 	});
 
 	grunt.registerTask('default', 'lint');
-	grunt.registerTask('release', 'concat min');
+	grunt.registerTask('release', 'lint concat min');
 
 };

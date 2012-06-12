@@ -1,5 +1,11 @@
-/*jshint browser:true, evil:true */
-/*globals console */
+/*
+
+(c) Gregers Rygg - MIT License
+
+jshint browser:true, evil:true
+globals console
+
+*/
 var crapLoader = (function() {
     var isHijacked = false,
         queue = [],
