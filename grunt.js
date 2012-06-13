@@ -1,3 +1,4 @@
+/*globals module:true*/
 module.exports = function( grunt ) {
 	'use strict';
 
@@ -44,8 +45,9 @@ module.exports = function( grunt ) {
 		jshint: {
 			options: {
 				es5: true,
-				esnext: true,
+				esnext: false,
 				bitwise: true,
+				boss: true,
 				curly: true,
 				eqeqeq: true,
 				newcap: true,
@@ -53,7 +55,7 @@ module.exports = function( grunt ) {
 				noempty: true,
 				regexp: true,
 				undef: true,
-				strict: true,
+				strict: false,
 				trailing: true,
 				smarttabs: true,
 				browser: true,

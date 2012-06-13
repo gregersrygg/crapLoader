@@ -1,17 +1,13 @@
-/*
-
+/**
 (c) Gregers Rygg - MIT License
-
-jshint browser:true, evil:true
-globals console
-
 */
+/*globals console*/
 var crapLoader = (function() {
+    
     var isHijacked = false,
         queue = [],
         inputBuffer = [],
         writeBuffer = {},
-        chunkBuffer,
         loading = 0,
         elementCache = {},
         returnedElements = [],
@@ -28,7 +24,6 @@ var crapLoader = (function() {
             src: undefined,
             timeout: 3000
         },priv,publ,
-        splitWithCapturingParenthesesWorks = ("abc".split(/(b)/)[1]==="b"),
         head = document.getElementsByTagName("head")[0] || document.documentElement,
         support = {
             scriptOnloadTriggeredAccurately: false,
@@ -59,7 +54,7 @@ var crapLoader = (function() {
                     returnedEl = returnedElements.pop();
                     var id = returnedEl.id;
                     var elInDoc = priv.getElementById(id);
-                    if (!elInDoc) continue;
+                    if (!elInDoc) { continue; }
                     var parent = elInDoc.parentNode;
                     elInDoc.id = id + "__tmp";
                     parent.insertBefore(returnedEl, elInDoc);
@@ -70,7 +65,7 @@ var crapLoader = (function() {
         },
 
         debug: function(message, obj) {
-            if(!globalOptions.debug || !window.console) return;
+            if(!globalOptions.debug || !window.console) { return; }
             var objExtra = "";
             if(obj) {
                 objExtra = "#"+obj.domId+" ";
@@ -82,7 +77,7 @@ var crapLoader = (function() {
 
         extend: function(t, s) {
             var k;
-            if(!s) return t;
+            if(!s) { return t; }
             for(k in s) {
                 t[k] = s[k];
             }
@@ -135,13 +130,13 @@ var crapLoader = (function() {
                 if(children && children.length) {
                     for(i=0,l=children.length; i<l; i++) {
                         child = children[i];
-                        if(child.id && child.id === domId) return child;
-                        if(child.children && child.children.length) return traverseForElById(child);
+                        if(child.id && child.id === domId) { return child; }
+                        if(child.children && child.children.length) { return traverseForElById(child); }
                     }
                 }
             }
 
-            if(el) return el;
+            if(el) { return el; }
             if(inputBuffer.length) {
                 html = inputBuffer.join("");
                 frag = document.createDocumentFragment();
@@ -163,7 +158,7 @@ var crapLoader = (function() {
                 if(language && !/^javascript/i.test(language)) { return; }
                 window.eval.call(window, code);
             });
-        })(),
+        }()),
 
         isScript: function(html) {
             return html.toLowerCase().indexOf("<script") === 0;
@@ -179,9 +174,9 @@ var crapLoader = (function() {
             loading++;
             // async loading code from jQuery
             var script = document.createElement("script");
-            if(obj.type) script.type = obj.type;
-            if(obj.charset) script.charset = obj.charset;
-            if(obj.language) script.language = obj.language;
+            if(obj.type) { script.type = obj.type; }
+            if(obj.charset) { script.charset = obj.charset; }
+            if(obj.language) { script.language = obj.language; }
 
             priv.logScript(obj);
 
@@ -207,7 +202,7 @@ var crapLoader = (function() {
             // This arises when a base node is used (#2709 and #4378).
             head.insertBefore( script, head.firstChild );
             setTimeout(function() {
-                if(!script.loaded) throw new Error("SCRIPT NOT LOADED: " + script.src);
+                if(!script.loaded) { throw new Error("SCRIPT NOT LOADED: " + script.src); }
             }, obj.timeout);
         },
 
@@ -249,18 +244,18 @@ var crapLoader = (function() {
             }
 
             for(i=0, l=tmp.length; i<l; i=i+1) {
-                if(tmp[i]!=="") result.push(tmp[i]);
+                if(tmp[i]!=="") { result.push(tmp[i]); }
             }
 
             return result;
         },
 
         stripNoScript: function(html) {
-            return html.replace(/<noscript>.*?<\/noscript>/ig, "");
+            return html.replace(/<noscript>[\s\S]*?<\/noscript>/ig, "");
         },
 
         trim: function(str) {
-            if(!str) return str;
+            if(!str) { return str; }
             return str.replace(/^\s*|\s*$/gi, "");
         },
 
@@ -286,9 +281,14 @@ var crapLoader = (function() {
                 }
             } else {
                 var container = priv.getCachedElById(obj.domId);
-                if(!container) throw new Error("crapLoader: Unable to inject html. Element with id '" + obj.domId + "' does not exist");
+                if(!container) {
+                    throw new Error("crapLoader: Unable to inject html. Element with id '" + obj.domId + "' does not exist");
+                }
+                
                 html = this.trim(html); // newline before <object> cause weird effects in IE
-                if(html) container.innerHTML += html;
+                if(html) {
+                    container.innerHTML += html;
+                }
                 priv.checkWriteBuffer(obj);
             }
         },
@@ -302,7 +302,7 @@ var crapLoader = (function() {
 
     publ = {
         hijack: function(options) {
-            if(isHijacked) return;
+            if(isHijacked) { return; }
             isHijacked = true;
             priv.extend(globalOptions, options);
             if(globalOptions.parallel && !support.scriptOnloadTriggeredAccurately) {
@@ -315,7 +315,7 @@ var crapLoader = (function() {
         },
 
         release: function() {
-            if(!isHijacked) return;
+            if(!isHijacked) { return; }
             isHijacked = false;
             document.write = this.orgWrite;
             document.writeln = this.orgWriteLn;
@@ -350,7 +350,9 @@ var crapLoader = (function() {
             } else {
                 queue.push(obj);
                 setTimeout(function() {
-                    if(loading === 0) priv.checkQueue();
+                    if(loading === 0) {
+                        priv.checkQueue();
+                    }
                 }, 1);
             }
         },
