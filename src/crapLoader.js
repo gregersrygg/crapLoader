@@ -136,7 +136,23 @@ var crapLoader = (function() {
                 }
             }
 
+            function searchForAlreadyReturnedEl(domId) {
+                var i, l, returnedEl;
+                for(i=0,l=returnedElements.length; i<l; i++) {
+                    returnedEl = returnedElements[i];
+                    if(returnedEl.id && returnedEl.id === domId) { return returnedEl; }
+                }
+            }
+
             if(el) { return el; }
+
+            if (returnedElements.length) {
+                found = searchForAlreadyReturnedEl(domId);
+                if (found) {
+                    return found;
+                }
+            }
+
             if(inputBuffer.length) {
                 html = inputBuffer.join("");
                 frag = document.createDocumentFragment();
