@@ -124,5 +124,24 @@ buster.testCase("crapLoader", {
         };
             
         crapLoader.runFunc(func, output.id);
+    },
+    
+    "should be possible to document.write an inline script (Issue #6)": function (done) {
+        var output = this.output;
+        var func = function () {
+            document.write('<sc'+'ript type=\"text\/javasc'+'ript\">');
+            document.write('document.write(\'<div id=\"myid\"><\/div>\');');
+            document.write('var mydiv = document.getElementById(\"myid\");');
+            document.write('mydiv.innerHTML = "success";');
+            document.write('<\/sc'+'ript>');
+        };
+        
+        crapLoader.runFunc(func, output.id, {
+            success: function () {
+                console.log("OUTPUT: " + output.innerHTML);
+                assert.equals(output.innerHTML, "<div id=\"myid\">success<\/div>");
+                done();
+            }
+        });
     }
 });

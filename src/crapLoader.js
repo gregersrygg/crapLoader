@@ -72,7 +72,6 @@ var crapLoader = (function() {
                 var depth = obj.depth;
                 while(depth--) { objExtra += "    "; }
             }
-            console.log("crapLoader " + objExtra + message);
         },
 
         extend: function(t, s) {
@@ -101,7 +100,6 @@ var crapLoader = (function() {
             inputBuffer = [];
 
             htmlPartArray = priv.separateScriptsFromHtml( outputFromScript );
-
 
             if(!writeBuffer[domId]) {
                 writeBuffer[domId] = htmlPartArray;
@@ -293,7 +291,7 @@ var crapLoader = (function() {
                         this.logScript( obj, code, lang);
                         this.globalEval( code, lang);
                     }
-                    priv.checkWriteBuffer(obj);
+                    priv.flush(obj);
                 }
             } else {
                 var container = priv.getCachedElById(obj.domId);
