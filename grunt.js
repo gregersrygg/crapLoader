@@ -49,6 +49,7 @@ module.exports = function( grunt ) {
 				bitwise: true,
 				boss: true,
 				curly: true,
+				evil: true,
 				eqeqeq: true,
 				newcap: true,
 				noarg: true,
