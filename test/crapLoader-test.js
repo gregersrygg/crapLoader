@@ -130,6 +130,19 @@ buster.testCase("crapLoader", {
         });
     },
     
+    "func overrides src": function (done) {
+        crapLoader.handle({
+            src: "data:text/javascript;plain,document.write(\"src\")",
+            func: function () {
+                document.write("func");
+            },
+            success: function () {
+                assert.equals(this.innerHTML, "func");
+                done();
+            }
+        });
+    },
+    
     "document.getElementById on an element just written should return the element": function (done) {
         var output = this.output;
         var func = function () {
