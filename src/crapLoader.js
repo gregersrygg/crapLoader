@@ -23,7 +23,7 @@ var crapLoader = (function() {
             func: undefined,
             src: undefined,
             timeout: 3000
-        },priv,publ,
+        },publ,
         head = document.getElementsByTagName("head")[0] || document.documentElement,
         support = {
             scriptOnloadTriggeredAccurately: false,
@@ -31,302 +31,299 @@ var crapLoader = (function() {
         };
 
 
+    
+    function checkQueue () {
+        if(queue.length) {
+            loadScript( queue.shift() );
+        } else if(loading === 0 && globalOptions.autoRelease) {
+            debug("Queue is empty. Auto-releasing.");
+            publ.release();
+        }
+    }
 
-    priv = {
-        checkQueue: function() {
-            if(queue.length) {
-                priv.loadScript( queue.shift() );
-            } else if(loading === 0 && globalOptions.autoRelease) {
-                this.debug("Queue is empty. Auto-releasing.");
-                publ.release();
+    function checkWriteBuffer (obj) {
+        var buffer = writeBuffer[obj.domId],
+            returnedEl;
+
+        if(buffer && buffer.length) {
+            writeHtml( buffer.shift(), obj );
+
+        } else {
+            while (returnedElements.length > 0) {
+                returnedEl = returnedElements.pop();
+                var id = returnedEl.id;
+                var elInDoc = getElementById(id);
+                if (!elInDoc) { continue; }
+                var parent = elInDoc.parentNode;
+                elInDoc.id = id + "__tmp";
+                parent.insertBefore(returnedEl, elInDoc);
+                parent.removeChild(elInDoc);
             }
-        },
+            finished(obj);
+        }
+    }
 
-        checkWriteBuffer: function(obj) {
-            var buffer = writeBuffer[obj.domId],
-                returnedEl;
+    function debug (message, obj) {
+        if(!globalOptions.debug || !window.console) { return; }
+        var objExtra = "";
+        if(obj) {
+            objExtra = "#"+obj.domId+" ";
+            var depth = obj.depth;
+            while(depth--) { objExtra += "    "; }
+        }
+        console.log("crapLoader " + objExtra + message);
+    }
 
-            if(buffer && buffer.length) {
-                priv.writeHtml( buffer.shift(), obj );
+    function extend (t, s) {
+        var k;
+        if(!s) { return t; }
+        for(k in s) {
+            t[k] = s[k];
+        }
+        return t;
+    }
 
-            } else {
-                while (returnedElements.length > 0) {
-                    returnedEl = returnedElements.pop();
-                    var id = returnedEl.id;
-                    var elInDoc = priv.getElementById(id);
-                    if (!elInDoc) { continue; }
-                    var parent = elInDoc.parentNode;
-                    elInDoc.id = id + "__tmp";
-                    parent.insertBefore(returnedEl, elInDoc);
-                    parent.removeChild(elInDoc);
-                }
-                priv.finished(obj);
-            }
-        },
-
-        debug: function(message, obj) {
-            if(!globalOptions.debug || !window.console) { return; }
-            var objExtra = "";
-            if(obj) {
-                objExtra = "#"+obj.domId+" ";
-                var depth = obj.depth;
-                while(depth--) { objExtra += "    "; }
-            }
-            console.log("crapLoader " + objExtra + message);
-        },
-
-        extend: function(t, s) {
-            var k;
-            if(!s) { return t; }
-            for(k in s) {
-                t[k] = s[k];
-            }
-            return t;
-        },
-
-        finished: function(obj) {
-            if(obj.success && typeof obj.success === "function") {
-                obj.success.call( document.getElementById(obj.domId) );
-            }
-
-            priv.checkQueue();
-        },
-
-        flush: function(obj) {
-            var domId = obj.domId,
-               outputFromScript,
-               htmlPartArray;
-
-            outputFromScript = this.stripNoScript( inputBuffer.join("") );
-            inputBuffer = [];
-
-            htmlPartArray = priv.separateScriptsFromHtml( outputFromScript );
-
-            if(!writeBuffer[domId]) {
-                writeBuffer[domId] = htmlPartArray;
-            } else {
-                Array.prototype.unshift.apply(writeBuffer[domId], htmlPartArray);
-            }
-            priv.checkWriteBuffer(obj);
-        },
-
-        getCachedElById: function(domId) {
-            return elementCache[domId] || (elementCache[domId] = document.getElementById(domId));
-        },
-
-        getElementById: function(domId) {
-            return ( publ.orgGetElementById.call ?
-                publ.orgGetElementById.call(document, domId) :
-                publ.orgGetElementById(domId) );
-        },
-
-        getElementByIdReplacement: function(domId) {
-            var el = priv.getElementById(domId),
-                html, frag, div, found;
-
-            function traverseForElById(domId, el) {
-                var children = el.children, i, l, child;
-                if(children && children.length) {
-                    for(i=0,l=children.length; i<l; i++) {
-                        child = children[i];
-                        if(child.id && child.id === domId) { return child; }
-                        if(child.children && child.children.length) { return traverseForElById(child); }
-                    }
-                }
-            }
-
-            function searchForAlreadyReturnedEl(domId) {
-                var i, l, returnedEl;
-                for(i=0,l=returnedElements.length; i<l; i++) {
-                    returnedEl = returnedElements[i];
-                    if(returnedEl.id === domId) { return returnedEl; }
-                }
-            }
-
-            if(el) { return el; }
-
-            if (returnedElements.length) {
-                found = searchForAlreadyReturnedEl(domId);
-                if (found) {
-                    return found;
-                }
-            }
-
-            if(inputBuffer.length) {
-                html = inputBuffer.join("");
-                frag = document.createDocumentFragment();
-                div = document.createElement("div");
-                div.innerHTML = html;
-                frag.appendChild(div);
-                found = traverseForElById(domId, div);
-                if (found) {
-                    returnedElements.push(found);
-                }
-                return found;
-            }
-        },
-
-        globalEval: (function() {
-            return (window.execScript ? function(code, language) {
-                window.execScript(code, language || "JavaScript");
-            } : function(code, language) {
-                if(language && !/^javascript/i.test(language)) { return; }
-                window.eval.call(window, code);
-            });
-        }()),
-
-        isScript: function(html) {
-            return html.toLowerCase().indexOf("<script") === 0;
-        },
-
-        runFunc: function(obj) {
-            obj.func();
-            obj.depth++;
-            this.flush(obj);
-        },
-
-        loadScript: function(obj) {
-            loading++;
-            // async loading code from jQuery
-            var script = document.createElement("script");
-            if(obj.type) { script.type = obj.type; }
-            if(obj.charset) { script.charset = obj.charset; }
-            if(obj.language) { script.language = obj.language; }
-
-            priv.logScript(obj);
-
-            var done = false;
-            // Attach handlers for all browsers
-            script.onload = script.onreadystatechange = function() {
-                loading--;
-                script.loaded = true;
-                if ( !done && (!this.readyState ||
-                        this.readyState === "loaded" || this.readyState === "complete") ) {
-                    done = true;
-                    script.onload = script.onreadystatechange = null;
-                    priv.debug("onload " + obj.src, obj);
-                    priv.flush(obj);
-                }
-            };
-
-            script.loaded = false;
-            script.src = obj.src;
-            obj.depth++;
-
-            // Use insertBefore instead of appendChild  to circumvent an IE6 bug.
-            // This arises when a base node is used (#2709 and #4378).
-            head.insertBefore( script, head.firstChild );
-            setTimeout(function() {
-                if(!script.loaded) { throw new Error("SCRIPT NOT LOADED: " + script.src); }
-            }, obj.timeout);
-        },
-
-        logScript: function(obj, code, lang) {
-            this.debug((code ?
-                "Inline " + lang + ": " + code.replace("\n", " ").substr(0, 30) + "..." :
-                "Inject " + obj.src), obj);
-        },
-
-        separateScriptsFromHtml: function(htmlStr) {
-            return priv.split(htmlStr, splitScriptsRegex);
-        },
-
-        split: function(str, regexp) {
-            var match, prevIndex=0, tmp, result = [], i, l;
-
-            if(support.splitWithCapturingParentheses) {
-                tmp = str.split(regexp);
-            } else {
-                // Cross browser split technique from Steven Levithan
-                // http://blog.stevenlevithan.com/archives/cross-browser-split
-                tmp = [];
-                while(match = regexp.exec(str)) {
-                    if(match.index > prevIndex) {
-                        result.push(str.slice(prevIndex, match.index));
-                    }
-
-                    if(match.length > 1 && match.index < str.length) {
-                        Array.prototype.push.apply(tmp, match.slice(1));
-                    }
-
-                    prevIndex = regexp.lastIndex;
-                }
-
-                if(prevIndex < str.length) {
-                    tmp.push(str.slice(prevIndex));
-                }
-
-            }
-
-            for(i=0, l=tmp.length; i<l; i=i+1) {
-                if(tmp[i]!=="") { result.push(tmp[i]); }
-            }
-
-            return result;
-        },
-
-        stripNoScript: function(html) {
-            return html.replace(/<noscript>[\s\S]*?<\/noscript>/ig, "");
-        },
-
-        trim: function(str) {
-            if(!str) { return str; }
-            return str.replace(/^\s*|\s*$/gi, "");
-        },
-
-        writeHtml: function(html, obj) {
-            if( this.isScript(html) ) {
-                var dummy = document.createElement("div");
-                dummy.innerHTML = "dummy<div>" + html + "</div>"; // trick for IE
-                var script = dummy.children[0].children[0];
-                var lang = script.getAttribute("language") || "javascript";
-                if(script.src) {
-                    obj.src = script.src;
-                    obj.charset = script.charset;
-                    obj.language = lang;
-                    obj.type = script.type;
-                    priv.loadScript(obj);
-                } else {
-                    var code = this.trim( script.text );
-                    if(code) {
-                        this.logScript( obj, code, lang);
-                        this.globalEval( code, lang);
-                    }
-                    priv.flush(obj);
-                }
-            } else {
-                var container = priv.getCachedElById(obj.domId);
-                if(!container) {
-                    throw new Error("crapLoader: Unable to inject html. Element with id '" + obj.domId + "' does not exist");
-                }
-                
-                html = this.trim(html); // newline before <object> cause weird effects in IE
-                if(html) {
-                    container.innerHTML += html;
-                }
-                priv.checkWriteBuffer(obj);
-            }
-        },
-
-        writeReplacement: function(str) {
-            inputBuffer.push(str);
-            priv.debug("write: " + str);
+    function finished (obj) {
+        if(obj.success && typeof obj.success === "function") {
+            obj.success.call( document.getElementById(obj.domId) );
         }
 
-    };
+        checkQueue();
+    }
+
+    function flush (obj) {
+        var domId = obj.domId,
+           outputFromScript,
+           htmlPartArray;
+
+        outputFromScript = stripNoScript( inputBuffer.join("") );
+        inputBuffer = [];
+
+        htmlPartArray = separateScriptsFromHtml( outputFromScript );
+
+        if(!writeBuffer[domId]) {
+            writeBuffer[domId] = htmlPartArray;
+        } else {
+            Array.prototype.unshift.apply(writeBuffer[domId], htmlPartArray);
+        }
+        checkWriteBuffer(obj);
+    }
+
+    function getCachedElById (domId) {
+        return elementCache[domId] || (elementCache[domId] = document.getElementById(domId));
+    }
+
+    function getElementById (domId) {
+        return ( publ.orgGetElementById.call ?
+            publ.orgGetElementById.call(document, domId) :
+            publ.orgGetElementById(domId) );
+    }
+
+    function getElementByIdReplacement (domId) {
+        var el = getElementById(domId),
+            html, frag, div, found;
+
+        function traverseForElById(domId, el) {
+            var children = el.children, i, l, child;
+            if(children && children.length) {
+                for(i=0,l=children.length; i<l; i++) {
+                    child = children[i];
+                    if(child.id && child.id === domId) { return child; }
+                    if(child.children && child.children.length) { return traverseForElById(child); }
+                }
+            }
+        }
+
+        function searchForAlreadyReturnedEl(domId) {
+            var i, l, returnedEl;
+            for(i=0,l=returnedElements.length; i<l; i++) {
+                returnedEl = returnedElements[i];
+                if(returnedEl.id === domId) { return returnedEl; }
+            }
+        }
+
+        if(el) { return el; }
+
+        if (returnedElements.length) {
+            found = searchForAlreadyReturnedEl(domId);
+            if (found) {
+                return found;
+            }
+        }
+
+        if(inputBuffer.length) {
+            html = inputBuffer.join("");
+            frag = document.createDocumentFragment();
+            div = document.createElement("div");
+            div.innerHTML = html;
+            frag.appendChild(div);
+            found = traverseForElById(domId, div);
+            if (found) {
+                returnedElements.push(found);
+            }
+            return found;
+        }
+    }
+
+    var globalEval = (function () {
+        return (window.execScript ? function(code, language) {
+            window.execScript(code, language || "JavaScript");
+        } : function(code, language) {
+            if(language && !/^javascript/i.test(language)) { return; }
+            window.eval.call(window, code);
+        });
+    }());
+
+    function isScript (html) {
+        return html.toLowerCase().indexOf("<script") === 0;
+    }
+
+    function runFunc (obj) {
+        obj.func();
+        obj.depth++;
+        flush(obj);
+    }
+
+    function loadScript (obj) {
+        loading++;
+        // async loading code from jQuery
+        var script = document.createElement("script");
+        if(obj.type) { script.type = obj.type; }
+        if(obj.charset) { script.charset = obj.charset; }
+        if(obj.language) { script.language = obj.language; }
+
+        logScript(obj);
+
+        var done = false;
+        // Attach handlers for all browsers
+        script.onload = script.onreadystatechange = function() {
+            loading--;
+            script.loaded = true;
+            if ( !done && (!this.readyState ||
+                    this.readyState === "loaded" || this.readyState === "complete") ) {
+                done = true;
+                script.onload = script.onreadystatechange = null;
+                debug("onload " + obj.src, obj);
+                flush(obj);
+            }
+        };
+
+        script.loaded = false;
+        script.src = obj.src;
+        obj.depth++;
+
+        // Use insertBefore instead of appendChild  to circumvent an IE6 bug.
+        // This arises when a base node is used (#2709 and #4378).
+        head.insertBefore( script, head.firstChild );
+        setTimeout(function() {
+            if(!script.loaded) { throw new Error("SCRIPT NOT LOADED: " + script.src); }
+        }, obj.timeout);
+    }
+
+    function logScript (obj, code, lang) {
+        debug((code ?
+            "Inline " + lang + ": " + code.replace("\n", " ").substr(0, 30) + "..." :
+            "Inject " + obj.src), obj);
+    }
+
+    function separateScriptsFromHtml (htmlStr) {
+        return split(htmlStr, splitScriptsRegex);
+    }
+
+    function split (str, regexp) {
+        var match, prevIndex=0, tmp, result = [], i, l;
+
+        if(support.splitWithCapturingParentheses) {
+            tmp = str.split(regexp);
+        } else {
+            // Cross browser split technique from Steven Levithan
+            // http://blog.stevenlevithan.com/archives/cross-browser-split
+            tmp = [];
+            while(match = regexp.exec(str)) {
+                if(match.index > prevIndex) {
+                    result.push(str.slice(prevIndex, match.index));
+                }
+
+                if(match.length > 1 && match.index < str.length) {
+                    Array.prototype.push.apply(tmp, match.slice(1));
+                }
+
+                prevIndex = regexp.lastIndex;
+            }
+
+            if(prevIndex < str.length) {
+                tmp.push(str.slice(prevIndex));
+            }
+
+        }
+
+        for(i=0, l=tmp.length; i<l; i=i+1) {
+            if(tmp[i]!=="") { result.push(tmp[i]); }
+        }
+
+        return result;
+    }
+
+    function stripNoScript (html) {
+        return html.replace(/<noscript>[\s\S]*?<\/noscript>/ig, "");
+    }
+
+    function trim (str) {
+        if(!str) { return str; }
+        return str.replace(/^\s*|\s*$/gi, "");
+    }
+
+    function writeHtml (html, obj) {
+        if( isScript(html) ) {
+            var dummy = document.createElement("div");
+            dummy.innerHTML = "dummy<div>" + html + "</div>"; // trick for IE
+            var script = dummy.children[0].children[0];
+            var lang = script.getAttribute("language") || "javascript";
+            if(script.src) {
+                obj.src = script.src;
+                obj.charset = script.charset;
+                obj.language = lang;
+                obj.type = script.type;
+                loadScript(obj);
+            } else {
+                var code = trim( script.text );
+                if(code) {
+                    logScript( obj, code, lang);
+                    globalEval( code, lang);
+                }
+                flush(obj);
+            }
+        } else {
+            var container = getCachedElById(obj.domId);
+            if(!container) {
+                throw new Error("crapLoader: Unable to inject html. Element with id '" + obj.domId + "' does not exist");
+            }
+            
+            html = trim(html); // newline before <object> cause weird effects in IE
+            if(html) {
+                container.innerHTML += html;
+            }
+            checkWriteBuffer(obj);
+        }
+    }
+
+    function writeReplacement (str) {
+        inputBuffer.push(str);
+        debug("write: " + str);
+    }
 
     publ = {
         hijack: function(options) {
             if(isHijacked) { return; }
             isHijacked = true;
-            priv.extend(globalOptions, options);
+            extend(globalOptions, options);
             if(globalOptions.parallel && !support.scriptOnloadTriggeredAccurately) {
                 globalOptions.parallel = false;
-                priv.debug("Browsers onload is not reliable. Disabling parallel loading.");
+                debug("Browsers onload is not reliable. Disabling parallel loading.");
             }
 
-            document.write = document.writeln = priv.writeReplacement;
-            document.getElementById = priv.getElementByIdReplacement;
+            document.write = document.writeln = writeReplacement;
+            document.getElementById = getElementByIdReplacement;
         },
 
         release: function() {
@@ -340,11 +337,11 @@ var crapLoader = (function() {
 
         handle: function(options) {
             if(!isHijacked) {
-                priv.debug("Not in hijacked mode. Auto-hijacking.");
+                debug("Not in hijacked mode. Auto-hijacking.");
                 this.hijack();
             }
-            var defaultOptsCopy = priv.extend({}, defaultOptions);
-            var obj = priv.extend(defaultOptsCopy, options);
+            var defaultOptsCopy = extend({}, defaultOptions);
+            var obj = extend(defaultOptsCopy, options);
             obj.depth = 0;
 
             if (!obj.domId) {
@@ -355,19 +352,19 @@ var crapLoader = (function() {
             }
 
             if (options.func) {
-                priv.runFunc(obj);
+                runFunc(obj);
                 return;
             }
 
             if(globalOptions.parallel) {
                 setTimeout(function() {
-                    priv.loadScript(obj);
+                    loadScript(obj);
                 }, 1);
             } else {
                 queue.push(obj);
                 setTimeout(function() {
                     if(loading === 0) {
-                        priv.checkQueue();
+                        checkQueue();
                     }
                 }, 1);
             }
@@ -378,7 +375,7 @@ var crapLoader = (function() {
                 options = domId;
                 domId = undefined;
             }
-            this.handle(priv.extend({
+            this.handle(extend({
                 src:    src,
                 domId:  domId
             }, options));
@@ -389,10 +386,10 @@ var crapLoader = (function() {
                 options = domId;
                 domId = undefined;
             }
-            this.handle(priv.extend({
+            this.handle( extend({
                 domId:  domId,
                 func:     func
-            }, options));
+            }, options) );
         },
 
         orgGetElementById   : document.getElementById,
