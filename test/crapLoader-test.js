@@ -124,6 +124,20 @@ buster.testCase("crapLoader", {
         crapLoader.runFunc(func, output.id);
     },
     
+    "should be possible to document.write an external script": function (done) {
+        var output = this.output;
+        var func = function () {
+            document.write("<script src=\"data:text/javascript;plain,document.write('external script')\"></script>");
+        };
+        
+        crapLoader.runFunc(func, output.id, {
+            success: function () {
+                assert.equals(output.innerHTML, "external script");
+                done();
+            }
+        });
+    },
+    
     "should be possible to document.write an inline script (Issue #6)": function (done) {
         var output = this.output;
         var func = function () {
