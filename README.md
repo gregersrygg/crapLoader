@@ -103,7 +103,8 @@ crapLoader.handle
 -----------------
 This is what *loadScript* and *runFunc* use internally. It only have one parameter with an option litteral. Here are all the options and default values.
 
-```crapLoader.handle({
+```
+crapLoader.handle({
     func:       undefined,  // Function that results in document.write. Overrides src options.
     src:        undefined,  // URL of the external script to load. Won't load if func is specified.
     charset:    undefined,  // Script charset for injected scripts.
