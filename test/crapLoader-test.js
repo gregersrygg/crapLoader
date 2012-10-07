@@ -138,7 +138,6 @@ buster.testCase("crapLoader", {
         
         crapLoader.runFunc(func, output.id, {
             success: function () {
-                console.log("OUTPUT: " + output.innerHTML);
                 assert.equals(output.innerHTML, "<div id=\"myid\">success<\/div>");
                 done();
             }
