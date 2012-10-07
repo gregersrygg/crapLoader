@@ -55,6 +55,17 @@ Usually banners are included with `document.write("<script src='...'></script>")
 This will load the scripts in parallel and put the document.write-output into the corresponding div.
 
 
+Run local function
+---------------
+Sometimes you need to run code that doesn't directly get loaded from an external source, but may need to call functions from a third-party script. Those functions may do document.write. Using *runFunc* will apply the same logic on a function as loadScript does.
+
+```javascript
+crapLoader.runFunc(function() {
+    evilFunctionThatMayCallDocumentWrite();
+}, "my-dom-id");
+```
+
+
 Advanced usage
 --------------
 First you have to hijack document.write. It should only be called once even if you load multiple scripts. You can do it before or after page load, but it has to be before you load the scripts that use document.write. In simple mode crapLoader will automatically hijack the document.write and writeln method. If you want to hijack earlier or set global uptions, you must call hijack yourself.
@@ -86,17 +97,6 @@ Then you must use crapLoader to load each script and supply a container id for t
         charset: "iso-8859-1"
     });
 </script>
-```
-
-
-Run local function
----------------
-Sometimes you need to run code that doesn't directly get loaded from an external source, but may in turn call something evil. To protect against this you can run code that outputs document.write to a DOM element. This won't guarantee that the code executed can't access elsewhere but it will capture document.write and follow subsequent script loads.
-
-```javascript
-crapLoader.runFunc(function() {
-    evilFunctionThatMayCallDocumentWrite();
-}, "my-dom-id");
 ```
 
 
