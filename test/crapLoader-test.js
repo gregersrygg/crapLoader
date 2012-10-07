@@ -3,10 +3,11 @@ var OUTPUT_ID = "test-output";
 var assert = buster.assert,
     refute = buster.refute;
     
-function testFuncOutput(output, func, expected, done) {
-    crapLoader.runFunc(func, output.id, {
+function testFuncOutput(func, expected, done) {
+    crapLoader.handle({
+        func: func,
         success: function () {
-            assert.equals(output.innerHTML, expected);
+            assert.equals(this.innerHTML, expected);
             done();
         }
     });
@@ -61,6 +62,22 @@ buster.testCase("crapLoader", {
         });
     },
     
+    "runFunc without domId": function () {
+        var func = function () {};
+        var success = function() {};
+        var spy = this.spy(crapLoader, "handle");
+            
+        crapLoader.runFunc(func, {
+            success: success
+        });
+        
+        assert.calledWith(spy, {
+            domId: undefined,
+            func: func,
+            success: success
+        });
+    },
+    
     "loadScript method takes all arguments": function () {
         var output = this.output;
         var success = function() {};
@@ -73,6 +90,22 @@ buster.testCase("crapLoader", {
         
         assert.calledWith(spy, {
             domId: output.id,
+            src: src,
+            success: success
+        });
+    },
+    
+    "loadScript without domId": function () {
+        var success = function() {};
+        var src = "data:text/javascript;plain,void(0);";
+        var spy = this.spy(crapLoader, "handle");
+            
+        crapLoader.loadScript(src, {
+            success: success
+        });
+        
+        assert.calledWith(spy, {
+            domId: undefined,
             src: src,
             success: success
         });
@@ -117,14 +150,12 @@ buster.testCase("crapLoader", {
     },
     
     "script is injected when src specified": function (done) {
-        var output = this.output;
         var src = "data:text/javascript;plain,document.write('from src');";
         
         crapLoader.handle({
-            domId: output.id,
             src: src,
             success: function () {
-                assert.equals(output.innerHTML, "from src");
+                assert.equals(this.innerHTML, "from src");
                 done();
             }
         });
@@ -156,7 +187,7 @@ buster.testCase("crapLoader", {
     },
     
     "a modified element returned by document.getElementById should be reflected in the document": function (done) {
-        testFuncOutput(this.output, function () {
+        testFuncOutput(function () {
             document.write("<div id=\"get-element-by-id-test\"></div>");
             document.getElementById("get-element-by-id-test").innerHTML = "test";
         }, "<div id=\"get-element-by-id-test\">test</div>", done);
@@ -176,13 +207,13 @@ buster.testCase("crapLoader", {
     },
     
     "should be possible to document.write an external script": function (done) {
-        testFuncOutput(this.output, function () {
+        testFuncOutput(function () {
             document.write("<script src=\"data:text/javascript;plain,document.write('external script')\"></script>");
         }, "external script", done);
     },
     
     "should be possible to document.write an inline script (Issue #6)": function (done) {
-        testFuncOutput(this.output, function () {
+        testFuncOutput(function () {
             document.write('<sc'+'ript type=\"text\/javasc'+'ript\">');
             document.write('document.write(\'<div id=\"myid\"><\/div>\');');
             document.write('var mydiv = document.getElementById(\"myid\");');
@@ -192,8 +223,14 @@ buster.testCase("crapLoader", {
     },
     
     "script tag is split into multiple write calls": function (done) {
-        testFuncOutput(this.output, function () {
+        testFuncOutput(function () {
             document.write("<scr"); document.write("ipt>document.write('split ut script');</script>");
         }, "split ut script", done);
+    },
+    
+    "newlines before <object> should be stripped from output": function (done) {
+        testFuncOutput(function () {
+            document.write("\n\t <object></object>");
+        }, "<object></object>", done);
     }
 });
