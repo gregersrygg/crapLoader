@@ -78,6 +78,44 @@ buster.testCase("crapLoader", {
         });
     },
     
+    "hijacks document.write automatically on first call": function (done) {
+        var output = this.output;
+        crapLoader.handle({
+            domId: output.id,
+            func: function () {
+                assert.equals(document.write.toString().indexOf("native code"), -1);
+                done();
+            }
+        });
+    },
+    
+    "success callback is called with container as this": function (done) {
+        var output = this.output;
+        crapLoader.handle({
+            domId: output.id,
+            func: function () {},
+            success: function () {
+                assert.same(this, output);
+                done();
+            }
+        });
+    },
+    
+    "a container is generated and appended to body if no domId": function (done) {
+        var text = "auto generated container";
+        crapLoader.handle({
+            func: function() {
+                document.write(text);
+            },
+            success: function () {
+                assert.equals(this.innerHTML, text, "a container should have been generated and have the data written");
+                assert.equals(this.parentNode, document.body, "the container parent should be body");
+                refute.isNull(this.id, "the container should have an id");
+                done();
+            }
+        });
+    },
+    
     "script is injected when src specified": function (done) {
         var output = this.output;
         var src = "data:text/javascript;plain,document.write('from src');";
