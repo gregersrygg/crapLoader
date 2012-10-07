@@ -99,6 +99,19 @@ Then you must use crapLoader to load each script and supply a container id for t
 </script>
 ```
 
+crapLoader.handle
+-----------------
+This is what *loadScript* and *runFunc* use internally. It only have one parameter with an option litteral. Here are all the options and default values.
+
+```crapLoader.handle({
+    func:       undefined,  // Function that results in document.write. Overrides src options.
+    src:        undefined,  // URL of the external script to load. Won't load if func is specified.
+    charset:    undefined,  // Script charset for injected scripts.
+    success:    undefined,  // Callback function when the all scripts (recursively) for this banner is finished loading.
+    timeout:    3000        // Load timeout for the injected scripts.
+});
+```
+
 
 Stability
 ---------
