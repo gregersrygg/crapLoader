@@ -1,3 +1,4 @@
+/*globals buster,crapLoader*/
 var OUTPUT_ID = "test-output";
 var assert = buster.assert,
     refute = buster.refute;
@@ -53,9 +54,6 @@ buster.testCase("crapLoader", {
     
     "loadScript method takes all arguments": function () {
         var output = this.output;
-        var func = function () {
-            document.write("simple test");
-        };
         var success = function() {};
         var src = "foo";
         var spy = this.spy(crapLoader, "handle");

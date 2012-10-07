@@ -72,6 +72,7 @@ var crapLoader = (function() {
                 var depth = obj.depth;
                 while(depth--) { objExtra += "    "; }
             }
+            console.log("crapLoader " + objExtra + message);
         },
 
         extend: function(t, s) {
@@ -138,7 +139,7 @@ var crapLoader = (function() {
                 var i, l, returnedEl;
                 for(i=0,l=returnedElements.length; i<l; i++) {
                     returnedEl = returnedElements[i];
-                    if(returnedEl.id && returnedEl.id === domId) { return returnedEl; }
+                    if(returnedEl.id === domId) { return returnedEl; }
                 }
             }
 
