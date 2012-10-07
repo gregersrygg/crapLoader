@@ -2,6 +2,15 @@
 var OUTPUT_ID = "test-output";
 var assert = buster.assert,
     refute = buster.refute;
+    
+function testFuncOutput(output, func, expected, done) {
+    crapLoader.runFunc(func, output.id, {
+        success: function () {
+            assert.equals(output.innerHTML, expected);
+            done();
+        }
+    });
+}
 
 buster.testCase("crapLoader", {
     
@@ -96,19 +105,10 @@ buster.testCase("crapLoader", {
     },
     
     "a modified element returned by document.getElementById should be reflected in the document": function (done) {
-        var output = this.output;
-        var func = function () {
+        testFuncOutput(this.output, function () {
             document.write("<div id=\"get-element-by-id-test\"></div>");
             document.getElementById("get-element-by-id-test").innerHTML = "test";
-        };
-        var success = function() {
-            assert.equals(output.innerHTML, "<div id=\"get-element-by-id-test\">test</div>");
-            done();
-        };
-            
-        crapLoader.runFunc(func, output.id, {
-            success: success
-        });
+        }, "<div id=\"get-element-by-id-test\">test</div>", done);
     },
     
     "document.getElementById on an element twice should get the same instance of element": function (done) {
@@ -125,34 +125,24 @@ buster.testCase("crapLoader", {
     },
     
     "should be possible to document.write an external script": function (done) {
-        var output = this.output;
-        var func = function () {
+        testFuncOutput(this.output, function () {
             document.write("<script src=\"data:text/javascript;plain,document.write('external script')\"></script>");
-        };
-        
-        crapLoader.runFunc(func, output.id, {
-            success: function () {
-                assert.equals(output.innerHTML, "external script");
-                done();
-            }
-        });
+        }, "external script", done);
     },
     
     "should be possible to document.write an inline script (Issue #6)": function (done) {
-        var output = this.output;
-        var func = function () {
+        testFuncOutput(this.output, function () {
             document.write('<sc'+'ript type=\"text\/javasc'+'ript\">');
             document.write('document.write(\'<div id=\"myid\"><\/div>\');');
             document.write('var mydiv = document.getElementById(\"myid\");');
             document.write('mydiv.innerHTML = "success";');
             document.write('<\/sc'+'ript>');
-        };
-        
-        crapLoader.runFunc(func, output.id, {
-            success: function () {
-                assert.equals(output.innerHTML, "<div id=\"myid\">success<\/div>");
-                done();
-            }
-        });
+        }, "<div id=\"myid\">success<\/div>", done);
+    },
+    
+    "script tag is split into multiple write calls": function (done) {
+        testFuncOutput(this.output, function () {
+            document.write("<scr"); document.write("ipt>document.write('split ut script');</script>");
+        }, "split ut script", done);
     }
 });
