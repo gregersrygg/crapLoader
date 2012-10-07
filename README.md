@@ -105,7 +105,7 @@ Stability
 crapLoader can handle more than any other open-source document.write hack that
 I've found, but I'm sure there are plenty of edge-cases it does not handle
 (yet). If you find something crapLoader can't handle please open a new issue
-with a *reproducible standalone example*.
+with a *unit test* or a *reproducible standalone example*.
 
 crapLoader has been used in production for one of Norways most used websites
 since June 2011.
