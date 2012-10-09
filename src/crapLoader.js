@@ -129,7 +129,10 @@ var crapLoader = (function() {
                 for(i=0,l=children.length; i<l; i++) {
                     child = children[i];
                     if(child.id && child.id === domId) { return child; }
-                    if(child.children && child.children.length) { return traverseForElById(child); }
+                    if(child.children && child.children.length) {
+                        var tmp = traverseForElById(domId, child);
+                        if (tmp) return tmp;
+                    }
                 }
             }
         }
