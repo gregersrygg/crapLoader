@@ -206,6 +206,13 @@ buster.testCase("crapLoader", {
         crapLoader.runFunc(func, output.id);
     },
     
+    "document.getElementById on an element after an element with children (Issue #9)": function (done) {
+        testFuncOutput(function () {
+            document.write("<div><span></span></div><div id=\"myDIV\"></div>");
+            document.getElementById('myDIV').innerHTML = 'Works';
+        }, "<div><span></span></div><div id=\"myDIV\">Works</div>", done);
+    },
+    
     "should be possible to document.write an external script": function (done) {
         testFuncOutput(function () {
             document.write("<script src=\"data:text/javascript;plain,document.write('external script')\"></script>");
