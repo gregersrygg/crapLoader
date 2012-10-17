@@ -326,6 +326,7 @@ var crapLoader = (function() {
             }
 
             document.write = document.writeln = writeReplacement;
+            document.open = document.close = function() {};
             document.getElementById = getElementByIdReplacement;
         },
 
@@ -334,6 +335,8 @@ var crapLoader = (function() {
             isHijacked = false;
             document.write = this.orgWrite;
             document.writeln = this.orgWriteLn;
+            document.open = this.orgOpen;
+            document.close = this.orgClose;
             document.getElementById = this.orgGetElementById;
             elementCache = {};
         },
@@ -398,6 +401,8 @@ var crapLoader = (function() {
         orgGetElementById   : document.getElementById,
         orgWrite            : document.write,
         orgWriteLn          : document.writeln,
+        orgOpen             : document.open,
+        orgClose            : document.close,
         _olt                : 1,
         _oltCallback        : function() {
             support.scriptOnloadTriggeredAccurately = (publ._olt===2);
