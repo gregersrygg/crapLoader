@@ -315,6 +315,17 @@ var crapLoader = (function() {
         debug("write: " + str);
     }
 
+    function openReplacement () {
+        // document.open() just returns the document when called from a blocking script:
+        // http://www.whatwg.org/specs/web-apps/current-work/#dom-document-open
+        return document;
+    }
+
+    function closeReplacement () {
+        // document.close() does nothing when called from a blocking script:
+        // http://www.whatwg.org/specs/web-apps/current-work/#dom-document-close
+    }
+
     publ = {
         hijack: function(options) {
             if(isHijacked) { return; }
@@ -326,7 +337,8 @@ var crapLoader = (function() {
             }
 
             document.write = document.writeln = writeReplacement;
-            document.open = document.close = function() {};
+            document.open = openReplacement;
+            document.open = closeReplacement;
             document.getElementById = getElementByIdReplacement;
         },
 
