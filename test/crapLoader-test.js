@@ -239,5 +239,13 @@ buster.testCase("crapLoader", {
         testFuncOutput(function () {
             document.write("\n\t <object></object>");
         }, "<object></object>", done);
+    },
+
+    "ignore document.open() and document.close() (Issue #10)": function (done) {
+        testFuncOutput(function () {
+            document.open();
+            document.write('Works');
+            document.close();
+        }, "Works", done);
     }
 });
