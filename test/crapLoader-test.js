@@ -243,9 +243,11 @@ buster.testCase("crapLoader", {
 
     "ignore document.open() and document.close() (Issue #10)": function (done) {
         testFuncOutput(function () {
+            document.write("Before ");
             document.open();
-            document.write('Works');
+            document.write("Works");
             document.close();
-        }, "Works", done);
+            document.write(" After");
+        }, "Before Works After", done);
     }
 });
