@@ -244,7 +244,8 @@ buster.testCase("crapLoader", {
     "ignore document.open() and document.close() (Issue #10)": function (done) {
         testFuncOutput(function () {
             document.write("Before ");
-            document.open();
+            var doc = document.open();
+            assert.equals(document, doc);
             document.write("Works");
             document.close();
             document.write(" After");
