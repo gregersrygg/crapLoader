@@ -338,7 +338,7 @@ var crapLoader = (function() {
 
             document.write = document.writeln = writeReplacement;
             document.open = openReplacement;
-            document.open = closeReplacement;
+            document.close = closeReplacement;
             document.getElementById = getElementByIdReplacement;
         },
 
