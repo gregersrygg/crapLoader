@@ -250,5 +250,11 @@ buster.testCase("crapLoader", {
             document.close();
             document.write(" After");
         }, "Before Works After", done);
+    },
+    
+    "Scripts should execute no matter what depth in the DOM-tree": function (done) {
+      testFuncOutput(function () {
+        document.write("<div><scr"+"ipt>document.write(\"inner\")</scr"+"ipt><span>HTML</span><"+"/div>");
+      }, "<div>inner<span>HTML</span></div>", done);
     }
 });
